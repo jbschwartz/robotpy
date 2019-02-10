@@ -40,7 +40,7 @@ class Dual:
       return self.r == other.r and self.d == other.d
 
   def __str__(self):
-    return str(self.r) + ' + ' + str(self.d) + u"\u03B5"
+    return f'{self.r} + {self.d}' + u"\u03B5"
 
   def conjugate(self):
     '''
