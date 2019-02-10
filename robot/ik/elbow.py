@@ -1,6 +1,6 @@
 import math
 
-from .. import constant, utils
+from .. import utils
 
 def solveElbow(r, s, upperArmLength, foreArmLength):
   '''
