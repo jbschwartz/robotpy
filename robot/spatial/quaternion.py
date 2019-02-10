@@ -61,8 +61,8 @@ class Quaternion:
     self.y = -self.y
     self.z = -self.z
 
-  def norm(a):
-    return math.sqrt(a.r**2 + a.x**2 + a.y**2 + a.z**2)
+  def norm(self):
+    return math.sqrt(self.r**2 + self.x**2 + self.y**2 + self.z**2)
 
   def normalize(self):
     '''
