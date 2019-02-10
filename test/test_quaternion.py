@@ -59,5 +59,10 @@ class TestQuaternion(unittest.TestCase):
   def test_normalize(self):
     norm = self.q.norm()
     expected = self.q / norm
-    self.assertAlmostEqual(self.q.normalize(), expected)
-    self.assertAlmostEqual(self.q.norm, 1)
+    self.q.normalize()
+
+    self.assertAlmostEqual(self.q.r, expected.r)
+    self.assertAlmostEqual(self.q.x, expected.x)
+    self.assertAlmostEqual(self.q.y, expected.y)
+    self.assertAlmostEqual(self.q.z, expected.z)
+    self.assertAlmostEqual(self.q.norm(), 1)

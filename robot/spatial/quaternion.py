@@ -69,7 +69,7 @@ class Quaternion:
     Normalizes the quaternion instance (i.e. norm of one)
     '''
     norm = self.norm()
+    self.r = self.r / norm
     self.x = self.x / norm
     self.y = self.y / norm
     self.z = self.z / norm
-    pass
