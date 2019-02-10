@@ -73,3 +73,6 @@ class Quaternion:
     self.x = self.x / norm
     self.y = self.y / norm
     self.z = self.z / norm
+
+def conjugate(q):
+  return Quaternion(q.r, -q.x, -q.y, -q.z)
