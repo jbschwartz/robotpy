@@ -5,11 +5,17 @@ class Quaternion:
   Class for representing quaternions of the form r + xi + yj + dk
   '''
 
-  def __init__(self, r = 1, x = 0, y = 0, z = 0):
+  def __init__(self, r = 1, x = 0, y = 0, z = 0, **kwargs):
     self.r = r
-    self.x = x
-    self.y = y
-    self.z = z
+    if 'axis' in kwargs:
+      axis = kwargs['axis']
+      self.x = axis.x
+      self.y = axis.y
+      self.z = axis.z
+    else:
+      self.x = x
+      self.y = y
+      self.z = z
 
   def __add__(self, other):
     if isinstance(other, Quaternion):

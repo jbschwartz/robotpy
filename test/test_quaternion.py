@@ -1,7 +1,7 @@
 import unittest
 import math
 
-from robot.spatial import Quaternion
+from robot.spatial import Quaternion, Vector3
 import robot.spatial.quaternion as quaternion
 
 class TestQuaternion(unittest.TestCase):
@@ -13,8 +13,13 @@ class TestQuaternion(unittest.TestCase):
   def test_init(self):
     '''
     Quaternion instances default to multiplicative identity quaternion
+
+    Quaternion accepts four parameters or an 'axis-angle' input
     '''
     self.assertEqual(self.I, Quaternion(1, 0, 0, 0))
+
+    axis = Vector3(1, 2, 3)
+    self.assertEqual(Quaternion(1, axis=axis), Quaternion(1, 1, 2, 3))
 
   def test_add(self):
     expected = Quaternion(5, -1, 5, 3)
