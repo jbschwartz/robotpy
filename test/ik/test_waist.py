@@ -32,4 +32,8 @@ class TestWaist(unittest.TestCase):
           for result, expected in zip(results, expecteds):
             with self.subTest(angle=angle):
               self.assertAlmostEqual(result, expected)
+    
+    # Determine the singular position
+    expected = math.inf
+    self.assertEqual(ik.solveWaist(0, 0)[0], expected)
 
