@@ -7,7 +7,7 @@ Quaternion = quaternion.Quaternion
 Vector3 = vector3.Vector3
 
 class Frame:
-  def __init__(self, pose : Dual):
+  def __init__(self, pose : Dual = Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))):
     self.pose = pose
 
   def position(self):
