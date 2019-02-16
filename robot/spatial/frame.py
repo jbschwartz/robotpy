@@ -23,13 +23,7 @@ class Frame:
     '''
     return self.pose.r
 
-  def euler(self):
-    '''
-    Return euler angle representation of frame orientation
-
-    Only implements intrinsic ZYX rotation currently
-    '''
-    # TODO: Include kwargs for method=[intrinsic, extrinsic] order=[ZYX, ZYZ, ...]
+  def _intrinsic(self, order):
     orientation = self.orientation()
     r = orientation.r
     x = orientation.x
@@ -41,11 +35,49 @@ class Frame:
     ySq = y ** 2
     zSq = z ** 2
 
-    Z = math.atan2(2 * (x * y + r * z), rSq + xSq - ySq - zSq)
-    Yp = math.asin(-2 * (x * z - r * y))
-    Xpp = math.atan2(2 * (y * z + r * x), rSq - xSq - ySq + zSq)
+    if order == 'ZYZ':
+      t1 = math.atan2(x, y)
+      t2 = math.atan2(z, r)
 
-    return Vector3(Z, Yp, Xpp)
+      Z = t2 - t1
+      Yp = 2 * math.acos(math.sqrt(rSq + zSq))
+      Zpp = t2 + t1
+
+      return [ Z, Yp, Zpp ]
+    elif order == 'ZYX':
+      Z = math.atan2(2 * (x * y + r * z), rSq + xSq - ySq - zSq)
+      Yp = math.asin(-2 * (x * z - r * y))
+      Xpp = math.atan2(2 * (y * z + r * x), rSq - xSq - ySq + zSq)
+
+      return [ Z, Yp, Xpp ]
+    else:
+      # TODO: Deal
+      pass
+
+  def _extrinsic(self, order):
+    # Take advantage of extrinsic being the reverse order intrinsic solution
+    order = order[::-1]
+    intrinsic = self._intrinsic(order)
+    intrinsic.reverse()
+    return intrinsic
+
+  def euler(self, **kwargs):
+    '''
+    Return euler angle representation of frame orientation.
+
+    Defaults to intrinsic ZYX if method and order are not provided
+    '''
+    method = 'intrinsic' if 'method' not in kwargs else str.lower(kwargs['method'])
+    order = 'ZYX' if 'order' not in kwargs else str.upper(kwargs['order'])
+
+    if method == 'intrinsic':
+      return self._intrinsic(order)
+    elif method == 'extrinsic':
+      return self._extrinsic(order)
+    else:
+      # Some unknown method
+      # TODO: Handle
+      pass
 
   def _axis(self, **kwargs):
     if 'axis' in kwargs:
