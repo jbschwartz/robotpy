@@ -76,6 +76,6 @@ class Frame:
 
   def z(self):
     '''
-    Frame y-axis vector
+    Frame z-axis vector
     '''
     return self._axis(axis = 'z')
