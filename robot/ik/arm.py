@@ -51,8 +51,6 @@ def solveArm(wristCenter : Vector3, upperArmLength, foreArmLength, shoulderWrist
   if len(shoulder) == 1:
     shoulder.append(shoulder[0])
 
-  print(shoulder, elbow, waist)
-
   # The elbow can have an up and down configuration if it is not colinear with the shoulder
   # Flip the shoulder handedness for the second waist solution
   if math.isclose(elbow, 0) or math.isclose(elbow, math.pi):
