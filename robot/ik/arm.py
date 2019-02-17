@@ -57,10 +57,10 @@ def solveArm(wristCenter : Vector3, upperArmLength, foreArmLength, shoulderWrist
     return [ [ waist[0], shoulder[0], elbow ], [ waist[1], math.pi - shoulder[1], elbow ] ]
   else:
     # When the shoulder switches handedness, the elbow flips configuration
-    return [ \
-      [ waist[0], shoulder[0], elbow ], \
-      [ waist[0], shoulder[1], -elbow ], \
-      [ waist[1], math.pi - shoulder[0], -elbow ], \
-      [ waist[1], math.pi - shoulder[1], elbow ], \
+    return [
+      [ waist[0], shoulder[0], elbow ],
+      [ waist[0], shoulder[1], -elbow ],
+      [ waist[1], math.pi - shoulder[0], -elbow ],
+      [ waist[1], math.pi - shoulder[1], elbow ],
     ]
 
