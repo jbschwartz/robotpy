@@ -53,6 +53,12 @@ class TestVector3(unittest.TestCase):
     expected = Vector3(self.v1.x / self.s, self.v1.y / self.s, self.v1.z / self.s)
     self.assertAlmostEqual(self.v1 / self.s, expected)
 
+  def test_getitem(self):
+    # Test to ensure vector is iterated in xyz order
+    expecteds = [ self.v1.x, self.v1.y, self.v1.z ]
+    for index, component in enumerate(self.v1):
+      self.assertEqual(component, expecteds[index])
+
   def test_length(self):
     expected = math.sqrt(14)
     self.assertAlmostEqual(self.v1.length(), expected)
