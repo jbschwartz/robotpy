@@ -6,13 +6,21 @@ class Quaternion:
   '''
 
   def __init__(self, r = 1, x = 0, y = 0, z = 0, **kwargs):
-    self.r = r
-    if 'axis' in kwargs:
-      axis = kwargs['axis']
+    '''
+    Quaternion accepts four parameters or converts an 'axis-angle' input
+    '''
+    if all(params in kwargs for params in ['axis', 'angle']):
+      # Angle expected in radians
+      angle = kwargs['angle'] / 2
+
+      axis = math.sin(angle) * kwargs['axis']
+
+      self.r = math.cos(angle)
       self.x = axis.x
       self.y = axis.y
       self.z = axis.z
     else:
+      self.r = r
       self.x = x
       self.y = y
       self.z = z

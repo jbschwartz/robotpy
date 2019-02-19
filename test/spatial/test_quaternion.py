@@ -13,13 +13,17 @@ class TestQuaternion(unittest.TestCase):
   def test_init(self):
     '''
     Quaternion instances default to multiplicative identity quaternion
-
-    Quaternion accepts four parameters or an 'axis-angle' input
     '''
     self.assertEqual(self.I, Quaternion(1, 0, 0, 0))
 
     axis = Vector3(1, 2, 3)
-    self.assertEqual(Quaternion(1, axis=axis), Quaternion(1, 1, 2, 3))
+    self.assertEqual(Quaternion(1, *axis), Quaternion(1, 1, 2, 3))
+
+    angle = math.radians(30)
+    c = math.cos(angle / 2)
+    s = math.sin(angle / 2)
+    expected = Quaternion(c, s * axis.x, s * axis.y, s * axis.z)
+    self.assertEqual(Quaternion(axis = axis, angle = angle), expected)
 
   def test_add(self):
     expected = Quaternion(5, -1, 5, 3)
