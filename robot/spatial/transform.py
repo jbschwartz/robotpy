@@ -10,21 +10,13 @@ class Transform:
   Class representing spatial rigid body transformation in three dimensions
   '''
   def __init__(self, **kwargs):
+    translation = Vector3() if 'translation' not in kwargs else kwargs['translation']
+    t = Quaternion(0, *translation)
     if all(params in kwargs for params in ['axis', 'angle']):
-      translation = Vector3()
-      if 'translation' in kwargs:
-        translation = kwargs['translation']
-
-      # kwargs['angle'] expected in radians
-      c = math.cos(kwargs['angle'] / 2)
-      s = math.sin(kwargs['angle'] / 2)
-
-      r = Quaternion(c, axis = s * kwargs['axis'])
-      t = Quaternion(0, axis = translation)
+      r = Quaternion(axis = kwargs['axis'], angle = kwargs['angle'])
 
       self.dual = Dual(r, 0.5 * t * r)
     elif 'translation' in kwargs:
-      t = Quaternion(0, axis = kwargs['translation'])
       self.dual = Dual(Quaternion(), 0.5 * t)
     elif 'dual' in kwargs:
       self.dual = kwargs['dual']
