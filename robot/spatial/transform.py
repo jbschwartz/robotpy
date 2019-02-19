@@ -28,6 +28,8 @@ class Transform:
       self.dual = Dual(Quaternion(), 0.5 * t)
     elif 'dual' in kwargs:
       self.dual = kwargs['dual']
+    else:
+      self.dual = Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))
 
   def __mul__(self, other):
     '''
