@@ -6,6 +6,8 @@ import math
 
 # TODO: Need to handle singular cases
 
+allSequences = ['zxz', 'xyx', 'yzy', 'zyz', 'xzx', 'yxy', 'xyz', 'yzx', 'zxy', 'xzy', 'zyx', 'yxz']
+
 def zyz(r, x, y, z):
   xz = 2 * x * z
   ry = 2 * r * y

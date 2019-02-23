@@ -1,6 +1,6 @@
 import math
 
-from . import dual, quaternion, vector3, transform
+from . import dual, euler, quaternion, vector3, transform
 
 Dual = dual.Dual
 Quaternion = quaternion.Quaternion
@@ -30,44 +30,6 @@ class Frame:
     '''
     return self.transform.rotation()
 
-  def _intrinsic(self, order):
-    orientation = self.orientation()
-    r = orientation.r
-    x = orientation.x
-    y = orientation.y
-    z = orientation.z
-
-    rSq = r ** 2
-    xSq = x ** 2
-    ySq = y ** 2
-    zSq = z ** 2
-
-    if order == 'ZYZ':
-      t1 = math.atan2(x, y)
-      t2 = math.atan2(z, r)
-
-      Z = t2 - t1
-      Yp = 2 * math.acos(math.sqrt(rSq + zSq))
-      Zpp = t2 + t1
-
-      return [ Z, Yp, Zpp ]
-    elif order == 'ZYX':
-      Z = math.atan2(2 * (x * y + r * z), rSq + xSq - ySq - zSq)
-      Yp = math.asin(-2 * (x * z - r * y))
-      Xpp = math.atan2(2 * (y * z + r * x), rSq - xSq - ySq + zSq)
-
-      return [ Z, Yp, Xpp ]
-    else:
-      # TODO: Deal
-      pass
-
-  def _extrinsic(self, order):
-    # Take advantage of extrinsic being the reverse order intrinsic solution
-    order = order[::-1]
-    intrinsic = self._intrinsic(order)
-    intrinsic.reverse()
-    return intrinsic
-
   def euler(self, **kwargs):
     '''
     Return euler angle representation of frame orientation.
@@ -75,16 +37,27 @@ class Frame:
     Defaults to intrinsic ZYX if method and order are not provided
     '''
     method = 'intrinsic' if 'method' not in kwargs else str.lower(kwargs['method'])
-    order = 'ZYX' if 'order' not in kwargs else str.upper(kwargs['order'])
+    order = 'zyx' if 'order' not in kwargs else str.lower(kwargs['order'])
 
     if method == 'intrinsic':
-      return self._intrinsic(order)
+      try:
+        eulerFunc = getattr(euler, order)
+        
+        orientation = self.transform.rotation()
+        return eulerFunc(*orientation)
+      except AttributeError:
+        if order not in euler.allSequences:
+          raise KeyError()
+        else:
+          raise NotImplementedError()
     elif method == 'extrinsic':
-      return self._extrinsic(order)
+      # Take advantage of extrinsic being the reverse order intrinsic solution
+      order = order[::-1]
+      intrinsic = self.euler(method = "intrinsic", order = order)
+      intrinsic.reverse()
+      return intrinsic
     else:
-      # Some unknown method
-      # TODO: Handle
-      pass
+      raise KeyError()
 
   def x(self):
     '''

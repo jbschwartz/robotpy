@@ -28,34 +28,6 @@ class TestFrame(unittest.TestCase):
     expected = Vector3(0, 0, 1)
     self.assertEqual(self.f0.z(), expected)
 
-  def test_euler(self):
-    # Default method and order should be intrinsic ZYX
-    result = self.f1.euler()
-    expecteds = [ math.radians(-135), math.radians(45), math.radians(180) ]
-
-    for angle, expected in zip(result, expecteds):
-      self.assertAlmostEqual(angle, expected, places=5)
-
-    methods = ["intrinsic", "extrinsic"]
-    orders = ["ZYX", "ZYZ"]
-    expecteds = {
-      "intrinsicZYX": [ math.radians(-135), math.radians(45), math.radians(180) ],
-      "intrinsicZYZ": [ math.radians(45), math.radians(135), math.radians(0) ],
-      "extrinsicXYZ": [ math.radians(180), math.radians(45), math.radians(-135) ],
-      "extrinsicZYZ": [ math.radians(0), math.radians(135), math.radians(45) ]
-    }
-
-    for method in methods:
-      for order in orders:
-
-        if method == "extrinsic":
-          order = order[::-1]
-
-        result = self.f1.euler(method=method, order=order)
-        for angle, expected in zip(result, expecteds[method + order]):
-          with self.subTest(f"{method}, {order}"):
-            self.assertAlmostEqual(angle, expected, places=5)
-
   def test_x(self):
     expected = self.t(Vector3(1, 0, 0))
     self.assertEqual(self.f2.x(), expected)
