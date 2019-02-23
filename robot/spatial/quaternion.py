@@ -67,6 +67,18 @@ class Quaternion:
   def __str__(self):
     return f'({self.r}, {self.x}, {self.y}, {self.z})'
 
+  def __getitem__(self, key):
+    if key == 0:
+        return self.r
+    elif key == 1:
+        return self.x
+    elif key == 2:
+        return self.y
+    elif key == 3:
+        return self.z
+    else:
+        raise IndexError()
+
   def conjugate(self):
     '''
     Conjugates the quaternion instance
