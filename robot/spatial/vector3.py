@@ -6,6 +6,12 @@ class Vector3:
     self.y = y
     self.z = z
 
+  def __abs__(self):
+    return Vector3(abs(self.x), abs(self.y), abs(self.z))
+  
+  def __round__(self, n):
+    return Vector3(round(self.x, n), round(self.y, n), round(self.z, n))
+
   def __add__(self, other):
     if isinstance(other, Vector3):
       return Vector3(self.x + other.x, self.y + other.y, self.z + other.z)
@@ -33,6 +39,11 @@ class Vector3:
   def __eq__(self, other):
     if isinstance(other, Vector3):
       return self.x == other.x and self.y == other.y and self.z == other.z
+    elif isinstance(other, int):
+      if other == 0:
+        # Used to check Vector3 == 0 (i.e. check if Vector3 is the zero vector)
+        # This is useful for unittest.assertAlmostEqual
+        return self.x == 0 and self.y == 0 and self.z == 0
 
   def __str__(self):
     return f'({self.x}, {self.y}, {self.z})'
