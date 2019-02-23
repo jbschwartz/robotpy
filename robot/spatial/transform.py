@@ -32,8 +32,16 @@ class Transform:
 
   __rmul__ = __mul__
 
-  def apply(self, p):
-    d = Dual(Quaternion(), Quaternion(0, p.x, p.y, p.z))
-    q = self.dual * d * dual.conjugate(self.dual)
+  def __call__(self, other, **kwargs):
+    q = Quaternion(0, other.x, other.y, other.z)
 
-    return Vector3(q.d.x, q.d.y, q.d.z)
+    if 'type' in kwargs and str.lower(kwargs['type']) == 'vector':
+      # Transformation of a vector
+      d = Dual(q, Quaternion(0, 0, 0, 0))
+      a = self.dual * d * dual.conjugate(self.dual)
+      return Vector3(a.r.x, a.r.y, a.r.z)
+    else:
+      # Transformation of a point
+      d = Dual(Quaternion(), q)
+      a = self.dual * d * dual.conjugate(self.dual)
+      return Vector3(a.d.x, a.d.y, a.d.z)

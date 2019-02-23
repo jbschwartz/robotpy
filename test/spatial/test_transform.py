@@ -20,8 +20,8 @@ class TestTransform(unittest.TestCase):
   def test_mul(self):
     # Rotate then translate
     combined = self.pureTranslate * self.pureRotate
-    result = combined.apply(self.point)
-    expected = self.pureTranslate.apply(self.pureRotate.apply(self.point)) # Vector3(7, -2, 1)
+    result = combined(self.point)
+    expected = self.pureTranslate(self.pureRotate(self.point)) # Vector3(7, -2, 1)
     
     self.assertAlmostEqual(result.x, expected.x)
     self.assertAlmostEqual(result.y, expected.y)
@@ -29,24 +29,24 @@ class TestTransform(unittest.TestCase):
 
     # Translate then rotate
     combined = self.pureRotate * self.pureTranslate
-    result = combined.apply(self.point)
-    expected = self.pureRotate.apply(self.pureTranslate.apply(self.point)) # Vector3(7, -6, -11)
+    result = combined(self.point)
+    expected = self.pureRotate(self.pureTranslate(self.point)) # Vector3(7, -6, -11)
 
     self.assertAlmostEqual(result.x, expected.x)
     self.assertAlmostEqual(result.y, expected.y)
     self.assertAlmostEqual(result.z, expected.z)
 
-  def test_apply(self):
+  def test_call(self):
     # Pure translation
     expected = Vector3(7, 6, 11)
-    self.assertEqual(self.pureTranslate.apply(self.point), expected)
+    self.assertEqual(self.pureTranslate(self.point), expected)
 
     # Pure rotation
     expected = Vector3(3, -4, -5)
-    self.assertEqual(self.pureRotate.apply(self.point), expected)
+    self.assertEqual(self.pureRotate(self.point), expected)
 
     # Rotation and translation (in that order)
-    result = self.both.apply(self.point)
+    result = self.both(self.point)
     expected = Vector3(7, -2, 1)
     
     self.assertAlmostEqual(result.x, expected.x)
