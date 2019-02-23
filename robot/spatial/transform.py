@@ -29,6 +29,9 @@ class Transform:
     '''
     if isinstance(other, Transform):
       return Transform(dual = self.dual * other.dual)
+    else:
+      # This specifically allows Transform * Frame to find Frame.__rmul__, for example
+      return NotImplemented
 
   __rmul__ = __mul__
 
