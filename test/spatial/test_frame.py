@@ -8,14 +8,14 @@ class TestFrame(unittest.TestCase):
     # Default Frame
     self.f0 = Frame()
 
-    # Frame is constructed by rotating around Z 45 degrees, rotation around new Y 135 degrees
-    self.f1 = Frame(Dual(
+    # Frame is constructed by rotating around Z 45 degrees, rotation around new Y 135 degrees 
+    self.f1 = Frame(Transform(dual = Dual(
       Quaternion(0.353553, -0.353553, 0.853553, 0.146447),
       Quaternion(0, 0, 0, 0)
-    ))
+    )))
 
     self.t = Transform(axis = Vector3(0, 0, 1), angle = math.radians(45))
-    self.f2 = Frame(self.t.dual)
+    self.f2 = Frame(self.t)
 
   def test_init(self):
     # Default frame is expected to be a standard XYZ coordinate frame
@@ -57,14 +57,14 @@ class TestFrame(unittest.TestCase):
             self.assertAlmostEqual(angle, expected, places=5)
 
   def test_x(self):
-    expected = self.t.apply(Vector3(1, 0, 0))
+    expected = self.t(Vector3(1, 0, 0))
     self.assertEqual(self.f2.x(), expected)
 
   def test_y(self):
-    expected = self.t.apply(Vector3(0, 1, 0))
+    expected = self.t(Vector3(0, 1, 0))
     self.assertEqual(self.f2.y(), expected)
 
   def test_z(self):
-    expected = self.t.apply(Vector3(0, 0, 1))
+    expected = self.t(Vector3(0, 0, 1))
     self.assertEqual(self.f2.z(), expected)
 

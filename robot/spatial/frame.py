@@ -1,27 +1,34 @@
 import math
 
-from . import dual, quaternion, vector3
+from . import dual, quaternion, vector3, transform
 
 Dual = dual.Dual
 Quaternion = quaternion.Quaternion
 Vector3 = vector3.Vector3
+Transform = transform.Transform
 
 class Frame:
-  def __init__(self, pose : Dual = Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))):
-    self.pose = pose
+  def __init__(self, transform : Transform = Transform()):
+    self.transform = transform
 
-  def position(self):
+  def __rmul__(self, other):
+    '''
+    Transformation of a frame
+    '''
+    if isinstance(other, Transform):
+      return Frame(self.transform * other)
+
+  def position(self) -> Vector3:
     '''
     Location of frame origin
     '''
-    t = 2 * self.pose.d * quaternion.conjugate(self.pose.r)
-    return Vector3(t.x, t.y, t.z)
+    return self.transform.translation()
   
-  def orientation(self):
+  def orientation(self) -> Quaternion:
     '''
     Frame orientation quaternion
     '''
-    return self.pose.r
+    return self.transform.rotation()
 
   def _intrinsic(self, order):
     orientation = self.orientation()
@@ -79,35 +86,20 @@ class Frame:
       # TODO: Handle
       pass
 
-  def _axis(self, **kwargs):
-    if 'axis' in kwargs:
-      q = Quaternion(0, 0, 0, 0)
-      axis = str.lower(kwargs['axis'])
-      if axis in ['x', 'y', 'z']:
-        setattr(q, axis, 1)
-      else:
-        # TODO: Handle unknown axis
-        pass
-
-      o = self.orientation()
-      a = o * q * quaternion.conjugate(o)
-      return Vector3(a.x, a.y, a.z)
-      
-
   def x(self):
     '''
     Frame x-axis vector
     '''
-    return self._axis(axis = 'x')
+    return self.transform(Vector3( 1, 0, 0 ), type='vector')
 
   def y(self):
     '''
     Frame y-axis vector
     '''
-    return self._axis(axis = 'y')
+    return self.transform(Vector3( 0, 1, 0 ), type='vector')
 
   def z(self):
     '''
     Frame z-axis vector
     '''
-    return self._axis(axis = 'z')
+    return self.transform(Vector3( 0, 0, 1 ), type='vector')
