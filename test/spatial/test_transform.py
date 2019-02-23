@@ -52,3 +52,17 @@ class TestTransform(unittest.TestCase):
     self.assertAlmostEqual(result.x, expected.x)
     self.assertAlmostEqual(result.y, expected.y)
     self.assertAlmostEqual(result.z, expected.z)
+
+  def test_translation(self):
+    expected = Vector3(4, 2, 6)
+    self.assertEqual(self.pureTranslate.translation(), expected)
+    
+  def test_rotation(self):
+    expected = self.pureRotate.dual.r
+    self.assertEqual(self.pureRotate.rotation(), expected)
+
+  def test_inverse(self):
+    expected = self.point
+
+    inverse = self.both.inverse()
+    self.assertAlmostEqual(inverse(self.both(self.point)), expected)

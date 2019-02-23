@@ -45,3 +45,20 @@ class Transform:
       d = Dual(Quaternion(), q)
       a = self.dual * d * dual.conjugate(self.dual)
       return Vector3(a.d.x, a.d.y, a.d.z)
+      
+  def translation(self) -> Vector3:
+    # "Undo" what was done in the __init__ function by working backwards
+    t = 2 * self.dual.d * quaternion.conjugate(self.dual.r)
+    return Vector3(t.x, t.y, t.z)
+
+  def rotation(self) -> Quaternion:
+    return self.dual.r
+
+  def inverse(self):
+    '''
+    Return a new Transformation that is an inverse to this transformation
+    '''
+    rstar = quaternion.conjugate(self.dual.r)
+    dstar = quaternion.conjugate(self.dual.d)
+
+    return Transform(dual = Dual(rstar, dstar))
