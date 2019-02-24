@@ -25,6 +25,12 @@ class Quaternion:
       self.y = y
       self.z = z
 
+  def __abs__(self):
+    return Quaternion(abs(self.r), abs(self.x), abs(self.y), abs(self.z))
+  
+  def __round__(self, n):
+    return Quaternion(round(self.r, n), round(self.x, n), round(self.y, n), round(self.z, n))
+
   def __add__(self, other):
     if isinstance(other, Quaternion):
       return Quaternion(self.r + other.r, self.x + other.x, self.y + other.y, self.z + other.z)
@@ -63,6 +69,11 @@ class Quaternion:
   def __eq__(self, other):
     if isinstance(other, Quaternion):
       return self.r == other.r and self.x == other.x and self.y == other.y and self.z == other.z
+    elif isinstance(other, int):
+      if other == 0:
+        # Used to check Quaternion == 0 (i.e. check if Quaternion is the zero vector)
+        # This is useful for unittest.assertAlmostEqual
+        return self.r == 0 and self.x == 0 and self.y == 0 and self.z == 0
 
   def __str__(self):
     return f'({self.r}, {self.x}, {self.y}, {self.z})'

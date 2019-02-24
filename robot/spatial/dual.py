@@ -10,6 +10,12 @@ class Dual:
     self.r = r
     self.d = d
 
+  def __abs__(self):
+    return Dual(abs(self.r), abs(self.d))
+  
+  def __round__(self, n):
+    return Dual(round(self.r, n), round(self.d, n))
+
   def __add__(self, other):
     return Dual(self.r + other.r, self.d + other.d)
 
@@ -38,6 +44,11 @@ class Dual:
   def __eq__(self, other):
     if isinstance(other, Dual):
       return self.r == other.r and self.d == other.d
+    elif isinstance(other, int):
+      if other == 0:
+        # Used to check Dual == 0 (i.e. check if Dual is the zero vector)
+        # This is useful for unittest.assertAlmostEqual
+        return self.r == 0 and self.d == 0
 
   def __str__(self):
     return f'{self.r} + {self.d}' + u"\u03B5"
