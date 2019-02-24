@@ -1,8 +1,6 @@
 import math
 
-from .. import utils
-
-def solveElbow(r, s, upperArmLength, foreArmLength):
+def solve_elbow(r, s, upper_arm_length, fore_arm_length):
   '''
   Calculate one elbow (joint 2) angle. 
   
@@ -10,7 +8,7 @@ def solveElbow(r, s, upperArmLength, foreArmLength):
   '''
 
   # Law of cosines
-  cosTheta = (r ** 2 + s ** 2 - upperArmLength ** 2 - foreArmLength ** 2) / (2 * upperArmLength * foreArmLength)
+  cosTheta = (r ** 2 + s ** 2 - upper_arm_length ** 2 - fore_arm_length ** 2) / (2 * upper_arm_length * fore_arm_length)
 
   # Use atan instead of acos as atan performs better for very small angle values
   # This will return nan if the target location is unreachable (i.e. cosTheta is outside the range [-1, 1])

@@ -26,7 +26,7 @@ class TestWaist(unittest.TestCase):
           y = self.armLength * math.sin(angle)
           x = self.armLength * math.cos(angle)
 
-          results = ik.solveWaist(x, y, shoulderOffset)
+          results = ik.solve_waist(x, y, shoulderOffset)
           expecteds = [ utils.clampAngle(angle - alpha), utils.clampAngle(angle + alpha + math.pi) ]
           
           for result, expected in zip(results, expecteds):
@@ -35,5 +35,5 @@ class TestWaist(unittest.TestCase):
     
     # Determine the singular position
     expected = math.inf
-    self.assertEqual(ik.solveWaist(0, 0)[0], expected)
+    self.assertEqual(ik.solve_waist(0, 0)[0], expected)
 

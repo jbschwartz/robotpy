@@ -2,7 +2,7 @@ import math
 
 from .. import constant, utils
 
-def solveWaist(x, y, wristOffset = 0):
+def solve_waist(x, y, wristOffset = 0):
   '''
   Calculate the waist (joint 0) angles with a shoulder-wrist offset
   '''

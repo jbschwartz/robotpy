@@ -2,11 +2,11 @@ import math
 
 from ..spatial import Vector3
 
-from .waist import solveWaist
-from .elbow import solveElbow
-from .shoulder import solveShoulder
+from .waist import solve_waist
+from .elbow import solve_elbow
+from .shoulder import solve_shoulder
 
-def rsCoordinates(wristCenter : Vector3, shoulderWristOffset, shoulderZOffset):
+def rs_coordinates(wrist_center : Vector3, shoulder_wrist_offset, shoulder_z_offset):
   '''
   Project a point (usually wrist center) in three dimension space onto the two dimension RS plane
   
@@ -24,27 +24,27 @@ def rsCoordinates(wristCenter : Vector3, shoulderWristOffset, shoulderZOffset):
   #      |      || ||                             |    || /        sqrt(x^2 + y^2)
   #   ---V--- ----|---------> X                ---V--- (O)-----------> X 
 
-  r = math.sqrt(wristCenter.x ** 2 + wristCenter.y ** 2 - shoulderWristOffset ** 2)
-  s = wristCenter.z - shoulderZOffset
+  r = math.sqrt(wrist_center.x ** 2 + wrist_center.y ** 2 - shoulder_wrist_offset ** 2)
+  s = wrist_center.z - shoulder_z_offset
 
   return [ r, s ]
 
-def solveArm(wristCenter : Vector3, upperArmLength, foreArmLength, shoulderWristOffset, shoulderZOffset):
+def solve_arm(wrist_center : Vector3, upper_arm_length, fore_arm_length, shoulder_wrist_offset, shoulder_z_offset):
   '''
   Get solutions for the first three joints of a canonical arm
   '''
 
-  waist = solveWaist(wristCenter.x, wristCenter.y, shoulderWristOffset)
+  waist = solve_waist(wrist_center.x, wrist_center.y, shoulder_wrist_offset)
   if not waist: 
     return []
 
-  r, s = rsCoordinates(wristCenter, shoulderWristOffset, shoulderZOffset)
+  r, s = rs_coordinates(wrist_center, shoulder_wrist_offset, shoulder_z_offset)
 
-  elbow = solveElbow(r, s, upperArmLength, foreArmLength)
+  elbow = solve_elbow(r, s, upper_arm_length, fore_arm_length)
   if math.isnan(elbow): 
     return []
 
-  shoulder = solveShoulder(r, s, upperArmLength, foreArmLength, elbow)
+  shoulder = solve_shoulder(r, s, upper_arm_length, fore_arm_length, elbow)
   if not shoulder: 
     return []
 

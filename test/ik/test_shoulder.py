@@ -20,8 +20,8 @@ class TestShoulder(unittest.TestCase):
 
     # For points on external workspace boundary
     fullReach = self.upperArmLength + self.foreArmLength
-    elbow = ik.solveElbow(fullReach, 0, self.upperArmLength, self.foreArmLength)
-    result = ik.solveShoulder(fullReach, 0, self.upperArmLength, self.foreArmLength, elbow)
+    elbow = ik.solve_elbow(fullReach, 0, self.upperArmLength, self.foreArmLength)
+    result = ik.solve_shoulder(fullReach, 0, self.upperArmLength, self.foreArmLength, elbow)
     expected = 0
     
     self.assertEqual(len(result), 1)
@@ -29,16 +29,16 @@ class TestShoulder(unittest.TestCase):
 
     # For points on internal workspace boundary
     internalBoundary = self.upperArmLength - self.foreArmLength
-    elbow = ik.solveElbow(internalBoundary, 0, self.upperArmLength, self.foreArmLength)
-    result = ik.solveShoulder(internalBoundary, 0, self.upperArmLength, self.foreArmLength, elbow)
+    elbow = ik.solve_elbow(internalBoundary, 0, self.upperArmLength, self.foreArmLength)
+    result = ik.solve_shoulder(internalBoundary, 0, self.upperArmLength, self.foreArmLength, elbow)
     expected = 0
 
     self.assertEqual(len(result), 1)
     self.assertAlmostEqual(result[0], expected)
 
     # For a position in the workspace
-    elbow = ik.solveElbow(self.x, self.y, self.upperArmLength, self.foreArmLength)
-    results = ik.solveShoulder(self.x, self.y, self.upperArmLength, self.foreArmLength, elbow)
+    elbow = ik.solve_elbow(self.x, self.y, self.upperArmLength, self.foreArmLength)
+    results = ik.solve_shoulder(self.x, self.y, self.upperArmLength, self.foreArmLength, elbow)
     expecteds = [ self.theta[0], 2 * math.atan2(self.y, self.x) - self.theta[0] ]
 
     self.assertEqual(len(results), 2)
@@ -47,8 +47,8 @@ class TestShoulder(unittest.TestCase):
         self.assertAlmostEqual(result, expected)
 
     # For the origin (i.e. on the shoulder axis)
-    elbow = ik.solveElbow(0, 0, self.upperArmLength, self.upperArmLength)
-    result = ik.solveShoulder(0, 0, self.upperArmLength, self.upperArmLength, elbow)
+    elbow = ik.solve_elbow(0, 0, self.upperArmLength, self.upperArmLength)
+    result = ik.solve_shoulder(0, 0, self.upperArmLength, self.upperArmLength, elbow)
     expected = math.inf
 
     self.assertEqual(len(result), 1)

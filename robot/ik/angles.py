@@ -1,12 +1,9 @@
 import math
 
-import itertools
-
-from .. import constant, utils
-from .arm import solveArm
+from .arm import solve_arm
 from .wrist import solve_wrist
 
-from ..spatial import Frame, dual
+from ..spatial import Frame
 
 def redundant_solutions(solutions, robot):
   # TODO: This can probably be more concise
@@ -36,7 +33,7 @@ def solve_angles(target : Frame, robot):
   # Transform end-effector tip frame to wrist center frame
   wrist_center = robot.wrist_center(target)
   
-  solutions = solveArm(
+  solutions = solve_arm(
     wrist_center,
     robot.upper_arm_length(),
     robot.fore_arm_length(),

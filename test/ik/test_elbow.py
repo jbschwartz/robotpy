@@ -15,32 +15,32 @@ class TestElbow(unittest.TestCase):
 
     # For points out of reach
     outOfReach = self.upperArmLength + self.foreArmLength
-    result = ik.solveElbow(outOfReach, outOfReach, self.upperArmLength, self.foreArmLength)
+    result = ik.solve_elbow(outOfReach, outOfReach, self.upperArmLength, self.foreArmLength)
 
     self.assertTrue(math.isnan(result))
 
     # For points too close to reach
     outOfReach = 0
-    result = ik.solveElbow(outOfReach, outOfReach, self.upperArmLength, self.foreArmLength)
+    result = ik.solve_elbow(outOfReach, outOfReach, self.upperArmLength, self.foreArmLength)
 
     self.assertTrue(math.isnan(result))
 
     # For points on external workspace boundary
     fullReach = self.upperArmLength + self.foreArmLength
-    result = ik.solveElbow(fullReach, 0, self.upperArmLength, self.foreArmLength)
+    result = ik.solve_elbow(fullReach, 0, self.upperArmLength, self.foreArmLength)
     expected = 0
     
     self.assertAlmostEqual(result, expected)
 
     # For points on internal workspace boundary
     internalBoundary = self.upperArmLength - self.foreArmLength
-    result = ik.solveElbow(internalBoundary, 0, self.upperArmLength, self.foreArmLength)
+    result = ik.solve_elbow(internalBoundary, 0, self.upperArmLength, self.foreArmLength)
     expected = math.pi
     
     self.assertAlmostEqual(result, expected)
 
     # For the origin (i.e. on the shoulder axis)
-    result = ik.solveElbow(0, 0, self.upperArmLength, self.upperArmLength)
+    result = ik.solve_elbow(0, 0, self.upperArmLength, self.upperArmLength)
     expected = math.pi
 
     self.assertAlmostEqual(result, expected)
@@ -54,7 +54,7 @@ class TestElbow(unittest.TestCase):
     x = self.upperArmLength * math.cos(theta[0]) + self.foreArmLength * math.cos(theta[0] + theta[1])
     y = self.upperArmLength * math.sin(theta[0]) + self.foreArmLength * math.sin(theta[0] + theta[1])
 
-    result = ik.solveElbow(x, y, self.upperArmLength, self.foreArmLength)
+    result = ik.solve_elbow(x, y, self.upperArmLength, self.foreArmLength)
 
     expected = theta[1]
 
