@@ -3,8 +3,7 @@ import math
 from operator import itemgetter
 
 from robot import ik
-
-from ..robots import abb_irb_120
+from robot.robots import abb_irb_120
 
 class TestAngles(unittest.TestCase):
   def setUp(self):

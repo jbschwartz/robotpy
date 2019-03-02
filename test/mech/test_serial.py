@@ -3,8 +3,7 @@ import math
 
 from robot.spatial import Vector3
 from robot.mech import Joint, Serial
-
-from ..robots import abb_irb_120
+from robot.robots import abb_irb_120
 
 class TestSerial(unittest.TestCase):
   def setUp(self):
