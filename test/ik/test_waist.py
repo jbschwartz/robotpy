@@ -27,7 +27,7 @@ class TestWaist(unittest.TestCase):
           x = self.armLength * math.cos(angle)
 
           results = ik.solve_waist(x, y, shoulderOffset)
-          expecteds = [ utils.clampAngle(angle - alpha), utils.clampAngle(angle + alpha + math.pi) ]
+          expecteds = [ utils.clamp_angle(angle - alpha), utils.clamp_angle(angle + alpha + math.pi) ]
           
           for result, expected in zip(results, expecteds):
             with self.subTest(angle=angle):

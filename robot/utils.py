@@ -1,6 +1,6 @@
 import math
 
-def clampAngle(angle):
+def clamp_angle(angle):
   '''
   Clamp angle to the range (-pi, pi]
   '''

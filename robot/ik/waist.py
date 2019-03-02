@@ -26,7 +26,7 @@ def solve_waist(x, y, wristOffset = 0):
 
   # Give solutions for both "left" and "right" shoulder configurations
   # Constrain solutions to (-PI, PI] as joint limits are typically symmetric about zero
-  first = utils.clampAngle(phi - alpha)
-  second = utils.clampAngle(phi + alpha + math.pi)
+  first = utils.clamp_angle(phi - alpha)
+  second = utils.clamp_angle(phi + alpha + math.pi)
 
   return [ first, second ]
