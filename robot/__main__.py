@@ -11,7 +11,8 @@ if __name__ == "__main__":
   show = {
     'waypoints': True,
     'ee_frame': True,
-    'base_frame': True
+    'base_frame': True,
+    'joint_angles': True
   }
 
   plot = RobotPlot(ABB_IRB_120, show = show)

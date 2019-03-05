@@ -1,3 +1,5 @@
+import math
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
@@ -15,7 +17,8 @@ class RobotPlot:
     self.show_flags = {
       'waypoints': False,
       'ee_frame': False,
-      'base_frame': False
+      'base_frame': False,
+      'joint_angles': False
     }
 
     # Check dictionary keys in show_flags to see if they're sensible?
@@ -28,7 +31,18 @@ class RobotPlot:
   def setup_plot_lib(self):
     self.fig = plt.figure(figsize=(12, 10))
   
-    self.ax_3d = plt.subplot2grid((1, 1), (0, 0), rowspan=6, projection='3d')
+    self.ax = []
+    grid_size = (1, 1)
+    if self.show_flags['joint_angles']:
+      grid_size = (6, 2) 
+
+      for i in range(0, 6):
+        p = plt.subplot2grid(grid_size, (i, 1))
+        p.set_xticklabels([])
+        p.set_title(f'Joint #{i + 1}')
+        self.ax.append(p)
+
+    self.ax_3d = plt.subplot2grid(grid_size, (0, 0), rowspan=6, projection='3d')
 
     self.ax_3d.set_xlabel('X')
     self.ax_3d.set_ylabel('Y')
@@ -39,8 +53,16 @@ class RobotPlot:
     self.ax_3d.set_zlim3d([0.0, 500])
 
   def trajectory(self, traj : list):
+    joint_angles = [[], [], [], [], [], []]
     for qs in traj:
       self.frames.append(self.robot.poses(qs))
+      for joint, q in zip(joint_angles, qs):
+        joint.append(math.degrees(q))
+
+    if self.show_flags['joint_angles']:
+      for joint, p in zip(joint_angles,  self.ax):
+        p.plot(joint)
+        p.scatter(0,joint[0])
 
     self.generate_robot_points()
     
@@ -48,7 +70,7 @@ class RobotPlot:
 
     # Get initial robot position
     xs, ys, zs = self.robot_points[first_frame_index]
-    self.robot_line = plt.plot(xs, ys, zs=zs, color='orange', linewidth=5.0)[0]
+    self.robot_line = self.ax_3d.plot(xs, ys, zs=zs, color='orange', linewidth=5.0)[0]
 
     if self.show_flags['waypoints']:
       xs, ys, zs = [], [], []
@@ -95,9 +117,9 @@ class RobotPlot:
     return coords
 
   def plot_frame(self, points):
-    x_line = plt.plot(points[0][0], points[0][1], zs=points[0][2], color='red')
-    y_line = plt.plot(points[1][0], points[1][1], zs=points[1][2], color='green')
-    z_line = plt.plot(points[2][0], points[2][1], zs=points[2][2], color='blue')
+    x_line = self.ax_3d.plot(points[0][0], points[0][1], zs=points[0][2], color='red')
+    y_line = self.ax_3d.plot(points[1][0], points[1][1], zs=points[1][2], color='green')
+    z_line = self.ax_3d.plot(points[2][0], points[2][1], zs=points[2][2], color='blue')
 
     return [x_line[0], y_line[0], z_line[0]]
 
@@ -107,6 +129,8 @@ class RobotPlot:
     if self.show_flags['ee_frame']:
       self.update_ee_frame(index)
 
+    self.update_joint_plots(index)
+
     return [self.robot_line] + self.ee_frame_lines
 
   def update_robot(self, index):
@@ -114,6 +138,13 @@ class RobotPlot:
 
     self.robot_line.set_data(xs, ys)
     self.robot_line.set_3d_properties(zs)
+
+  def update_joint_plots(self, index):
+    for ax in self.ax:
+      del ax.collections[:]
+      # I'm assuming there is only one line here...
+      value = ax.get_lines()[0].get_ydata()[index]
+      ax.scatter(index, value)
 
   def update_ee_frame(self, index):
     '''
@@ -134,7 +165,7 @@ class RobotPlot:
       return
 
     if 'animate' in kwargs and kwargs['animate']:
-      anim = animation.FuncAnimation(self.fig, self.update_plot, len(self.frames), interval=75, blit=False)
+      anim = animation.FuncAnimation(self.fig, self.update_plot, len(self.frames), interval=150, blit=False)
 
     # if 'loop' in kwargs and kwargs['loop']:
     #   # Duplicate trajectory, reverse, and append
