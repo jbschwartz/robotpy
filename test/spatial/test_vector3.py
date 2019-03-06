@@ -99,3 +99,10 @@ class TestVector3(unittest.TestCase):
     expected = math.radians(45)
     self.assertAlmostEqual(vector3.angleBetween(x, p), expected)
     self.assertAlmostEqual(vector3.angleBetween(p, x), expected)
+
+  def test_vector3_cross(self):
+    expected = Vector3(-9, -3, 1)
+    self.assertAlmostEqual(vector3.cross(self.v1, self.v2), expected)
+
+    expected = Vector3(9, 3, -1)
+    self.assertAlmostEqual(vector3.cross(self.v2, self.v1), expected)
