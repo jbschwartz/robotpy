@@ -17,7 +17,7 @@ class Facet:
     if not self.computed_normal:
       self.compute_normal()
 
-    return not vector3.almost_equal(self.passed_normal, self.computed_normal)
+    return not vector3.almost_equal(self.passed_normal, self.computed_normal, 0.0001)
 
   def compute_normal(self):
     if self.is_complete():
