@@ -59,13 +59,13 @@ class Vector3:
         raise IndexError()
 
   def length(self):
-    return math.sqrt(self.lengthSq())
+    return math.sqrt(self.length_sq())
 
-  def lengthSq(self):
+  def length_sq(self):
     return self.x**2 + self.y**2 + self.z**2
 
   def is_unit(self):
-    return math.isclose(self.lengthSq(), 1.0)
+    return math.isclose(self.length_sq(), 1.0)
   
   def normalize(self):
     length = self.length()
@@ -73,7 +73,7 @@ class Vector3:
     self.y /= length
     self.z /= length
 
-def angleBetween(v1, v2):
+def angle_between(v1, v2):
   dot = v1 * v2
   return math.acos(dot / (v1.length() * v2.length()))
 

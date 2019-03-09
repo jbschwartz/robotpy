@@ -63,9 +63,9 @@ class TestVector3(unittest.TestCase):
     expected = math.sqrt(14)
     self.assertAlmostEqual(self.v1.length(), expected)
 
-  def test_lengthSq(self):
+  def test_length_sq(self):
     expected = 14
-    self.assertAlmostEqual(self.v1.lengthSq(), expected)
+    self.assertAlmostEqual(self.v1.length_sq(), expected)
 
   def test_is_unit(self):
     unit_vector = vector3.normalize(self.v1)
@@ -88,22 +88,22 @@ class TestVector3(unittest.TestCase):
 
     self.assertEqual(result, expected)
 
-  def test_vector3_angleBetween(self):
+  def test_vector3_angle_between(self):
     expected = 0
-    self.assertAlmostEqual(vector3.angleBetween(self.v1, 5 * self.v1), expected)
+    self.assertAlmostEqual(vector3.angle_between(self.v1, 5 * self.v1), expected)
 
     x = Vector3(1, 0, 0)
     y = Vector3(0, 1, 0)
 
     expected = math.radians(90)
-    self.assertAlmostEqual(vector3.angleBetween(x, y), expected)
-    self.assertAlmostEqual(vector3.angleBetween(y, x), expected)
+    self.assertAlmostEqual(vector3.angle_between(x, y), expected)
+    self.assertAlmostEqual(vector3.angle_between(y, x), expected)
 
     p = Vector3(45, 45, 0)
 
     expected = math.radians(45)
-    self.assertAlmostEqual(vector3.angleBetween(x, p), expected)
-    self.assertAlmostEqual(vector3.angleBetween(p, x), expected)
+    self.assertAlmostEqual(vector3.angle_between(x, p), expected)
+    self.assertAlmostEqual(vector3.angle_between(p, x), expected)
 
   def test_vector3_cross(self):
     expected = Vector3(-9, -3, 1)
