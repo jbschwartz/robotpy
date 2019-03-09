@@ -94,7 +94,7 @@ def cross(a, b):
     a.x * b.y - a.y * b.x
   )
 
-def almost_equal(v1, v2):
+def almost_equal(v1, v2, tol = 0.00001):
   difference = v1 - v2
 
-  return math.isclose(difference.length(), 0.0, abs_tol=0.00001)
+  return math.isclose(difference.length_sq(), 0.0, abs_tol=tol)
