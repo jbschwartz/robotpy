@@ -48,7 +48,7 @@ class STLParser:
     # Assuming ASCII format for now
     with open(filename, 'r') as f:
       self.warnings.clear()
-      self.current_line = 0
+      self.current_line = 1
 
       for line in f:
         try:
