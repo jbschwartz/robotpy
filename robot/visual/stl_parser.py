@@ -31,9 +31,9 @@ def check_state(expected_state):
       if self.state is expected_state:
         return f(self, *args)
       else:
-        state_name = self.state.name.strip('PARSE_').replace('_', ' ').lower()
-        new_state = f.__name__.strip('begin_').replace('_', '').lower()
-        raise Exception(f'While parsing {state_name} state, unexpected transition to {new_state} state')
+        state_name = self.state.name.replace('PARSE_', '').replace('_', ' ').lower()
+        new_state = f.__name__.replace('begin_', '').replace('_', '').lower()
+        raise Exception(f'While parsing {state_name} state, unexpected transition to {new_state} state on line {self.current_line}')
     return wrapper
   return _check_state
 
