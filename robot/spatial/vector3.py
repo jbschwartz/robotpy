@@ -65,7 +65,9 @@ class Vector3:
     return self.x**2 + self.y**2 + self.z**2
 
   def is_unit(self):
-    return math.isclose(self.length_sq(), 1.0)
+    # TODO: We really should a library global control over these tolerance values
+    # They shouldn't be hardcoded here.
+    return math.isclose(self.length_sq(), 1.0, abs_tol=0.00001)
   
   def normalize(self):
     length = self.length()
@@ -95,4 +97,4 @@ def cross(a, b):
 def almost_equal(v1, v2):
   difference = v1 - v2
 
-  return math.isclose(difference.length(), 0.0)
+  return math.isclose(difference.length(), 0.0, abs_tol=0.00001)
