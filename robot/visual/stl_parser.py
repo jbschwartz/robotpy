@@ -1,4 +1,4 @@
-import enum, math
+import enum, math, traceback
 
 from .mesh import Mesh
 from .facet import Facet
@@ -55,6 +55,7 @@ class STLParser:
           self.consume(line.strip())
           self.current_line += 1
         except Exception as error:
+          print(traceback.format_exc())
           print(f'Parsing error: {error.args[0]}')
           return None
       
