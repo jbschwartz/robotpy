@@ -21,7 +21,14 @@ class Facet:
   def computed_normal(self):
     if self.is_complete():
       edges = [ self.vertices[1] - self.vertices[0], self.vertices[2] - self.vertices[1]]
-      return vector3.cross(edges[0], edges[1]).normalize()
+      normal = vector3.cross(edges[0], edges[1])
+
+      if math.isclose(normal.length(), 0.0):
+        raise Exception('Degenerate triangle found')
+      
+      normal.normalize()
+
+      return normal 
     else:
       # TODO: Figure out what an appropriate action would be here
       pass
