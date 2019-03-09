@@ -1,4 +1,4 @@
-from .visual import Facet 
+from .facet import Facet 
 
 class Mesh:
   def __init__(self, name):
