@@ -132,7 +132,6 @@ class STLParser:
       raise Exception('Unexpected facet')
 
   def normal(self, x, y, z):
-    # TODO: Check if STL allows this to be optional
     if self.state is ParserState.PARSE_NORMAL:
       n = Vector3(x, y, z)
 
