@@ -22,6 +22,8 @@ class WarningType(enum.Enum):
   NON_UNIT_NORMAL = enum.auto()
   CONFLICTING_NORMALS = enum.auto()
   INVALID_COLOR = enum.auto()
+  EMPTY_SOLID = enum.auto()
+  END_SOLID_NAME_MISMATCH = enum.auto()
 
 # TODO: How to pass current state into error messages?
 def state_name(state):
@@ -65,6 +67,10 @@ class STLParser:
         message = 'Conflicting facet normal'
       elif warning_type is WarningType.INVALID_COLOR:
         message = 'Invalid color'
+      elif warning_type is WarningType.EMPTY_SOLID:
+        message = 'Empty solid'
+      elif warning_type is WarningType.END_SOLID_NAME_MISMATCH:
+        message = 'Wrong endsolid name'
 
       print(f'Warning: {message} provided on line {line}')
 
@@ -179,14 +185,15 @@ class STLParser:
     else:
       raise Exception(f'Cannot close facet in {state_name(self.state)}')
 
-  def end_solid(self, rest):
+  def end_solid(self, name):
     if self.state is ParserState.PARSE_SOLID:
       # We know we've seen at least one facet if the current facet is complete
       if not self.current_facet.is_complete():
-        # TODO: Should this be a warning instead?
-        raise Exception(f'Solid is empty')
+        self.add_warning(WarningType.EMPTY_SOLID)
 
-      # TODO: Make sure the name of the endsolid call matches the opening solid call
-      # Make this a warning
+      # Make sure the name of the endsolid call matches the opening solid call
+      if name != self.meshes[-1].name:
+        self.add_warning(WarningType.END_SOLID_NAME_MISMATCH)
+
     else:
       raise Exception(f'Cannot close solid in {state_name(self.state)}')
