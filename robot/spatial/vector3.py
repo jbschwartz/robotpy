@@ -78,6 +78,7 @@ def angle_between(v1, v2):
   return math.acos(dot / (v1.length() * v2.length()))
 
 def normalize(v):
+  # TODO: Make sure that length is non-zero before dividing
   length = v.length()
   return Vector3(v.x / length, v.y / length, v.z / length)
 
