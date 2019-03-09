@@ -165,7 +165,7 @@ class STLParser:
   
   @check_state(ParserState.PARSE_VERTEX)
   def end_loop(self):
-    if self.current_facet.is_complete():
+    if not self.current_facet.is_complete():
       raise Exception(f'Loop does not contain exactly 3 vertices')
 
     self.state = ParserState.PARSE_FACET_COMPLETE
