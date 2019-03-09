@@ -135,8 +135,7 @@ class STLParser:
     if self.state is ParserState.PARSE_NORMAL:
       n = Vector3(x, y, z)
 
-      # TODO: Replace with Vector3.is_unit()
-      if not math.isclose(n.length, 1.0):
+      if not n.is_unit():
         self.add_warning(WarningType.NON_UNIT_NORMAL)
         n.normalize()
 
