@@ -23,14 +23,6 @@ class WarningType(enum.Enum):
   CONFLICTING_NORMALS = enum.auto()
   INVALID_COLOR = enum.auto()
 
-# TODO: How to keep warning state?
-# warnings = {
-#   NON_UNIT_NORMAL: {
-#     'message':
-#     'line':
-#   }
-# }
-
 # TODO: How to pass current state into error messages?
 def state_name(state):
   pass
@@ -40,7 +32,7 @@ class STLParser:
     self.meshes = []
     self.state = ParserState.READY
     self.current_facet = Facet()
-    self.warnings = set()
+    self.warnings = dict()
 
   def parse(self, filename):
     # Assuming ASCII format for now
@@ -51,17 +43,30 @@ class STLParser:
       for line in f:
         try:
           self.consume(line.strip())
-          # TODO: Use this variable in exception messages. Thanks @atomfighter.
           self.current_line += 1
         except Exception as error:
           print(f'Parsing error: {error.args[0]}')
           return None
       
-      for warning_type in self.warnings:
-        message = ''
-        print(f'Warning: {message}')
+      self.print_warnings()
 
     return self.meshes
+
+  def add_warning(self, warning_type : WarningType):
+    # Store the line that generated the warning to display to the user
+    self.warnings[warning_type] = self.current_line
+
+  def print_warnings(self):
+    for warning_type, line in self.warnings.items():
+      message = 'Unknown warning'
+      if warning_type is WarningType.NON_UNIT_NORMAL:
+        message = 'Non-unit normal'
+      elif warning_type is WarningType.CONFLICTING_NORMALS:
+        message = 'Conflicting facet normal'
+      elif warning_type is WarningType.INVALID_COLOR:
+        message = 'Invalid color'
+
+      print(f'Warning: {message} provided on line {line}')
 
   def parse_components(self, components_string):
     return list(map(float, components_string.split(' ')))
@@ -133,7 +138,7 @@ class STLParser:
 
       # TODO: Replace with Vector3.is_unit()
       if not math.isclose(n.length, 1.0):
-        self.warnings.add(WarningType.NON_UNIT_NORMAL)
+        self.add_warning(WarningType.NON_UNIT_NORMAL)
         n.normalize()
 
       self.current_facet.passed_normal = n
@@ -169,7 +174,7 @@ class STLParser:
   def end_facet(self):
     if self.state is ParserState.PARSE_FACET_COMPLETE:
       if self.current_facet.has_conflicting_normal():
-        self.warnings.add(WarningType.CONFLICTING_NORMALS)
+        self.add_warning(WarningType.CONFLICTING_NORMALS)
 
       self.meshes[-1].add_facet(self.current_facet)
       self.state = ParserState.PARSE_SOLID
