@@ -21,6 +21,7 @@ class ParserState(enum.Enum):
 class WarningType(enum.Enum):
   NON_UNIT_NORMAL = enum.auto()
   CONFLICTING_NORMALS = enum.auto()
+  INVALID_COLOR = enum.auto()
 
 # TODO: How to keep warning state?
 # warnings = {
@@ -71,7 +72,6 @@ class STLParser:
     if keyword == 'solid':
       self.begin_solid(rest)
     elif keyword == 'color':
-      # TODO: Check that the color make senses; for example: float values between 0 and 1
       self.solid_color(*self.parse_components(rest))
     elif keyword == 'facet':
       self.begin_facet()
@@ -110,9 +110,11 @@ class STLParser:
       raise Exception('Unexpected solid')
 
   def solid_color(self, r, g, b):
-    # TODO: Check if STL allows per facet or per vertex coloring
-    # If so, we need to allow more states here
     if self.state is ParserState.PARSE_SOLID:
+      # Check that color components are floating point values between 0 and 1
+      if not all(0.0 <= color_component <= 1 for color_component in [r, g, b]):
+        self.add_warning(WarningType.INVALID_COLOR)
+
       self.meshes[-1].set_color(r, g, b)
     else:
       raise Exception('Unexpected color')
