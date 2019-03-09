@@ -25,9 +25,17 @@ class WarningType(enum.Enum):
   EMPTY_SOLID = enum.auto()
   END_SOLID_NAME_MISMATCH = enum.auto()
 
-# TODO: How to pass current state into error messages?
-def state_name(state):
-  pass
+def check_state(expected_state):
+  def _check_state(f):
+    def wrapper(self, *args):
+      if self.state is expected_state:
+        return f(self, *args)
+      else:
+        state_name = self.state.name.strip('PARSE_').replace('_', ' ').lower()
+        new_state = f.__name__.strip('begin_').replace('_', '').lower()
+        raise Exception(f'While parsing {state_name} state, unexpected transition to {new_state} state')
+    return wrapper
+  return _check_state
 
 class STLParser:
   def __init__(self):
@@ -113,87 +121,68 @@ class STLParser:
     else:
       raise Exception(f'Encountered unknown keyword: {keyword}')
 
+  @check_state(ParserState.READY)
   def begin_solid(self, name):
-    if self.state is ParserState.READY:
-      self.meshes.append(Mesh(name))
-      self.state = ParserState.PARSE_SOLID
-    else:
-      raise Exception('Unexpected solid')
+    self.meshes.append(Mesh(name))
+    self.state = ParserState.PARSE_SOLID
 
+  @check_state(ParserState.PARSE_SOLID)
   def solid_color(self, r, g, b):
-    if self.state is ParserState.PARSE_SOLID:
-      # Check that color components are floating point values between 0 and 1
-      if not all(0.0 <= color_component <= 1 for color_component in [r, g, b]):
-        self.add_warning(WarningType.INVALID_COLOR)
+    # Check that color components are floating point values between 0 and 1
+    if not all(0.0 <= color_component <= 1 for color_component in [r, g, b]):
+      self.add_warning(WarningType.INVALID_COLOR)
 
-      self.meshes[-1].set_color(r, g, b)
-    else:
-      raise Exception('Unexpected color')
+    self.meshes[-1].set_color(r, g, b)
 
-  def begin_facet(self):
-    if self.state is ParserState.PARSE_SOLID:
-      self.current_facet = Facet()
-      self.state = ParserState.PARSE_NORMAL
-    else:
-      raise Exception('Unexpected facet')
+  @check_state(ParserState.PARSE_SOLID)
+  def begin_facet(self):  
+    self.current_facet = Facet()
+    self.state = ParserState.PARSE_NORMAL
 
+  @check_state(ParserState.PARSE_NORMAL)
   def normal(self, x, y, z):
-    if self.state is ParserState.PARSE_NORMAL:
-      n = Vector3(x, y, z)
+    n = Vector3(x, y, z)
 
-      if not n.is_unit():
-        self.add_warning(WarningType.NON_UNIT_NORMAL)
-        n.normalize()
+    if not n.is_unit():
+      self.add_warning(WarningType.NON_UNIT_NORMAL)
+      n.normalize()
 
-      self.current_facet.passed_normal = n
-      self.state = ParserState.PARSE_LOOP
-    else:
-      raise Exception('Unexpected normal')
+    self.current_facet.passed_normal = n
+    self.state = ParserState.PARSE_LOOP
 
+  @check_state(ParserState.PARSE_FACET)
   def begin_loop(self):
-    if self.state is ParserState.PARSE_FACET:
-      self.state = ParserState.PARSE_VERTEX
-    else:
-      raise Exception('Unexpected loop')
+    self.state = ParserState.PARSE_VERTEX
 
+  @check_state(ParserState.PARSE_VERTEX)
   def vertex(self, x, y, z):
-    if self.state is ParserState.PARSE_VERTEX:
-      if self.current_facet.is_complete():
-        raise Exception(f'Too many vertices given for facet')
-      
-      v = Vector3(x, y, z)
-      self.current_facet.vertices.append(v)
-    else:
-      raise Exception('Unexpected vertex')
+    if self.current_facet.is_complete():
+      raise Exception(f'Too many vertices given for facet')
+    
+    v = Vector3(x, y, z)
+    self.current_facet.vertices.append(v)
   
+  @check_state(ParserState.PARSE_VERTEX)
   def end_loop(self):
-    if self.state is ParserState.PARSE_VERTEX:
-      if self.current_facet.is_complete():
-        raise Exception(f'Loop does not contain exactly 3 vertices')
+    if self.current_facet.is_complete():
+      raise Exception(f'Loop does not contain exactly 3 vertices')
 
-      self.state = ParserState.PARSE_FACET_COMPLETE
-    else:
-      raise Exception(f'Cannot close loop in {state_name(self.state)}')
+    self.state = ParserState.PARSE_FACET_COMPLETE
 
+  @check_state(ParserState.PARSE_FACET_COMPLETE)
   def end_facet(self):
-    if self.state is ParserState.PARSE_FACET_COMPLETE:
-      if self.current_facet.has_conflicting_normal():
-        self.add_warning(WarningType.CONFLICTING_NORMALS)
+    if self.current_facet.has_conflicting_normal():
+      self.add_warning(WarningType.CONFLICTING_NORMALS)
 
-      self.meshes[-1].add_facet(self.current_facet)
-      self.state = ParserState.PARSE_SOLID
-    else:
-      raise Exception(f'Cannot close facet in {state_name(self.state)}')
+    self.meshes[-1].add_facet(self.current_facet)
+    self.state = ParserState.PARSE_SOLID
 
-  def end_solid(self, name):
-    if self.state is ParserState.PARSE_SOLID:
-      # We know we've seen at least one facet if the current facet is complete
-      if not self.current_facet.is_complete():
-        self.add_warning(WarningType.EMPTY_SOLID)
+  @check_state(ParserState.PARSE_SOLID)
+  def end_solid(self, name):    
+    # We know we've seen at least one facet if the current facet is complete
+    if not self.current_facet.is_complete():
+      self.add_warning(WarningType.EMPTY_SOLID)
 
-      # Make sure the name of the endsolid call matches the opening solid call
-      if name != self.meshes[-1].name:
-        self.add_warning(WarningType.END_SOLID_NAME_MISMATCH)
-
-    else:
-      raise Exception(f'Cannot close solid in {state_name(self.state)}')
+    # Make sure the name of the endsolid call matches the opening solid call
+    if name != self.meshes[-1].name:
+      self.add_warning(WarningType.END_SOLID_NAME_MISMATCH)
