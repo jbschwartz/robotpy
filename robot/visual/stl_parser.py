@@ -66,7 +66,8 @@ class STLParser:
     return list(map(float, components_string.split(' ')))
 
   def consume(self, line):
-    keyword, rest = line.split(' ', 1)
+    # Ignore case
+    keyword, rest = line.lower().split(' ', 1)
     if keyword == 'solid':
       self.begin_solid(rest)
     elif keyword == 'color':
