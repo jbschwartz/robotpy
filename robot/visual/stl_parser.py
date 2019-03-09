@@ -76,7 +76,7 @@ class STLParser:
     elif keyword == 'facet':
       self.begin_facet()
 
-      consume(rest)
+      self.consume(rest)
     elif keyword == 'normal':
       try:
         self.normal(*self.parse_components(rest))
