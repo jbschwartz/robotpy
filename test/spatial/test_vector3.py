@@ -111,3 +111,7 @@ class TestVector3(unittest.TestCase):
 
     expected = Vector3(9, 3, -1)
     self.assertAlmostEqual(vector3.cross(self.v2, self.v1), expected)
+
+  @unittest.skip("Need to write test")
+  def test_almost_equal(self):
+    self.assertTrue(False)
