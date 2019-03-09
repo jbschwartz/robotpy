@@ -9,7 +9,6 @@ Vector3 = vector3.Vector3
 
 @enum.unique
 class ParserState(enum.Enum):
-  READY = enum.auto()
   PARSE_SOLID = enum.auto()
   PARSE_FACET = enum.auto()
   PARSE_NORMAL = enum.auto()
@@ -40,7 +39,7 @@ def check_state(expected_state):
 class STLParser:
   def __init__(self):
     self.meshes = []
-    self.state = ParserState.READY
+    self.state = ParserState.PARSE_SOLID
     self.current_facet = Facet()
     self.warnings = dict()
 
@@ -122,12 +121,12 @@ class STLParser:
     else:
       raise Exception(f'Encountered unknown keyword: {keyword}')
 
-  @check_state(ParserState.READY)
+  @check_state(ParserState.PARSE_SOLID)
   def begin_solid(self, name):
     self.meshes.append(Mesh(name))
-    self.state = ParserState.PARSE_SOLID
+    self.state = ParserState.PARSE_FACET
 
-  @check_state(ParserState.PARSE_SOLID)
+  @check_state(ParserState.PARSE_FACET)
   def solid_color(self, r, g, b):
     # Check that color components are floating point values between 0 and 1
     if not all(0.0 <= color_component <= 1 for color_component in [r, g, b]):
@@ -135,7 +134,7 @@ class STLParser:
 
     self.meshes[-1].set_color(r, g, b)
 
-  @check_state(ParserState.PARSE_SOLID)
+  @check_state(ParserState.PARSE_FACET)
   def begin_facet(self):  
     self.current_facet = Facet()
     self.state = ParserState.PARSE_NORMAL
@@ -151,7 +150,7 @@ class STLParser:
     self.current_facet.passed_normal = n
     self.state = ParserState.PARSE_LOOP
 
-  @check_state(ParserState.PARSE_FACET)
+  @check_state(ParserState.PARSE_LOOP)
   def begin_loop(self):
     self.state = ParserState.PARSE_VERTEX
 
@@ -176,9 +175,9 @@ class STLParser:
       self.add_warning(WarningType.CONFLICTING_NORMALS)
 
     self.meshes[-1].add_facet(self.current_facet)
-    self.state = ParserState.PARSE_SOLID
+    self.state = ParserState.PARSE_FACET
 
-  @check_state(ParserState.PARSE_SOLID)
+  @check_state(ParserState.PARSE_FACET)
   def end_solid(self, name):    
     # We know we've seen at least one facet if the current facet is complete
     if not self.current_facet.is_complete():
@@ -187,3 +186,5 @@ class STLParser:
     # Make sure the name of the endsolid call matches the opening solid call
     if name != self.meshes[-1].name:
       self.add_warning(WarningType.END_SOLID_NAME_MISMATCH)
+    
+    self.state = ParserState.PARSE_SOLID
