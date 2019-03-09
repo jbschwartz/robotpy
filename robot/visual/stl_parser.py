@@ -88,27 +88,27 @@ class STLParser:
 
   def consume(self, line):
     # Ignore case
-    keyword, rest = line.lower().split(' ', 1)
+    keyword, *rest = line.lower().split(' ', 1)
     if keyword == 'solid':
-      self.begin_solid(rest)
+      self.begin_solid(rest[0])
     elif keyword == 'color':
-      self.solid_color(*self.parse_components(rest))
+      self.solid_color(*self.parse_components(rest[0]))
     elif keyword == 'facet':
       self.begin_facet()
 
-      self.consume(rest)
+      self.consume(rest[0])
     elif keyword == 'normal':
       try:
-        self.normal(*self.parse_components(rest))
+        self.normal(*self.parse_components(rest[0]))
       except TypeError:
         raise Exception('Normal contains an invalid number of components')
       except ValueError:
         raise Exception('Normal component cannot be converted to float')
-    elif keyword == 'outer' and rest == 'loop':
+    elif keyword == 'outer' and rest[0] == 'loop':
       self.begin_loop()
     elif keyword == 'vertex':
       try:
-        self.vertex(*self.parse_components(rest))
+        self.vertex(*self.parse_components(rest[0]))
       except TypeError:
         raise Exception('Vertex contains an invalid number of components')
       except ValueError:
@@ -118,7 +118,7 @@ class STLParser:
     elif keyword == 'endfacet':
       self.end_facet()
     elif keyword == 'endsolid':
-      self.end_solid(rest)
+      self.end_solid(rest[0])
     else:
       raise Exception(f'Encountered unknown keyword: {keyword}')
 
