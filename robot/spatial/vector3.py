@@ -63,6 +63,9 @@ class Vector3:
 
   def lengthSq(self):
     return self.x**2 + self.y**2 + self.z**2
+
+  def is_unit(self):
+    return math.isclose(self.lengthSq(), 1.0)
   
   def normalize(self):
     length = self.length()

@@ -67,6 +67,11 @@ class TestVector3(unittest.TestCase):
     expected = 14
     self.assertAlmostEqual(self.v1.lengthSq(), expected)
 
+  def test_is_unit(self):
+    unit_vector = vector3.normalize(self.v1)
+    self.assertFalse(self.v1.is_unit())
+    self.assertTrue(unit_vector.is_unit())
+
   def test_normalize(self):
     length = self.v1.length()
     expected = self.v1 / length
