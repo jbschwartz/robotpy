@@ -14,7 +14,9 @@ class Facet:
 
   def has_conflicting_normal(self):
     # TODO: Probably need to fix this later: make math.isclose work on Vector3
-    return math.isclose(self.passed_normal, self.computed_normal())
+    difference = self.passed_normal - self.computed_normal()
+
+    return not math.isclose(difference.length(), 0.0)
 
   def computed_normal(self):
     if self.is_complete():
