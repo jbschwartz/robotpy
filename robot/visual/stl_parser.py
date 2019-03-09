@@ -98,7 +98,7 @@ class STLParser:
     elif keyword == 'endfacet':
       self.end_facet()
     elif keyword == 'endsolid':
-      self.end_solid()
+      self.end_solid(rest)
     else:
       raise Exception(f'Encountered unknown keyword: {keyword}')
 
