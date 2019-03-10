@@ -90,28 +90,23 @@ class STLParser:
     keyword, *rest = line.lower().split(' ', 1)
     if keyword == 'solid':
       self.begin_solid(rest[0])
-    elif keyword == 'color':
-      self.solid_color(*self.parse_components(rest[0]))
     elif keyword == 'facet':
       self.begin_facet()
 
       self.consume(rest[0])
-    elif keyword == 'normal':
+    elif keyword == 'color' or keyword == 'normal' or keyword == 'vertex':
       try:
-        self.normal(*self.parse_components(rest[0]))
+        # `color`, `normal` and `vertex` keywords all:
+        #  - Call functions of their name, and
+        #  - Pass in three float components
+        fn = getattr(self, keyword)
+        fn(*self.parse_components(rest[0]))
       except TypeError:
-        raise Exception('Normal contains an invalid number of components')
+        raise Exception(f'{keyword.capitalize()} contains an invalid number of components')
       except ValueError:
-        raise Exception('Normal component cannot be converted to float')
+        raise Exception(f'{keyword.capitalize()} component cannot be converted to float')
     elif keyword == 'outer' and rest[0] == 'loop':
       self.begin_loop()
-    elif keyword == 'vertex':
-      try:
-        self.vertex(*self.parse_components(rest[0]))
-      except TypeError:
-        raise Exception('Vertex contains an invalid number of components')
-      except ValueError:
-        raise Exception('Vertex component cannot be converted to float')
     elif keyword == 'endloop':
       self.end_loop()
     elif keyword == 'endfacet':
@@ -127,7 +122,7 @@ class STLParser:
     self.state = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
-  def solid_color(self, r, g, b):
+  def color(self, r, g, b):
     # Check that color components are floating point values between 0 and 1
     if not all(0.0 <= color_component <= 1 for color_component in [r, g, b]):
       self.add_warning(WarningType.INVALID_COLOR)
