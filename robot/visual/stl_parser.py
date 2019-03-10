@@ -43,19 +43,20 @@ class STLParser:
 
   def __init__(self):
     self.meshes = []
+    self.warnings = dict()
     self.state = ParserState.PARSE_SOLID
     self.current_facet = Facet()
-    self.warnings = dict()
+    self.current_line = 1
+    self.stats = {
+      'facets': 0,
+      'vertices': 0
+    }
 
   def parse(self, filename):
     # Assuming ASCII format for now
     with open(filename, 'r') as f:
-      self.warnings.clear()
-      self.current_line = 1
-      self.stats = {
-        'facets': 0,
-        'vertices': 0
-      }
+      # Reset all the state information in case we parse multiple times
+      self.__init__()
 
       for line in f:
         try:
