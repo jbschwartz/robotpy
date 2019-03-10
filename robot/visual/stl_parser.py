@@ -16,7 +16,7 @@ class ParserState(enum.Enum):
   PARSE_VERTEX = enum.auto()
 
   def __str__(self):
-    return self.name.replace('PARSE_', '').replace('_', ' ')
+    return self.name.replace('PARSE_', '').replace('_', ' ').lower()
 
 @enum.unique
 class WarningType(enum.Enum):
