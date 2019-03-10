@@ -99,7 +99,6 @@ class STLParser:
 
     return components
 
-
   def consume(self, line):
     # Ignore case
     keyword, *rest = line.lower().split(' ', 1)
