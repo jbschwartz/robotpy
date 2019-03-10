@@ -70,23 +70,12 @@ class STLParser:
         self.consume(line.strip())
         self.current['line'] += 1
 
-    self.show_warnings and self.print_warnings()
-
     return self.meshes
 
   def add_warning(self, warning_type : WarningType):
     # Store the line that generated the warning to display to the user
     if isinstance(warning_type, WarningType):
       self.warnings[warning_type] = self.current['line']
-
-  def print_warnings(self):
-    for warning, line in self.warnings.items():
-      # TODO: Clean up color codes
-      print('\033[93m' + f'Warning: {warning.value} provided on line {line}' + '\033[0m')
-  
-  def print_stats(self):
-    for key, number in self.stats.items():
-      print(f'{key.capitalize()}: {number}')
 
   def parse_components(self, keyword, components_string):
     try:
