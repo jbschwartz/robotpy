@@ -116,7 +116,7 @@ class STLParser:
 
   @check_state(ParserState.PARSE_SOLID)
   def solid(self, name):
-    self.meshes.append(Mesh(name))
+    self.current['mesh'] = Mesh(name)
     self.current['state'] = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
@@ -125,7 +125,7 @@ class STLParser:
     if self.show_warnings and not all(0.0 <= color_component <= 1 for color_component in [r, g, b]):
       self.add_warning(WarningType.INVALID_COLOR)
 
-    self.meshes[-1].set_color(r, g, b)
+    self.current['mesh'].set_color(r, g, b)
 
   @check_state(ParserState.PARSE_FACET)
   def facet(self, normal):  
@@ -175,7 +175,7 @@ class STLParser:
     try:
       if self.show_warnings and self.current['facet'].has_conflicting_normal():
         self.add_warning(WarningType.CONFLICTING_NORMALS)
-      self.meshes[-1].facets.append(self.current['facet'])
+      self.current['mesh'].facets.append(self.current['facet'])
     except:
       self.add_warning(WarningType.DEGENERATE_TRIANGLE)
 
@@ -189,7 +189,8 @@ class STLParser:
         self.add_warning(WarningType.EMPTY_SOLID)
 
       # Make sure the name of the endsolid call matches the opening solid call
-      if name != self.meshes[-1].name:
+      if name != self.current['mesh'].name:
         self.add_warning(WarningType.END_SOLID_NAME_MISMATCH)
     
+    self.meshes.append(self.current['mesh'])
     self.current['state'] = ParserState.PARSE_SOLID
