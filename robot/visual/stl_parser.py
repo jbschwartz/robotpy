@@ -122,7 +122,7 @@ class STLParser:
   @check_state(ParserState.PARSE_FACET)
   def color(self, r, g, b):
     # Check that color components are floating point values between 0 and 1
-    if not all(0.0 <= color_component <= 1 for color_component in [r, g, b]):
+    if self.show_warnings and not all(0.0 <= color_component <= 1 for color_component in [r, g, b]):
       self.add_warning(WarningType.INVALID_COLOR)
 
     self.meshes[-1].set_color(r, g, b)
@@ -140,7 +140,7 @@ class STLParser:
   def normal(self, x, y, z):
     n = Vector3(x, y, z)
 
-    if not n.is_unit():
+    if self.show_warnings and not n.is_unit():
       self.add_warning(WarningType.NON_UNIT_NORMAL)
       n.normalize()
 
@@ -149,7 +149,7 @@ class STLParser:
 
   @check_state(ParserState.PARSE_LOOP)
   def outer(self, loop_keyword = None):
-    if loop_keyword != 'loop':
+    if self.show_warnings and loop_keyword != 'loop':
       self.add_warning(WarningType.NO_LOOP_KEYWORD)
 
     self.current['state'] = ParserState.PARSE_VERTEX
@@ -173,7 +173,7 @@ class STLParser:
   @check_state(ParserState.PARSE_LOOP)
   def endfacet(self):
     try:
-      if self.current['facet'].has_conflicting_normal():
+      if self.show_warnings and self.current['facet'].has_conflicting_normal():
         self.add_warning(WarningType.CONFLICTING_NORMALS)
       self.meshes[-1].facets.append(self.current['facet'])
     except:
@@ -183,12 +183,13 @@ class STLParser:
 
   @check_state(ParserState.PARSE_FACET)
   def endsolid(self, name):    
-    # We know we've seen at least one facet if the current facet is complete
-    if not self.current['facet'].is_complete():
-      self.add_warning(WarningType.EMPTY_SOLID)
+    if self.show_warnings:
+      # We know we've seen at least one facet if the current facet is complete
+      if not self.current['facet'].is_complete():
+        self.add_warning(WarningType.EMPTY_SOLID)
 
-    # Make sure the name of the endsolid call matches the opening solid call
-    if name != self.meshes[-1].name:
-      self.add_warning(WarningType.END_SOLID_NAME_MISMATCH)
+      # Make sure the name of the endsolid call matches the opening solid call
+      if name != self.meshes[-1].name:
+        self.add_warning(WarningType.END_SOLID_NAME_MISMATCH)
     
     self.current['state'] = ParserState.PARSE_SOLID
