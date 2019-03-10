@@ -1,14 +1,11 @@
 import enum, math
 
-from .mesh import Mesh
+from .exceptions import *
 from .facet import Facet
+from .mesh import Mesh
 
 from ..common import Timer
-from ..spatial import vector3
-
-from .exceptions import *
-
-Vector3 = vector3.Vector3
+from ..spatial import Vector3
 
 @enum.unique
 class ParserState(enum.Enum):
