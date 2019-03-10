@@ -3,6 +3,7 @@ import enum, math
 from .mesh import Mesh
 from .facet import Facet
 
+from ..common import Timer
 from ..spatial import vector3
 
 from .exceptions import *
@@ -57,19 +58,23 @@ class STLParser:
 
     self.stats = {
       'facets': 0,
-      'vertices': 0
+      'vertices': 0,
+      'elapsed': 0
     }
 
   def parse(self, filename):
     # Assuming ASCII format for now
     with open(filename, 'r') as f:
-      # Reset all the state information in case we parse multiple times
-      self.reset()
+      with Timer() as timer:
+        # Reset all the state information in case we parse multiple times
+        self.reset()
 
-      for line in f:
-        self.consume(line.strip())
-        self.current['line'] += 1
+        for line in f:
+          self.consume(line.strip())
+          self.current['line'] += 1
 
+    self.stats['elapsed'] = timer.elapsed
+    
     return self.meshes
 
   def add_warning(self, warning_type : WarningType):
