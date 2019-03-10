@@ -52,6 +52,10 @@ class STLParser:
     with open(filename, 'r') as f:
       self.warnings.clear()
       self.current_line = 1
+      self.stats = {
+        'facets': 0,
+        'vertices': 0
+      }
 
       for line in f:
         try:
@@ -62,6 +66,7 @@ class STLParser:
           print('\033[91m' + f'Parsing error on line {self.current_line}: {error.args[0]}' + '\033[0m')
           return None
       
+      self.print_stats()
       self.print_warnings()
 
     return self.meshes
@@ -87,6 +92,10 @@ class STLParser:
         message = 'No loop keyword'
 
       print('\033[93m' + f'Warning: {message} provided on line {line}' + '\033[0m')
+  
+  def print_stats(self):
+    for key, number in self.stats.items():
+      print(f'{key.capitalize()}: {number}')
 
   def parse_components(self, keyword, components_string):
     try:
@@ -127,9 +136,10 @@ class STLParser:
   @check_state(ParserState.PARSE_FACET)
   def facet(self, normal):  
     self.current_facet = Facet()
-    self.state = ParserState.PARSE_NORMAL
+    self.stats['facets'] += 1
 
     # Continue processing the normal
+    self.state = ParserState.PARSE_NORMAL
     self.consume(normal)
 
   @check_state(ParserState.PARSE_NORMAL)
@@ -157,6 +167,7 @@ class STLParser:
     
     v = Vector3(x, y, z)
     self.current_facet.vertices.append(v)
+    self.stats['vertices'] += 1
   
   @check_state(ParserState.PARSE_VERTEX)
   def endloop(self):
