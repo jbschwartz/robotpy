@@ -49,6 +49,8 @@ class STLParser:
     self.warnings = dict()
     self.show_warnings = warnings
 
+    self.reset()
+
   def reset(self):
     self.current = {
       'state': ParserState.PARSE_SOLID,
