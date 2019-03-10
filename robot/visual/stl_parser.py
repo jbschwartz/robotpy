@@ -170,7 +170,7 @@ class STLParser:
     try:
       if self.current_facet.has_conflicting_normal():
         self.add_warning(WarningType.CONFLICTING_NORMALS)
-      self.meshes[-1].add_facet(self.current_facet)
+      self.meshes[-1].facets.append(self.current['facet'])
     except:
       self.add_warning(WarningType.DEGENERATE_TRIANGLE)
 
