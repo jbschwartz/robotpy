@@ -41,10 +41,12 @@ def check_state(expected_state):
 class STLParser:
   KEYWORD_WHITELIST = ('solid', 'color', 'facet', 'normal', 'outer', 'vertex', 'endloop', 'endfacet', 'endsolid')
 
-  def __init__(self):
+  def __init__(self, warnings = True):
     self.meshes = []
     self.warnings = dict()
-    
+    self.show_warnings = warnings
+
+  def reset(self):
     self.current = {
       'state': ParserState.PARSE_SOLID,
       'facet': Facet(),
@@ -60,7 +62,7 @@ class STLParser:
     # Assuming ASCII format for now
     with open(filename, 'r') as f:
       # Reset all the state information in case we parse multiple times
-      self.__init__()
+      self.reset()
 
       for line in f:
         try:
@@ -71,8 +73,7 @@ class STLParser:
           print('\033[91m' + f'Parsing error on line {self.current["line"]}: {error.args[0]}' + '\033[0m')
           return None
       
-      self.print_stats()
-      self.print_warnings()
+    self.show_warnings and self.print_warnings()
 
     return self.meshes
 
