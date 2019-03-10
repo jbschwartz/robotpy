@@ -38,10 +38,9 @@ def check_state(expected_state):
     return wrapper
   return _check_state
 
-# TODO: Is this the best place to leave this?
-whitelist = ['solid', 'color', 'facet', 'normal', 'outer', 'loop', 'vertex', 'endloop', 'endfacet', 'endsolid']
-
 class STLParser:
+  KEYWORD_WHITELIST = ('solid', 'color', 'facet', 'normal', 'outer', 'vertex', 'endloop', 'endfacet', 'endsolid')
+
   def __init__(self):
     self.meshes = []
     self.state = ParserState.PARSE_SOLID
@@ -98,7 +97,7 @@ class STLParser:
     # Ignore case
     keyword, *rest = line.lower().split(' ', 1)
 
-    if keyword in whitelist:
+    if keyword in self.KEYWORD_WHITELIST:
       fn = getattr(self, keyword)
     else:
       raise Exception(f'Encountered unknown keyword: {keyword}')
