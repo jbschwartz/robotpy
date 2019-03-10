@@ -14,7 +14,6 @@ class ParserState(enum.Enum):
   PARSE_NORMAL = enum.auto()
   PARSE_LOOP = enum.auto()
   PARSE_VERTEX = enum.auto()
-  PARSE_FACET_COMPLETE = enum.auto()
 
   def __str__(self):
     return self.name.replace('PARSE_', '').replace('_', ' ')
@@ -164,9 +163,9 @@ class STLParser:
     if not self.current_facet.is_complete():
       raise Exception(f'Loop does not contain exactly 3 vertices')
 
-    self.state = ParserState.PARSE_FACET_COMPLETE
+    self.state = ParserState.PARSE_LOOP
 
-  @check_state(ParserState.PARSE_FACET_COMPLETE)
+  @check_state(ParserState.PARSE_LOOP)
   def endfacet(self):
     try:
       if self.current_facet.has_conflicting_normal():
