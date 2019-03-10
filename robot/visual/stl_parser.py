@@ -23,6 +23,7 @@ class WarningType(enum.Enum):
   INVALID_COLOR = enum.auto()
   EMPTY_SOLID = enum.auto()
   END_SOLID_NAME_MISMATCH = enum.auto()
+  NO_LOOP_KEYWORD = enum.auto()
 
 def check_state(expected_state):
   def _check_state(f):
@@ -35,6 +36,9 @@ def check_state(expected_state):
         raise Exception(f'While parsing {state_name} state, unexpected transition to {new_state} state on line {self.current_line}')
     return wrapper
   return _check_state
+
+# TODO: Is this the best place to leave this?
+whitelist = ['solid', 'color', 'facet', 'normal', 'outer', 'loop', 'vertex', 'endloop', 'endfacet', 'endsolid']
 
 class STLParser:
   def __init__(self):
@@ -55,7 +59,7 @@ class STLParser:
           self.current_line += 1
         except Exception as error:
           print(traceback.format_exc())
-          print(f'Parsing error: {error.args[0]}')
+          print('\033[91m' + f'Parsing error on line {self.current_line}: {error.args[0]}' + '\033[0m')
           return None
       
       self.print_warnings()
@@ -79,45 +83,36 @@ class STLParser:
         message = 'Empty solid'
       elif warning_type is WarningType.END_SOLID_NAME_MISMATCH:
         message = 'Wrong endsolid name'
+      elif warning_type is WarningType.NO_LOOP_KEYWORD:
+        message = 'No loop keyword'
 
-      print(f'Warning: {message} provided on line {line}')
+      print('\033[93m' + f'Warning: {message} provided on line {line}' + '\033[0m')
 
-  def parse_components(self, components_string):
-    return list(map(float, components_string.split(' ')))
+  def parse_components(self, keyword, components_string):
+    try:
+      return list(map(float, components_string.split(' ')))
+    except TypeError:
+      raise Exception(f'{keyword.capitalize()} contains an invalid number of components')
+    except ValueError:
+      raise Exception(f'{keyword.capitalize()} component cannot be converted to float')
 
   def consume(self, line):
     # Ignore case
     keyword, *rest = line.lower().split(' ', 1)
-    if keyword == 'solid':
-      self.begin_solid(rest[0])
-    elif keyword == 'facet':
-      self.begin_facet()
 
-      self.consume(rest[0])
-    elif keyword == 'color' or keyword == 'normal' or keyword == 'vertex':
-      try:
-        # `color`, `normal` and `vertex` keywords all:
-        #  - Call functions of their name, and
-        #  - Pass in three float components
-        fn = getattr(self, keyword)
-        fn(*self.parse_components(rest[0]))
-      except TypeError:
-        raise Exception(f'{keyword.capitalize()} contains an invalid number of components')
-      except ValueError:
-        raise Exception(f'{keyword.capitalize()} component cannot be converted to float')
-    elif keyword == 'outer' and rest[0] == 'loop':
-      self.begin_loop()
-    elif keyword == 'endloop':
-      self.end_loop()
-    elif keyword == 'endfacet':
-      self.end_facet()
-    elif keyword == 'endsolid':
-      self.end_solid(rest[0])
+    if keyword in whitelist:
+      fn = getattr(self, keyword)
     else:
       raise Exception(f'Encountered unknown keyword: {keyword}')
 
+    # For these keywords, convert string to list of floats
+    if keyword in ['color', 'normal', 'vertex']:
+      rest = self.parse_components(keyword, *rest)
+    
+    fn(*rest)
+
   @check_state(ParserState.PARSE_SOLID)
-  def begin_solid(self, name):
+  def solid(self, name):
     self.meshes.append(Mesh(name))
     self.state = ParserState.PARSE_FACET
 
@@ -130,9 +125,12 @@ class STLParser:
     self.meshes[-1].set_color(r, g, b)
 
   @check_state(ParserState.PARSE_FACET)
-  def begin_facet(self):  
+  def facet(self, normal):  
     self.current_facet = Facet()
     self.state = ParserState.PARSE_NORMAL
+
+    # Continue processing the normal
+    self.consume(normal)
 
   @check_state(ParserState.PARSE_NORMAL)
   def normal(self, x, y, z):
@@ -146,7 +144,10 @@ class STLParser:
     self.state = ParserState.PARSE_LOOP
 
   @check_state(ParserState.PARSE_LOOP)
-  def begin_loop(self):
+  def outer(self, loop_keyword = None):
+    if loop_keyword != 'loop':
+      self.add_warning(WarningType.NO_LOOP_KEYWORD)
+
     self.state = ParserState.PARSE_VERTEX
 
   @check_state(ParserState.PARSE_VERTEX)
@@ -158,14 +159,14 @@ class STLParser:
     self.current_facet.vertices.append(v)
   
   @check_state(ParserState.PARSE_VERTEX)
-  def end_loop(self):
+  def endloop(self):
     if not self.current_facet.is_complete():
       raise Exception(f'Loop does not contain exactly 3 vertices')
 
     self.state = ParserState.PARSE_FACET_COMPLETE
 
   @check_state(ParserState.PARSE_FACET_COMPLETE)
-  def end_facet(self):
+  def endfacet(self):
     if self.current_facet.has_conflicting_normal():
       self.add_warning(WarningType.CONFLICTING_NORMALS)
 
@@ -173,7 +174,7 @@ class STLParser:
     self.state = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
-  def end_solid(self, name):    
+  def endsolid(self, name):    
     # We know we've seen at least one facet if the current facet is complete
     if not self.current_facet.is_complete():
       self.add_warning(WarningType.EMPTY_SOLID)
