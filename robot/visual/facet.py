@@ -40,7 +40,6 @@ class Facet:
     normal = vector3.cross(edges[0], edges[1])
 
     if math.isclose(normal.length(), 0.0):
-      # TODO: Probably should make a specific exception for this
       raise DegenerateTriangleError('Degenerate triangle found')
     
     normal.normalize()
