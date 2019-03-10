@@ -31,10 +31,10 @@ class WarningType(enum.Enum):
 def check_state(expected_state):
   def _check_state(f):
     def wrapper(self, *args):
-      if self.state is expected_state:
+      if self.current['state'] is expected_state:
         return f(self, *args)
       else:
-        raise Exception(f'unexpected `{f.__name__}` while parsing `{self.state}`')
+        raise Exception(f'unexpected `{f.__name__}` while parsing `{self.current["state"]}`')
     return wrapper
   return _check_state
 
@@ -44,9 +44,13 @@ class STLParser:
   def __init__(self):
     self.meshes = []
     self.warnings = dict()
-    self.state = ParserState.PARSE_SOLID
-    self.current_facet = Facet()
-    self.current_line = 1
+    
+    self.current = {
+      'state': ParserState.PARSE_SOLID,
+      'facet': Facet(),
+      'line': 1
+    }
+
     self.stats = {
       'facets': 0,
       'vertices': 0
@@ -61,10 +65,10 @@ class STLParser:
       for line in f:
         try:
           self.consume(line.strip())
-          self.current_line += 1
+          self.current['line'] += 1
         except Exception as error:
           print(traceback.format_exc())
-          print('\033[91m' + f'Parsing error on line {self.current_line}: {error.args[0]}' + '\033[0m')
+          print('\033[91m' + f'Parsing error on line {self.current["line"]}: {error.args[0]}' + '\033[0m')
           return None
       
       self.print_stats()
@@ -75,7 +79,7 @@ class STLParser:
   def add_warning(self, warning_type : WarningType):
     # Store the line that generated the warning to display to the user
     if isinstance(warning_type, WarningType):
-      self.warnings[warning_type] = self.current_line
+      self.warnings[warning_type] = self.current['line']
 
   def print_warnings(self):
     for warning, line in self.warnings.items():
@@ -112,7 +116,7 @@ class STLParser:
   @check_state(ParserState.PARSE_SOLID)
   def solid(self, name):
     self.meshes.append(Mesh(name))
-    self.state = ParserState.PARSE_FACET
+    self.current['state'] = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
   def color(self, r, g, b):
@@ -124,11 +128,11 @@ class STLParser:
 
   @check_state(ParserState.PARSE_FACET)
   def facet(self, normal):  
-    self.current_facet = Facet()
+    self.current['facet'] = Facet()
     self.stats['facets'] += 1
 
     # Continue processing the normal
-    self.state = ParserState.PARSE_NORMAL
+    self.current['state'] = ParserState.PARSE_NORMAL
     self.consume(normal)
 
   @check_state(ParserState.PARSE_NORMAL)
@@ -139,51 +143,51 @@ class STLParser:
       self.add_warning(WarningType.NON_UNIT_NORMAL)
       n.normalize()
 
-    self.current_facet.passed_normal = n
-    self.state = ParserState.PARSE_LOOP
+    self.current['facet'].passed_normal = n
+    self.current['state'] = ParserState.PARSE_LOOP
 
   @check_state(ParserState.PARSE_LOOP)
   def outer(self, loop_keyword = None):
     if loop_keyword != 'loop':
       self.add_warning(WarningType.NO_LOOP_KEYWORD)
 
-    self.state = ParserState.PARSE_VERTEX
+    self.current['state'] = ParserState.PARSE_VERTEX
 
   @check_state(ParserState.PARSE_VERTEX)
   def vertex(self, x, y, z):
-    if self.current_facet.is_complete():
+    if self.current['facet'].is_complete():
       raise Exception(f'Too many vertices given for facet')
     
     v = Vector3(x, y, z)
-    self.current_facet.vertices.append(v)
+    self.current['facet'].vertices.append(v)
     self.stats['vertices'] += 1
   
   @check_state(ParserState.PARSE_VERTEX)
   def endloop(self):
-    if not self.current_facet.is_complete():
+    if not self.current['facet'].is_complete():
       raise Exception(f'Loop does not contain exactly 3 vertices')
 
-    self.state = ParserState.PARSE_LOOP
+    self.current['state'] = ParserState.PARSE_LOOP
 
   @check_state(ParserState.PARSE_LOOP)
   def endfacet(self):
     try:
-      if self.current_facet.has_conflicting_normal():
+      if self.current['facet'].has_conflicting_normal():
         self.add_warning(WarningType.CONFLICTING_NORMALS)
       self.meshes[-1].facets.append(self.current['facet'])
     except:
       self.add_warning(WarningType.DEGENERATE_TRIANGLE)
 
-    self.state = ParserState.PARSE_FACET
+    self.current['state'] = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
   def endsolid(self, name):    
     # We know we've seen at least one facet if the current facet is complete
-    if not self.current_facet.is_complete():
+    if not self.current['facet'].is_complete():
       self.add_warning(WarningType.EMPTY_SOLID)
 
     # Make sure the name of the endsolid call matches the opening solid call
     if name != self.meshes[-1].name:
       self.add_warning(WarningType.END_SOLID_NAME_MISMATCH)
     
-    self.state = ParserState.PARSE_SOLID
+    self.current['state'] = ParserState.PARSE_SOLID
