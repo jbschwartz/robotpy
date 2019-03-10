@@ -1,5 +1,7 @@
 import math
 
+from .exceptions import DegenerateTriangleError
+
 from ..spatial import vector3
 
 Vector3 = vector3.Vector3
@@ -28,7 +30,7 @@ class Facet:
 
     if math.isclose(normal.length(), 0.0):
       # TODO: Probably should make a specific exception for this
-      raise Exception('Degenerate triangle found')
+      raise DegenerateTriangleError('Degenerate triangle found')
     
     normal.normalize()
 

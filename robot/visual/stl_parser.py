@@ -1,9 +1,11 @@
-import enum, math, traceback
+import enum, math
 
 from .mesh import Mesh
 from .facet import Facet
 
 from ..spatial import vector3
+
+from .exceptions import *
 
 Vector3 = vector3.Vector3
 
@@ -34,7 +36,7 @@ def check_state(expected_state):
       if self.current['state'] is expected_state:
         return f(self, *args)
       else:
-        raise Exception(f'unexpected `{f.__name__}` while parsing `{self.current["state"]}`')
+        raise STLStateError(self.current['line'], self.current["state"], f.__name__)
     return wrapper
   return _check_state
 
@@ -65,14 +67,9 @@ class STLParser:
       self.reset()
 
       for line in f:
-        try:
-          self.consume(line.strip())
-          self.current['line'] += 1
-        except Exception as error:
-          print(traceback.format_exc())
-          print('\033[91m' + f'Parsing error on line {self.current["line"]}: {error.args[0]}' + '\033[0m')
-          return None
-      
+        self.consume(line.strip())
+        self.current['line'] += 1
+
     self.show_warnings and self.print_warnings()
 
     return self.meshes
@@ -93,11 +90,15 @@ class STLParser:
 
   def parse_components(self, keyword, components_string):
     try:
-      return list(map(float, components_string.split(' ')))
-    except TypeError:
-      raise Exception(f'{keyword.capitalize()} contains an invalid number of components')
+      components = list(map(float, components_string.split(' ')))
     except ValueError:
-      raise Exception(f'{keyword.capitalize()} component cannot be converted to float')
+      raise STLFloatError(self.current['line'], keyword)
+
+    if len(components) != 3:
+      raise STLUnexpectedSize(self.current['line'], keyword)
+
+    return components
+
 
   def consume(self, line):
     # Ignore case
@@ -106,7 +107,7 @@ class STLParser:
     if keyword in self.KEYWORD_WHITELIST:
       fn = getattr(self, keyword)
     else:
-      raise Exception(f'Encountered unknown keyword: {keyword}')
+      raise ParserError(self.current['line'], f'Unknown keyword: {keyword}')
 
     # For these keywords, convert string to list of floats
     if keyword in ['color', 'normal', 'vertex']:
@@ -156,17 +157,16 @@ class STLParser:
 
   @check_state(ParserState.PARSE_VERTEX)
   def vertex(self, x, y, z):
-    if self.current['facet'].is_complete():
-      raise Exception(f'Too many vertices given for facet')
-    
     v = Vector3(x, y, z)
     self.current['facet'].vertices.append(v)
     self.stats['vertices'] += 1
   
   @check_state(ParserState.PARSE_VERTEX)
   def endloop(self):
-    if not self.current['facet'].is_complete():
-      raise Exception(f'Loop does not contain exactly 3 vertices')
+    facet = self.current['facet'] 
+
+    if not facet.is_triangle():
+      raise STLNotATriangle(self.current['line'], facet.size())
 
     self.current['state'] = ParserState.PARSE_LOOP
 
@@ -175,17 +175,17 @@ class STLParser:
     try:
       if self.show_warnings and self.current['facet'].has_conflicting_normal():
         self.add_warning(WarningType.CONFLICTING_NORMALS)
-      self.current['mesh'].facets.append(self.current['facet'])
-    except:
+    except DegenerateTriangleError:
       self.add_warning(WarningType.DEGENERATE_TRIANGLE)
 
+    self.current['mesh'].facets.append(self.current['facet'])
     self.current['state'] = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
   def endsolid(self, name):    
     if self.show_warnings:
-      # We know we've seen at least one facet if the current facet is complete
-      if not self.current['facet'].is_complete():
+      # We know we've seen at least one valid facet if the current facet is a triangle
+      if not self.current['facet'].is_triangle():
         self.add_warning(WarningType.EMPTY_SOLID)
 
       # Make sure the name of the endsolid call matches the opening solid call
