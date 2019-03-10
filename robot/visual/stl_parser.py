@@ -18,13 +18,13 @@ class ParserState(enum.Enum):
 
 @enum.unique
 class WarningType(enum.Enum):
-  NON_UNIT_NORMAL = enum.auto()
-  CONFLICTING_NORMALS = enum.auto()
-  INVALID_COLOR = enum.auto()
-  EMPTY_SOLID = enum.auto()
-  END_SOLID_NAME_MISMATCH = enum.auto()
-  NO_LOOP_KEYWORD = enum.auto()
-  DEGENERATE_TRIANGLE = enum.auto()
+  NON_UNIT_NORMAL = 'Non-unit normal'
+  CONFLICTING_NORMALS = 'Conflicting facet normal'
+  INVALID_COLOR = 'Invalid color'
+  EMPTY_SOLID = 'Empty solid'
+  END_SOLID_NAME_MISMATCH = 'Wrong endsolid name'
+  NO_LOOP_KEYWORD = 'No loop keyword'
+  DEGENERATE_TRIANGLE = 'Degenerate triangle'
 
 def check_state(expected_state):
   def _check_state(f):
@@ -74,28 +74,13 @@ class STLParser:
 
   def add_warning(self, warning_type : WarningType):
     # Store the line that generated the warning to display to the user
-    self.warnings[warning_type] = self.current_line
+    if isinstance(warning_type, WarningType):
+      self.warnings[warning_type] = self.current_line
 
   def print_warnings(self):
-    for warning_type, line in self.warnings.items():
-      message = 'Unknown warning'
-      if warning_type is WarningType.NON_UNIT_NORMAL:
-        message = 'Non-unit normal'
-      elif warning_type is WarningType.CONFLICTING_NORMALS:
-        message = 'Conflicting facet normal'
-      elif warning_type is WarningType.INVALID_COLOR:
-        message = 'Invalid color'
-      elif warning_type is WarningType.EMPTY_SOLID:
-        message = 'Empty solid'
-      elif warning_type is WarningType.END_SOLID_NAME_MISMATCH:
-        message = 'Wrong endsolid name'
-      elif warning_type is WarningType.NO_LOOP_KEYWORD:
-        message = 'No loop keyword'
-      elif warning_type is WarningType.DEGENERATE_TRIANGLE:
-        message = 'Degenerate triangle'
-
+    for warning, line in self.warnings.items():
       # TODO: Clean up color codes
-      print('\033[93m' + f'Warning: {message} provided on line {line}' + '\033[0m')
+      print('\033[93m' + f'Warning: {warning.value} provided on line {line}' + '\033[0m')
   
   def print_stats(self):
     for key, number in self.stats.items():
