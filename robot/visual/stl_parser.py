@@ -74,7 +74,7 @@ class STLParser:
           self.current['line'] += 1
 
     self.stats['elapsed'] = timer.elapsed
-    
+
     return self.meshes
 
   def add_warning(self, warning_type : WarningType):
@@ -175,7 +175,7 @@ class STLParser:
     self.current['state'] = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
-  def endsolid(self, name):    
+  def endsolid(self, name):
     if self.show_warnings:
       # We know we've seen at least one valid facet if the current facet is a triangle
       if not self.current['facet'].is_triangle():
