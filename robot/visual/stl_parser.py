@@ -16,6 +16,9 @@ class ParserState(enum.Enum):
   PARSE_VERTEX = enum.auto()
   PARSE_FACET_COMPLETE = enum.auto()
 
+  def __str__(self):
+    return self.name.replace('PARSE_', '').replace('_', ' ')
+
 @enum.unique
 class WarningType(enum.Enum):
   NON_UNIT_NORMAL = 'Non-unit normal'
@@ -32,9 +35,7 @@ def check_state(expected_state):
       if self.state is expected_state:
         return f(self, *args)
       else:
-        state_name = self.state.name.replace('PARSE_', '').replace('_', ' ').lower()
-        new_state = f.__name__.replace('begin_', '').replace('_', '').lower()
-        raise Exception(f'While parsing {state_name} state, unexpected transition to {new_state} state on line {self.current_line}')
+        raise Exception(f'unexpected `{f.__name__}` while parsing `{self.state}`')
     return wrapper
   return _check_state
 
