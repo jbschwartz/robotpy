@@ -24,6 +24,7 @@ class WarningType(enum.Enum):
   EMPTY_SOLID = enum.auto()
   END_SOLID_NAME_MISMATCH = enum.auto()
   NO_LOOP_KEYWORD = enum.auto()
+  DEGENERATE_TRIANGLE = enum.auto()
 
 def check_state(expected_state):
   def _check_state(f):
@@ -90,7 +91,10 @@ class STLParser:
         message = 'Wrong endsolid name'
       elif warning_type is WarningType.NO_LOOP_KEYWORD:
         message = 'No loop keyword'
+      elif warning_type is WarningType.DEGENERATE_TRIANGLE:
+        message = 'Degenerate triangle'
 
+      # TODO: Clean up color codes
       print('\033[93m' + f'Warning: {message} provided on line {line}' + '\033[0m')
   
   def print_stats(self):
@@ -178,10 +182,13 @@ class STLParser:
 
   @check_state(ParserState.PARSE_FACET_COMPLETE)
   def endfacet(self):
-    if self.current_facet.has_conflicting_normal():
-      self.add_warning(WarningType.CONFLICTING_NORMALS)
+    try:
+      if self.current_facet.has_conflicting_normal():
+        self.add_warning(WarningType.CONFLICTING_NORMALS)
+      self.meshes[-1].add_facet(self.current_facet)
+    except:
+      self.add_warning(WarningType.DEGENERATE_TRIANGLE)
 
-    self.meshes[-1].add_facet(self.current_facet)
     self.state = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
