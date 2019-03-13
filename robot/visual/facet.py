@@ -50,4 +50,4 @@ class Facet:
     edges = self.compute_edges()
     total_length = sum(list(map(lambda edge: edge.length(), edges)))
     
-    return total_length / edges
+    return total_length / len(edges)
