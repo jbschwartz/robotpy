@@ -61,16 +61,15 @@ class STLParser:
       'elapsed': 0
     }
 
-  def parse(self, filename):
+  def parse(self, file):
     # Assuming ASCII format for now
-    with open(filename, 'r') as f:
-      with Timer() as timer:
-        # Reset all the state information in case we parse multiple times
-        self.reset()
+    with Timer() as timer:
+      # Reset all the state information in case we parse multiple times
+      self.reset()
 
-        for line in f:
-          self.consume(line.strip())
-          self.current['line'] += 1
+      for line in file:
+        self.consume(line.strip())
+        self.current['line'] += 1
 
     self.stats['elapsed'] = timer.elapsed
 
