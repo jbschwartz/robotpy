@@ -42,13 +42,14 @@ class STLParser:
   KEYWORD_WHITELIST = ('solid', 'color', 'facet', 'normal', 'outer', 'vertex', 'endloop', 'endfacet', 'endsolid')
 
   def __init__(self, warnings = True):
-    self.meshes = []
-    self.warnings = dict()
     self.show_warnings = warnings
 
     self.reset()
 
   def reset(self):
+    self.meshes = []
+    self.warnings = dict()
+    
     self.current = {
       'state': ParserState.PARSE_SOLID,
       'facet': Facet(),
