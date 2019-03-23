@@ -1,0 +1,98 @@
+{
+  "name": "Robot",
+  "description": "ABB IRB 120",
+  "joints": [
+    {
+      "alpha": -90,
+      "a": 0,
+      "theta": 0,
+      "d": 290,
+      "limits": {
+        "low": -165,
+        "high": 165
+      }
+    },
+    {
+      "alpha": 0,
+      "a": 270,
+      "theta": -90,
+      "d": 0,
+      "limits": {
+        "low": -110,
+        "high": 110
+      }
+    },
+    {
+      "alpha": -90,
+      "a": 70,
+      "theta": 0,
+      "d": 0,
+      "limits": {
+        "low": -110,
+        "high": 70
+      }
+    },
+    {
+      "alpha": 90,
+      "a": 0,
+      "theta": 0,
+      "d": 302,
+      "limits": {
+        "low": -160,
+        "high": 160
+      }
+    },
+    {
+      "alpha": -90,
+      "a": 0,
+      "theta": 0,
+      "d": 0,
+      "limits": {
+        "low": -120,
+        "high": 120
+      }
+    },
+    {
+      "alpha": 0,
+      "a": 0,
+      "theta": 180,
+      "d": 72,
+      "limits": {
+        "low": -400,
+        "high": 400
+      }
+    }
+  ],
+  "links": [
+    {
+      "name": "Base",
+      "color": [1, 0.25, 0.25],
+      "mesh_file": "ABB_IRB120-0.stl"
+    },
+    {
+      "name": "Waist",
+      "color": [0.5, 0.15, 0.85],
+      "mesh_file": "ABB_IRB120-1.stl"
+    },
+    {
+      "name": "Upper Arm",
+      "color": [1, 0, 1],
+      "mesh_file": "ABB_IRB120-2.stl"
+    },
+    {
+      "name": "Forearm",
+      "color": [0.25, 0.25, 1],
+      "mesh_file": "ABB_IRB120-3.stl"
+    },
+    {
+      "name": "Wrist 1",
+      "color": [0.5, 0.25, 1],
+      "mesh_file": "ABB_IRB120-4.stl"
+    },
+    {
+      "name": "Wrist 2",
+      "color": [1, 1, 0],
+      "mesh_file": "ABB_IRB120-5.stl"
+    }
+  ]
+}

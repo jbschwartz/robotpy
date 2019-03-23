@@ -3,11 +3,11 @@ import math
 
 from robot.spatial import Vector3
 from robot.mech import Joint, Serial
-from robot.robots import abb_irb_120
+from robot.robots import ABB_IRB_120
 
 class TestSerial(unittest.TestCase):
   def setUp(self):
-    self.robot = abb_irb_120.robot
+    self.robot = ABB_IRB_120
     
   def test_pose(self):
     angles = [ math.radians(45) ] * 6

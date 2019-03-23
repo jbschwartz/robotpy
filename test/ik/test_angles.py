@@ -3,11 +3,11 @@ import math
 from operator import itemgetter
 
 from robot import ik
-from robot.robots import abb_irb_120
+from robot.robots import ABB_IRB_120
 
 class TestAngles(unittest.TestCase):
   def setUp(self):
-    self.ABB_IRB_120 = abb_irb_120.robot
+    self.ABB_IRB_120 = ABB_IRB_120
 
     self.angles = [ math.radians(45) ] * 6
 
