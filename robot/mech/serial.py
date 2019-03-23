@@ -1,6 +1,4 @@
-import math
-import copy
-import itertools
+import copy, itertools, json, math
 
 from ..spatial import Dual, Quaternion, Transform, Frame, Vector3
 from robot import constant
