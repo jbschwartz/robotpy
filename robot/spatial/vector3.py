@@ -58,6 +58,10 @@ class Vector3:
     else:
         raise IndexError()
 
+  def __setitem__(self, index, value):
+    components = ['x', 'y', 'z']
+    setattr(self, components[index], value)
+
   def length(self):
     return math.sqrt(self.length_sq())
 
