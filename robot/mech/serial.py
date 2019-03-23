@@ -1,11 +1,36 @@
 import copy, itertools, json, math
 
+from .joint import Joint
+from .link import Link
+
 from ..spatial import Dual, Quaternion, Transform, Frame, Vector3
 from robot import constant
 
+def load(filename):
+  joints = []
+  links = []
+  with open(filename) as json_file:  
+    data = json.load(json_file)
+
+    for joint_params in data['joints']:
+      for param, value in joint_params.items():
+        if param == 'limits':
+          value['low'] = math.radians(value['low'])
+          value['high'] = math.radians(value['high'])
+        elif param in ['alpha', 'theta']:
+          joint_params[param] = math.radians(value)
+
+      joints.append(Joint(**joint_params))
+
+    for link_parameters in data['links']:
+      links.append(Link(**link_parameters))
+
+  return Serial(joints, links)
+
 class Serial:
-  def __init__(self, joints : list):
+  def __init__(self, joints : list, links = []):
     self.joints = joints
+    self.links = links
     self.position = Vector3()
 
     self.checkStructure()
