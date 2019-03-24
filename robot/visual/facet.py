@@ -14,9 +14,9 @@ class Facet:
     if facet_floats:
       self.normal = Vector3(*facet_floats[0:3])
       self.vertices = [
-        Vector3(*facet_floats[3:3]),
-        Vector3(*facet_floats[6:3]),
-        Vector3(*facet_floats[9:3])
+        Vector3(*facet_floats[3:6]),
+        Vector3(*facet_floats[6:9]),
+        Vector3(*facet_floats[9:12])
       ]
 
   def is_triangle(self):

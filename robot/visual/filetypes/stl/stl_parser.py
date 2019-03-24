@@ -122,6 +122,8 @@ class STLParser:
 
       current_mesh.append_buffer(Facet(facet_floats))
 
+    self.meshes.append(current_mesh)
+
   def parse_ascii(self, file):
     for line in file:
       self.consume(line.strip())
