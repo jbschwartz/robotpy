@@ -5,7 +5,7 @@ from .facet import Facet
 from ..spatial import vector3
 
 class Mesh:
-  def __init__(self, name):
+  def __init__(self, name = None):
     self.name = name
     self.buffer = []
     self.count = 0
