@@ -1,11 +1,10 @@
 import enum, math, struct
 
-from .exceptions import *
-from .facet import Facet
-from .mesh import Mesh
-
-from ..common import Timer
-from ..spatial import vector3
+from robot.common       import Timer
+from robot.exceptions   import *
+from robot.spatial      import vector3
+from robot.visual.facet import Facet
+from robot.visual.mesh  import Mesh
 
 Vector3 = vector3.Vector3
 
