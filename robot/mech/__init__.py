@@ -1,5 +1,3 @@
-from . import joint, link, serial
-
-Joint = joint.Joint
-Link = link.Link
-Serial = serial.Serial
+from. joint  import Joint
+from. link   import Link
+from. serial import Serial

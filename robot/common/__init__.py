@@ -1,3 +1,1 @@
-from . import timer
-
-Timer = timer.Timer
+from .timer import Timer
