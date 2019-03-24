@@ -70,25 +70,22 @@ class STLParser:
       'elapsed': 0
     }
 
-  def identify(self, file):
-    # Peek at the first few bytes 
-    position = file.tell()
-    first_word = str(file.read(5)).lower()
-    file.seek(position)
+  def identify(self, file_path):
+    with open(file_path, 'rb') as file:
+      first_word = file.read(5).decode('ascii').lower()
 
-    # An ASCII STL file must start with "solid"
-    if first_word == "solid":
-      return STLType.ASCII
-    else:
-      return STLType.BINARY
+      # An ASCII STL file must start with "solid"
+      return STLType.ASCII if first_word == 'solid' else STLType.BINARY
 
-  def parse(self, file, file_type = None):
+  def parse(self, file_path, file_type = None):
     if not file_type:
-      file_type = self.identify(file)
+      file_type = self.identify(file_path)
 
     if file_type is STLType.ASCII:
-      return self.parse_ascii(file)
+      with open(file_path, 'r') as file:
+        return self.parse_ascii(file)
     else:
+      with open(file_path, 'rb') as file:
       return self.parse_binary(file)
 
   def parse_binary(self, file):
