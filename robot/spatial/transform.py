@@ -36,19 +36,23 @@ class Transform:
   __rmul__ = __mul__
 
   def __call__(self, other, **kwargs):
-    q = Quaternion(0, other.x, other.y, other.z)
+    if isinstance(other, Vector3):
+      q = Quaternion(0, other.x, other.y, other.z)
+      if 'type' in kwargs and str.lower(kwargs['type']) == 'vector':
+        return self.transform_vector(q)
+      else:
+        return self.transform_point(q)
+        
+  def transform_vector(self, vector):
+    d = Dual(vector, Quaternion(0, 0, 0, 0))
+    a = self.dual * d * dual.conjugate(self.dual)
+    return Vector3(a.r.x, a.r.y, a.r.z)
 
-    if 'type' in kwargs and str.lower(kwargs['type']) == 'vector':
-      # Transformation of a vector
-      d = Dual(q, Quaternion(0, 0, 0, 0))
-      a = self.dual * d * dual.conjugate(self.dual)
-      return Vector3(a.r.x, a.r.y, a.r.z)
-    else:
-      # Transformation of a point
-      d = Dual(Quaternion(), q)
-      a = self.dual * d * dual.conjugate(self.dual)
-      return Vector3(a.d.x, a.d.y, a.d.z)
-      
+  def transform_point(self, point):
+    d = Dual(Quaternion(), point)
+    a = self.dual * d * dual.conjugate(self.dual)
+    return Vector3(a.d.x, a.d.y, a.d.z)
+
   def translation(self) -> Vector3:
     # "Undo" what was done in the __init__ function by working backwards
     t = 2 * self.dual.d * quaternion.conjugate(self.dual.r)
