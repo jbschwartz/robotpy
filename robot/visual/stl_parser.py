@@ -35,6 +35,12 @@ class STLType(enum.Enum):
   ASCII  = enum.auto()
   BINARY = enum.auto()
 
+  def __str__(self):
+    return 'ascii' if self is STLType.ASCII else 'binary'
+
+  def open_mode(self):
+    return 'r' if self is STLType.ASCII else 'rb'
+
 def check_state(expected_state):
   def _check_state(f):
     def wrapper(self, *args):
@@ -81,12 +87,9 @@ class STLParser:
     if not file_type:
       file_type = self.identify(file_path)
 
-    if file_type is STLType.ASCII:
-      with open(file_path, 'r') as file:
-        return self.parse_ascii(file)
-    else:
-      with open(file_path, 'rb') as file:
-      return self.parse_binary(file)
+    with open(file_path, file_type.open_mode()) as file:
+      parse_function = getattr(self, f'parse_{file_type}')
+      return parse_function(file)
 
   def parse_binary(self, file):
     pass
