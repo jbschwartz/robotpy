@@ -84,28 +84,28 @@ class STLParser:
       return STLType.ASCII if first_word == 'solid' else STLType.BINARY
 
   def parse(self, file_path, file_type = None):
+    # Reset all the state information in case we parse multiple times
+    self.reset()
+
     if not file_type:
       file_type = self.identify(file_path)
 
-    with open(file_path, file_type.open_mode()) as file:
-      parse_function = getattr(self, f'parse_{file_type}')
-      return parse_function(file)
+    with Timer() as timer:
+      with open(file_path, file_type.open_mode()) as file:
+        parse_function = getattr(self, f'parse_{file_type}')
+        parse_function(file)
+
+    self.stats['elapsed'] = timer.elapsed
+
+    return self.meshes
 
   def parse_binary(self, file):
     pass
 
   def parse_ascii(self, file):
-    with Timer() as timer:
-      # Reset all the state information in case we parse multiple times
-      self.reset()
-
-      for line in file:
-        self.consume(line.strip())
-        self.current['line'] += 1
-
-    self.stats['elapsed'] = timer.elapsed
-
-    return self.meshes
+    for line in file:
+      self.consume(line.strip())
+      self.current['line'] += 1
 
   def add_warning(self, warning_type : WarningType):
     # Store the line that generated the warning to display to the user
