@@ -30,6 +30,11 @@ class WarningType(enum.Enum):
   NO_LOOP_KEYWORD = 'No loop keyword'
   DEGENERATE_TRIANGLE = 'Degenerate triangle'
 
+@enum.unique
+class STLType(enum.Enum):
+  ASCII = enum.auto()
+  BINARY = enum.auto()
+
 def check_state(expected_state):
   def _check_state(f):
     def wrapper(self, *args):
@@ -65,8 +70,31 @@ class STLParser:
       'elapsed': 0
     }
 
-  def parse(self, file):
-    # Assuming ASCII format for now
+  def identify(self, file):
+    # Peek at the first few bytes 
+    position = file.tell()
+    first_word = str(file.read(5)).lower()
+    file.seek(position)
+
+    # An ASCII STL file must start with "solid"
+    if first_word == "solid":
+      return STLType.ASCII
+    else:
+      return STLType.BINARY
+
+  def parse(self, file, file_type = None):
+    if not file_type:
+      file_type = self.identify(file)
+
+    if file_type is STLType.ASCII:
+      return self.parse_ascii(file)
+    else:
+      return self.parse_binary(file)
+
+  def parse_binary(self, file):
+    pass
+
+  def parse_ascii(self, file):
     with Timer() as timer:
       # Reset all the state information in case we parse multiple times
       self.reset()
