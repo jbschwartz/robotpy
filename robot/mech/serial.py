@@ -23,6 +23,7 @@ def load(filename):
       joints.append(Joint(**joint_params))
 
     for link_parameters in data['links']:
+      link_parameters['mesh_file'] = data['mesh_file']
       links.append(Link(**link_parameters))
 
   return Serial(joints, links)

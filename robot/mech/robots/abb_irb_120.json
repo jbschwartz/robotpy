@@ -1,6 +1,7 @@
 {
   "name": "Robot",
   "description": "ABB IRB 120",
+  "mesh_file": "abb_irb_120.stl",
   "joints": [
     {
       "alpha": -90,
@@ -64,40 +65,12 @@
     }
   ],
   "links": [
-    {
-      "name": "Base",
-      "color": [1, 0.25, 0.25],
-      "mesh_file": "ABB_IRB120-0.stl"
-    },
-    {
-      "name": "Waist",
-      "color": [0.5, 0.15, 0.85],
-      "mesh_file": "ABB_IRB120-1.stl"
-    },
-    {
-      "name": "Upper Arm",
-      "color": [1, 0, 1],
-      "mesh_file": "ABB_IRB120-2.stl"
-    },
-    {
-      "name": "Forearm",
-      "color": [0.25, 0.25, 1],
-      "mesh_file": "ABB_IRB120-3.stl"
-    },
-    {
-      "name": "Wrist 1",
-      "color": [0.5, 0.25, 1],
-      "mesh_file": "ABB_IRB120-4.stl"
-    },
-    {
-      "name": "Wrist 2",
-      "color": [1, 1, 0],
-      "mesh_file": "ABB_IRB120-5.stl"
-    },
-    {
-      "name": "Wrist 3",
-      "color": [1, 1, 0],
-      "mesh_file": "ABB_IRB120-6.stl"
-    }
+    { "name": "Base",      "color": [1.00, 0.25, 0.25] },
+    { "name": "Waist",     "color": [0.50, 0.15, 0.85] },
+    { "name": "Upper Arm", "color": [1.00, 0.00, 1.00] },
+    { "name": "Forearm",   "color": [0.25, 0.25, 1.00] },
+    { "name": "Wrist 1",   "color": [0.50, 0.25, 1.00] },
+    { "name": "Wrist 2",   "color": [1.00, 1.00, 0.00] },
+    { "name": "Wrist 3",   "color": [1.00, 1.00, 0.00] }
   ]
 }
