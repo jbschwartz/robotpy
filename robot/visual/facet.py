@@ -7,9 +7,17 @@ from ..spatial import vector3
 Vector3 = vector3.Vector3
 
 class Facet:
-  def __init__(self):
-    self.normal = Vector3()
+  def __init__(self, facet_floats = None):
     self.vertices = []
+    self.normal = Vector3()
+
+    if facet_floats:
+      self.normal = Vector3(*facet_floats[0:3])
+      self.vertices = [
+        Vector3(*facet_floats[3:3]),
+        Vector3(*facet_floats[6:3]),
+        Vector3(*facet_floats[9:3])
+      ]
 
   def is_triangle(self):
     return self.size() == 3
