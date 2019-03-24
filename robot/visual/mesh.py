@@ -17,15 +17,3 @@ class Mesh:
     for vertex in facet.vertices:
       self.buffer.extend([*vertex, *facet.normal])
       self.count += 1
-      
-  # def build_vertex_list(self):
-  #   for facet in self.facets:
-  #     for vertex in facet.vertices:
-  #       self.vertices.append(vertex)
-  #       if facet.computed_normal:
-  #         self.vertex_normals.append(facet.computed_normal)
-  #       else:
-  #         self.vertex_normals.append([0, 0, 1])
-  #       index = len(self.vertices) - 1
-  #       self.indices.append(index)
-
