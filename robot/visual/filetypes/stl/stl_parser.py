@@ -1,5 +1,7 @@
 import enum, math, struct
 
+from .stl_type import STLType
+
 from robot.common       import Timer
 from robot.exceptions   import *
 from robot.spatial      import vector3
@@ -28,17 +30,6 @@ class WarningType(enum.Enum):
   END_SOLID_NAME_MISMATCH = 'Wrong endsolid name'
   NO_LOOP_KEYWORD         = 'No loop keyword'
   DEGENERATE_TRIANGLE     = 'Degenerate triangle'
-
-@enum.unique
-class STLType(enum.Enum):
-  ASCII  = enum.auto()
-  BINARY = enum.auto()
-
-  def __str__(self):
-    return 'ascii' if self is STLType.ASCII else 'binary'
-
-  def open_mode(self):
-    return 'r' if self is STLType.ASCII else 'rb'
 
 def check_state(expected_state):
   def _check_state(f):
