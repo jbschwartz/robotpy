@@ -1,4 +1,4 @@
-import enum, math
+import enum, math, struct
 
 from .exceptions import *
 from .facet import Facet
@@ -54,6 +54,15 @@ def check_state(expected_state):
 class STLParser:
   KEYWORD_WHITELIST = ('solid', 'color', 'facet', 'normal', 'outer', 'vertex', 'endloop', 'endfacet', 'endsolid')
 
+  # Each facet is defined by:
+  #   float32[3] – Normal vector
+  #   float32[3] – Vertex 1
+  #   float32[3] – Vertex 2
+  #   float32[3] – Vertex 3
+  #   uint16     - Attribute
+  FACET_FORMAT = '<fff fff fff fff H'
+  FACET_SIZE   = struct.calcsize(FACET_FORMAT)
+
   def __init__(self, compute_normals = False, warnings = False):
     self.compute_normals = compute_normals
     self.show_warnings = warnings
@@ -100,7 +109,28 @@ class STLParser:
     return self.meshes
 
   def parse_binary(self, file):
-    pass
+    header = file.read(80).decode('ascii')
+    # We assume that the file is well formed (and well informed)
+    self.stats['facets'], = struct.unpack('<i', file.read(4))
+
+    current_mesh = Mesh(0)
+    while True:
+      buffer = file.read(self.FACET_SIZE)
+      if not buffer:
+        break
+
+      *facet_floats, mesh_id = struct.unpack(self.FACET_FORMAT, buffer)
+
+      # We use the attribute value to idenitfy which mesh a facet belongs to
+      # This allows multiple meshes to be saved to one file
+      
+      # This is non-standard binary STL behavior
+      # Typically the attribute is 0 but can be used to store color information
+      if mesh_id != current_mesh.name:
+        self.meshes.append(current_mesh)
+        current_mesh = Mesh(mesh_id)
+
+      current_mesh.append_buffer(Facet(facet_floats))
 
   def parse_ascii(self, file):
     for line in file:
