@@ -11,10 +11,10 @@ Vector3 = vector3.Vector3
 
 @enum.unique
 class ParserState(enum.Enum):
-  PARSE_SOLID = enum.auto()
-  PARSE_FACET = enum.auto()
+  PARSE_SOLID  = enum.auto()
+  PARSE_FACET  = enum.auto()
   PARSE_NORMAL = enum.auto()
-  PARSE_LOOP = enum.auto()
+  PARSE_LOOP   = enum.auto()
   PARSE_VERTEX = enum.auto()
 
   def __str__(self):
@@ -22,17 +22,17 @@ class ParserState(enum.Enum):
 
 @enum.unique
 class WarningType(enum.Enum):
-  NON_UNIT_NORMAL = 'Non-unit normal'
-  CONFLICTING_NORMALS = 'Conflicting facet normal'
-  INVALID_COLOR = 'Invalid color'
-  EMPTY_SOLID = 'Empty solid'
+  NON_UNIT_NORMAL         = 'Non-unit normal'
+  CONFLICTING_NORMALS     = 'Conflicting facet normal'
+  INVALID_COLOR           = 'Invalid color'
+  EMPTY_SOLID             = 'Empty solid'
   END_SOLID_NAME_MISMATCH = 'Wrong endsolid name'
-  NO_LOOP_KEYWORD = 'No loop keyword'
-  DEGENERATE_TRIANGLE = 'Degenerate triangle'
+  NO_LOOP_KEYWORD         = 'No loop keyword'
+  DEGENERATE_TRIANGLE     = 'Degenerate triangle'
 
 @enum.unique
 class STLType(enum.Enum):
-  ASCII = enum.auto()
+  ASCII  = enum.auto()
   BINARY = enum.auto()
 
 def check_state(expected_state):
