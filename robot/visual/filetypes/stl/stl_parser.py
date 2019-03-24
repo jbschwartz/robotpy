@@ -90,7 +90,7 @@ class STLParser:
       file_type = self.identify(file_path)
 
     with Timer() as timer:
-      with open(file_path, file_type.open_mode()) as file:
+      with open(file_path, file_type.read_mode()) as file:
         parse_function = getattr(self, f'parse_{file_type}')
         parse_function(file)
 

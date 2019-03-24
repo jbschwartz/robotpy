@@ -8,5 +8,8 @@ class STLType(enum.Enum):
   def __str__(self):
     return 'ascii' if self is STLType.ASCII else 'binary'
 
-  def open_mode(self):
+  def read_mode(self):
     return 'r' if self is STLType.ASCII else 'rb'
+
+  def write_mode(self):
+    return 'w' if self is STLType.ASCII else 'wb'
