@@ -1,3 +1,5 @@
+import math
+
 from .facet import Facet 
 
 from ..spatial import vector3
@@ -5,29 +7,25 @@ from ..spatial import vector3
 class Mesh:
   def __init__(self, name):
     self.name = name
-    self.vertices = []
-    self.vertex_normals = []
-    self.indices = [] # Indices that make up facets
-    pass
+    self.buffer = []
+    self.count = 0
 
   def set_color(self, r, g, b):
     pass
 
-  def check_duplicate(self, new_vertex):
-    for index, stored_vertex in enumerate(self.vertices):
-      if vector3.almost_equal(stored_vertex, new_vertex):
-        return index
-    
-    return -1
+  def append_buffer(self, facet):
+    for vertex in facet.vertices:
+      self.buffer.extend([*vertex, *facet.normal])
+      self.count += 1
+      
+  # def build_vertex_list(self):
+  #   for facet in self.facets:
+  #     for vertex in facet.vertices:
+  #       self.vertices.append(vertex)
+  #       if facet.computed_normal:
+  #         self.vertex_normals.append(facet.computed_normal)
+  #       else:
+  #         self.vertex_normals.append([0, 0, 1])
+  #       index = len(self.vertices) - 1
+  #       self.indices.append(index)
 
-  def add_facet(self, facet : Facet):
-    # TODO: Spatial hashing to remove duplicates!
-    # TODO: Assert that the facet has three verticies
-    for new_vertex in facet.vertices:
-      duplicate_index = self.check_duplicate(new_vertex)
-      if duplicate_index >= 0:
-        self.indices.append(duplicate_index)
-      else:
-        self.vertices.append(new_vertex)
-        self.vertex_normals.append(facet.computed_normal)
-        self.indices.append(len(self.vertices) - 1)

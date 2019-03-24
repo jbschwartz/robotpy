@@ -8,8 +8,7 @@ Vector3 = vector3.Vector3
 
 class Facet:
   def __init__(self):
-    self.passed_normal = Vector3()
-    self.computed_normal = None
+    self.normal = Vector3()
     self.vertices = []
 
   def is_triangle(self):
@@ -29,13 +28,7 @@ class Facet:
 
     return edges
 
-  def has_conflicting_normal(self):
-    if not self.computed_normal:
-      self.compute_normal()
-
-    return not vector3.almost_equal(self.passed_normal, self.computed_normal, 0.0001)
-
-  def compute_normal(self):
+  def computed_normal(self):
     edges = self.compute_edges()
     normal = vector3.cross(edges[0], edges[1])
 
@@ -44,10 +37,4 @@ class Facet:
     
     normal.normalize()
 
-    self.computed_normal = normal 
-
-  def mean_edge_length(self):
-    edges = self.compute_edges()
-    total_length = sum(list(map(lambda edge: edge.length(), edges)))
-    
-    return total_length / len(edges)
+    return normal 

@@ -5,7 +5,9 @@ from .facet import Facet
 from .mesh import Mesh
 
 from ..common import Timer
-from ..spatial import Vector3
+from ..spatial import vector3
+
+Vector3 = vector3.Vector3
 
 @enum.unique
 class ParserState(enum.Enum):
@@ -41,7 +43,8 @@ def check_state(expected_state):
 class STLParser:
   KEYWORD_WHITELIST = ('solid', 'color', 'facet', 'normal', 'outer', 'vertex', 'endloop', 'endfacet', 'endsolid')
 
-  def __init__(self, warnings = True):
+  def __init__(self, compute_normals = False, warnings = False):
+    self.compute_normals = compute_normals
     self.show_warnings = warnings
 
     self.reset()
@@ -137,7 +140,7 @@ class STLParser:
       self.add_warning(WarningType.NON_UNIT_NORMAL)
       n.normalize()
 
-    self.current['facet'].passed_normal = n
+    self.current['facet'].normal = n
     self.current['state'] = ParserState.PARSE_LOOP
 
   @check_state(ParserState.PARSE_LOOP)
@@ -164,13 +167,22 @@ class STLParser:
 
   @check_state(ParserState.PARSE_LOOP)
   def endfacet(self):
-    try:
-      if self.show_warnings and self.current['facet'].has_conflicting_normal():
-        self.add_warning(WarningType.CONFLICTING_NORMALS)
-    except DegenerateTriangleError:
-      self.add_warning(WarningType.DEGENERATE_TRIANGLE)
+    current_facet = self.current['facet']
 
-    self.current['mesh'].facets.append(self.current['facet'])
+    try:
+      if self.compute_normals:
+        computed = current_facet.computed_normal()
+
+        if self.show_warnings:
+          if not vector3.almost_equal(current_facet.normal, computed, 0.0001):
+            self.add_warning(WarningType.CONFLICTING_NORMALS)
+        
+        current_facet.normal = computed
+    except DegenerateTriangleError:
+      if self.show_warnings:
+        self.add_warning(WarningType.DEGENERATE_TRIANGLE)
+
+    self.current['mesh'].append_buffer(current_facet)
     self.current['state'] = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
