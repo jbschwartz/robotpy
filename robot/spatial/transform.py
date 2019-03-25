@@ -1,9 +1,13 @@
 import math
-from . import quaternion, dual, vector3
 
-Quaternion = quaternion.Quaternion
-Dual = dual.Dual
-Vector3 = vector3.Vector3
+from . import quaternion
+from . import dual
+from .quaternion import Quaternion
+from .dual       import Dual
+from .vector3    import Vector3
+
+from robot.visual.facet import Facet
+from robot.visual.mesh  import Mesh
 
 class Transform:
   '''
