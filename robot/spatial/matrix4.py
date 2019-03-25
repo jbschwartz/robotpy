@@ -2,8 +2,11 @@ from .dual      import Dual
 from .transform import Transform
 
 class Matrix4:
-  def __init__(self, arg):
+  def __init__(self, arg = None):
     self.elements = [0.0] * 16
+    for diag_index in [0, 5, 10, 15]: 
+      self.elements[diag_index]  = 1.0
+
     if isinstance(arg, Dual):
       self.construct_from_dual(arg)
     elif isinstance(arg, Transform):
