@@ -2,7 +2,7 @@ import math
 
 from .exceptions import DegenerateTriangleError
 
-from ..spatial import vector3
+from robot.spatial import vector3
 
 Vector3 = vector3.Vector3
 
