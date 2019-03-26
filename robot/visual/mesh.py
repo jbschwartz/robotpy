@@ -2,11 +2,17 @@ import math
 
 from .facet import Facet 
 
-from ..spatial import vector3
+from robot.spatial import vector3
+
+# Big TODO: Make a Buffer class which accepts a mesh in its constructor
+# Store Facet objects instead of storing buffer-style floats
+# There are too many instances where I want to access the facets as objects
 
 class Mesh:
+  # Number of buffer elements per vertex
+  VERTEX_SIZE = 6
   # Number of buffer elements per facet
-  FACET_SIZE = 18
+  FACET_SIZE = 3 * VERTEX_SIZE
 
   def __init__(self, name = None):
     self.name = name
@@ -31,11 +37,20 @@ class Mesh:
     # Every six floating points are a facet
     return int(len(self.buffer) / self.FACET_SIZE)
 
+  def window_iterate(self, window_size):
+    n = 0
+    while n < len(self.buffer):
+      yield self.buffer[n : n + window_size]
+      n += window_size
+
   def facets(self):
     '''
     Iterable list of facet data returned in the format of the buffer (v, n, v, n, ...)
     '''
-    n = 0
-    while n < len(self.buffer):
-      yield self.buffer[n : n+self.FACET_SIZE]
-      n += self.FACET_SIZE
+    return self.window_iterate(self.FACET_SIZE)
+
+  def vertices(self):
+    '''
+    Iterable list of vertex data returned in the format of the buffer (vx, vy, vz, nx, ny, nz)
+    '''
+    return self.window_iterate(self.VERTEX_SIZE)
