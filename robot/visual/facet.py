@@ -7,23 +7,12 @@ from robot.spatial import vector3
 Vector3 = vector3.Vector3
 
 class Facet:
-  def __init__(self, facet_floats = None):
-    self.vertices = []
-    self.normal = Vector3()
-
-    if facet_floats:
-      self.normal = Vector3(*facet_floats[0:3])
-      self.vertices = [
-        Vector3(*facet_floats[3:6]),
-        Vector3(*facet_floats[6:9]),
-        Vector3(*facet_floats[9:12])
-      ]
+  def __init__(self, vertices = [], normal = Vector3()):
+    self.vertices = vertices
+    self.normal = normal
 
   def is_triangle(self):
-    return self.size() == 3
-
-  def size(self):
-    return len(self.vertices)
+    return len(self.vertices) == 3
 
   def compute_edges(self):
     # TODO: Consider caching this result

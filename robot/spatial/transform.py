@@ -41,44 +41,34 @@ class Transform:
 
   def __call__(self, other, **kwargs):
     if isinstance(other, Vector3):
-      q = Quaternion(0, other.x, other.y, other.z)
       if 'type' in kwargs and str.lower(kwargs['type']) == 'vector':
-        return self.transform_vector(q)
+        return self.transform_vector(other)
       else:
-        return self.transform_point(q)
+        return self.transform_point(other)
     elif isinstance(other, Mesh):
       return self.transform_mesh(other)
         
   def transform_vector(self, vector):
-    d = Dual(vector, Quaternion(0, 0, 0, 0))
+    d = Dual(Quaternion(0, vector.x, vector.y, vector.z), Quaternion(0, 0, 0, 0))
     a = self.dual * d * dual.conjugate(self.dual)
     return Vector3(a.r.x, a.r.y, a.r.z)
 
   def transform_point(self, point):
-    d = Dual(Quaternion(), point)
+    d = Dual(Quaternion(), Quaternion(0, point.x, point.y, point.z))
     a = self.dual * d * dual.conjugate(self.dual)
     return Vector3(a.d.x, a.d.y, a.d.z)
 
   def transform_mesh(self, mesh):
     new_mesh = Mesh()
-
-    for index, facet_floats in enumerate(mesh.facets()):
-      vectors = [
-        Vector3(*facet_floats[3:6]),  # Normal
-        Vector3(*facet_floats[0:3]),  # Vertex 1
-        Vector3(*facet_floats[6:9]),  # Vertex 2
-        Vector3(*facet_floats[12:15]) # Vertex 3
-      ]
-
-      buffer = []
-      for index, vector in enumerate(vectors):
-        vectors[index] = self.__call__(vector, type = 'vector' if index == 0 else 'point')
-        buffer.extend([*vectors[index]])
-
-      new_facet = Facet(buffer)
-      new_mesh.append_buffer(new_facet)
+    new_mesh.facets = list(map(self.transform_facet, mesh.facets))
 
     return new_mesh
+
+  def transform_facet(self, facet):
+    new_normal = self.transform_vector(facet.normal)
+    new_vertices = list(map(self.transform_point, facet.vertices))
+
+    return Facet(new_vertices, new_normal)
 
   def translation(self) -> Vector3:
     # "Undo" what was done in the __init__ function by working backwards

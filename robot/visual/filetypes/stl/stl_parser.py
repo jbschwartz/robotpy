@@ -110,6 +110,13 @@ class STLParser:
         break
 
       *facet_floats, mesh_id = struct.unpack(self.FACET_FORMAT, buffer)
+      
+      normal = Vector3(*facet_floats[0:3])
+      vertices = [
+        Vector3(*facet_floats[3:6]),
+        Vector3(*facet_floats[6:9]),
+        Vector3(*facet_floats[9:12])
+      ]
 
       # We use the attribute value to idenitfy which mesh a facet belongs to
       # This allows multiple meshes to be saved to one file
@@ -120,7 +127,7 @@ class STLParser:
         self.meshes.append(current_mesh)
         current_mesh = Mesh(mesh_id)
 
-      current_mesh.append_buffer(Facet(facet_floats))
+      current_mesh.facets.append(Facet(vertices, normal))
 
     self.meshes.append(current_mesh)
 
@@ -232,7 +239,7 @@ class STLParser:
       if self.show_warnings:
         self.add_warning(WarningType.DEGENERATE_TRIANGLE)
 
-    self.current['mesh'].append_buffer(current_facet)
+    self.current['mesh'].facets.append(current_facet)
     self.current['state'] = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
