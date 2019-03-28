@@ -6,11 +6,8 @@ import matplotlib as mpl
 import matplotlib.animation as animation
 mpl.rcParams['toolbar'] = 'None'
 
-from ..mech import Serial
-from ..spatial import Frame
-
 class RobotPlot:
-  def __init__(self, robot : Serial, **kwargs):
+  def __init__(self, robot, **kwargs):
     self.robot = robot
     self.frames = []
 
@@ -104,7 +101,7 @@ class RobotPlot:
 
       self.robot_points.append(points)
 
-  def frame_points(self, frame : Frame):    
+  def frame_points(self, frame):
     pos = frame.position()
     axes = [frame.x(), frame.y(), frame.z()]
 
