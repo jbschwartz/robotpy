@@ -1,3 +1,4 @@
+from .ambient_light  import AmbientLight
 from .buffer         import Buffer
 from .camera         import Camera
 from .facet          import Facet
