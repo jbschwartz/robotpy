@@ -16,6 +16,34 @@ class Camera:
     self.target = target
     self.up = up
     self.aspect = aspect
+    self.theta = 0
+
+  def orbit(self, direction, center = None):
+    if not center:
+      center = self.target
+
+    if direction == Vector3(1,0,0):
+      self.theta += 10
+    elif direction == Vector3(-1,0,0):
+      self.theta -= 10
+
+    # ... TODO: Movement along the surface of a sphere
+
+    forward = self.position - self.target
+    radius = forward.length()
+
+    x = radius * math.cos(math.radians(self.theta - 90))
+    y = radius * math.sin(math.radians(self.theta - 90))
+
+    self.position = Vector3(x, y, 350)
+
+  def zoom(self, direction):
+    '''
+    Move the camera in or out along its line of sight
+    '''
+    line_of_sight = vector3.normalize(self.position - self.target)
+
+    self.position += self.ZOOM_SPEED * direction * line_of_sight
 
   def projection_matrix(self):
     fov = math.radians(60)
