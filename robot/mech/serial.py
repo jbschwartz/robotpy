@@ -34,6 +34,8 @@ class Serial:
     self.links = links
     self.position = Vector3()
 
+    self.qs = [0] * 6
+
     self.checkStructure()
 
   def checkStructure(self):
@@ -47,23 +49,28 @@ class Serial:
     correctElbow = math.isclose(self.joints[1].dh['alpha'], 0) or math.isclose(self.joints[1].dh['alpha'], math.pi)
     assert correctElbow, 'Robot does not have a recognized elbow configuration'
 
-  def pose(self, qs : list = []) -> Frame: 
+  def pose(self) -> Frame: 
     t = Transform()
 
-    for joint, value in itertools.zip_longest(self.joints, qs, fillvalue=0):
+    for joint, value in itertools.zip_longest(self.joints, self.qs, fillvalue=0):
       t *= joint.transform(value)
 
     return Frame(t)
 
-  def poses(self, qs : list = []) -> list: 
+  def current_transforms(self) -> list: 
     ts = [ Transform() ]
     
-    for joint, value in itertools.zip_longest(self.joints, qs, fillvalue=0):
+    for joint, value in itertools.zip_longest(self.joints, self.qs, fillvalue=0):
       # Get last frame
       t = copy.deepcopy(ts[-1])
       t *= joint.transform(value)
       ts.append(t)
     
+    return ts
+
+  def poses(self) -> list: 
+    ts = self.current_transforms()
+
     return [ Frame(t) for t in ts ]
 
   def upper_arm_length(self):

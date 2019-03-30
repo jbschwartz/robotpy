@@ -11,7 +11,8 @@ class TestSerial(unittest.TestCase):
     
   def test_pose(self):
     angles = [ math.radians(45) ] * 6
-    frame = self.robot.pose(angles)
+    self.robot.qs = angles
+    frame = self.robot.pose()
     
     result = frame.position()
     expected = Vector3(133.58578643, 184.49747468, 128.00714267)
@@ -20,7 +21,8 @@ class TestSerial(unittest.TestCase):
 
   def test_poses(self):
     angles = [ math.radians(0) ] * 6
-    frames = self.robot.poses(angles)
+    self.robot.qs = angles
+    frames = self.robot.poses()
     expecteds = [
       Vector3(0, 0, 0),
       Vector3(0, 0, 290),
@@ -49,7 +51,8 @@ class TestSerial(unittest.TestCase):
 
   def test_wrist_center(self):
     angles = [ math.radians(45) ] * 6
-    frame = self.robot.pose(angles)
+    self.robot.qs = angles
+    frame = self.robot.pose()
 
     result = self.robot.wrist_center(frame)
     expected = Vector3(184.49747468, 184.49747468, 178.91883092)
