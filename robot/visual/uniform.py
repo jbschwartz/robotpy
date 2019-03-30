@@ -1,11 +1,12 @@
 from OpenGL.GL import *
 
 GL_TYPE_UNIFORM_FN = {
-  5124: glUniform1iv,
-  35670: glUniform1f,
-  35665: glUniform3fv,
-  35676: glUniformMatrix4fv,
-  35678: None
+  GL_INT:        glUniform1iv,
+  GL_FLOAT:      glUniform1f,
+  GL_BOOL:       glUniform1i,
+  GL_FLOAT_VEC3: glUniform3fv,
+  GL_FLOAT_MAT4: glUniformMatrix4fv,
+  GL_SAMPLER_2D: None
 }
 
 class Uniform:
@@ -25,7 +26,7 @@ class Uniform:
     try:
       self.set_function = GL_TYPE_UNIFORM_FN[self.gl_type]
     except KeyError:
-      raise Exception(f'Unknown uniform GL_TYPE value: {self.gl_type}')
+      raise Exception(f'Unknown uniform GL_TYPE value: {self.gl_type} ({self.name})')
 
   def get_name(self, length):
     return self.ascii_list_to_string(glGetProgramResourceName(self.program_id, GL_UNIFORM, self.index, length))
