@@ -47,9 +47,6 @@ class ShaderProgram():
       location = values[2]
       array_size = values[3]
 
-  def ascii_list_to_string(self, ascii_list):
-    return 
-
   def add_shader(self, filename, shader_type):
     try:
       shader_id = glCreateShader(shader_type)
