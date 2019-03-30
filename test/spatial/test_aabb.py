@@ -14,7 +14,7 @@ class TestAABB(unittest.TestCase):
     
     self.aabb.extend(v1)
 
-    print(self.aabb.min, self.aabb.max)
+    # print(self.aabb.min, self.aabb.max)
 
     self.assertAlmostEqual(v1, self.aabb.min)
     self.assertAlmostEqual(v1, self.aabb.max)
