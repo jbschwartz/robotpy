@@ -7,3 +7,4 @@ from .mesh           import Mesh
 from .robot_plot     import RobotPlot
 from .shader_program import ShaderProgram
 from .window         import Window
+from .window_events  import WindowEvents
