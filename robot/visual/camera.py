@@ -1,13 +1,16 @@
 import math
 import numpy as np
 
+from .observer import Observer
+
 from ..spatial import vector3
 
 Vector3 = vector3.Vector3
 normalize = vector3.normalize
 cross = vector3.cross
 
-class Camera:
+class Camera(Observer):
+  ZOOM_SPEED = 15
   '''
   For now a basic wrapper around a lookat function
   '''
