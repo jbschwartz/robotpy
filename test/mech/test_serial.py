@@ -7,7 +7,7 @@ from robot.mech.robots import ABB_IRB_120
 
 class TestSerial(unittest.TestCase):
   def setUp(self):
-    self.robot = ABB_IRB_120
+    self.robot = ABB_IRB_120.serial
     
   def test_pose(self):
     angles = [ math.radians(45) ] * 6

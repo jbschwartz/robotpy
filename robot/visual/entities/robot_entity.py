@@ -45,8 +45,8 @@ def load(filename):
 
 class RobotEntity():
   def __init__(self, serial : Serial, meshes, shader_program : ShaderProgram = None):
-    self.vao = glGenVertexArrays(1)
-    self.vbo = glGenBuffers(1)
+    self.vao = -1 if not bool(glGenVertexArrays) else glGenVertexArrays(1)
+    self.vbo = -1 if not bool(glGenBuffers) else glGenBuffers(1)
     self.buffer = []
     self.shader_program = shader_program
 
