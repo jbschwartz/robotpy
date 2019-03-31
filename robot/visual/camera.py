@@ -1,11 +1,11 @@
 import math
-import numpy as np
 
 from .observer import Observer
 
 import robot.spatial as spatial
 
 Vector3 = spatial.vector3.Vector3
+Matrix4 = spatial.matrix4.Matrix4
 
 class Camera(Observer):
   ZOOM_SPEED = 15
@@ -27,6 +27,7 @@ class Camera(Observer):
 
     self.camera_to_world = spatial.Transform(axis=right, angle=angle, translation=position)
 
+  @property
   def position(self):
     return self.camera_to_world.translation()
 
@@ -37,28 +38,85 @@ class Camera(Observer):
     if not center:
       center = self.target
 
-    if direction == Vector3(1,0,0):
-      self.theta += 10
-    elif direction == Vector3(-1,0,0):
-      self.theta -= 10
+    if direction.x > 0:
+      theta = +1
+    elif direction.x < 0:
+      theta = -1
+    else:
+      theta = 0
 
-    # ... TODO: Movement along the surface of a sphere
+    if direction.y > 0:
+      phi = 1
+    elif direction.y < 0:
+      phi = -1
+    else:
+      phi = 0
 
-    forward = self.position - self.target
-    radius = forward.length()
+    # axis = self.camera_to_world(Vector3(0,0,1), type="vector")
+    # axis = Vector3(0,0,1)
+    # rotate_z = spatial.Transform(axis=axis, angle=math.radians(theta))
+    # rotate_x = spatial.Transform(axis=spatial.Vector3(0,1,0), angle=math.radians(phi))
 
-    x = radius * math.cos(math.radians(self.theta - 90))
-    y = radius * math.sin(math.radians(self.theta - 90))
+    # position = -self.camera_to_world.translation()
 
-    self.position = Vector3(x, y, 350)
+    # print(spatial.Frame(self.camera_to_world).position())
+
+
+    # # self.camera_to_world = spatial.Transform(translation=position) * self.camera_to_world
+    # self.camera_to_world = rotate_z * self.camera_to_world
+    # self.camera_to_world = rotate_x * self.camera_to_world
+    # self.camera_to_world = spatial.Transform(axis=axis, angle=math.radians(theta)) * self.camera_to_world
+    # self.camera_to_world = spatial.Transform(translation=-position) * self.camera_to_world
+
+    # print(spatial.Frame(self.camera_to_world).orientation())
+
+    # # ... TODO: Movement along the surface of a sphere
+
+    # forward = self.position - self.target
+    # radius = forward.length()
+
+    # x = radius * math.cos(math.radians(self.theta - 90))
+    # y = radius * math.sin(math.radians(self.theta - 90))
+
+    # self.position = Vector3(x, y, 350)
 
   def zoom(self, direction):
     '''
     Move the camera in or out along its line of sight
     '''
-    line_of_sight = vector3.normalize(self.position - self.target)
+    movement = Vector3(0, 0, self.ZOOM_SPEED * direction)
+    self.camera_to_world = spatial.Transform(translation=movement) * self.camera_to_world
 
-    self.position += self.ZOOM_SPEED * direction * line_of_sight
+  def click(self, x, y):
+    pass
+    # fov = math.radians(60)
+    # f = 1.0/math.tan(fov/2.0)
+    # zN, zF = (100, 10000.0)
+    # a = self.aspect
+
+    # p = np.array([f/a, 0.0, 0.0,               0.0, 
+    #               0.0, f,   0.0,               0.0, 
+    #               0.0, 0.0, (zF+zN)/(zN-zF),  -1.0, 
+    #               0.0, 0.0, 2.0*zF*zN/(zN-zF), 0.0], np.float32).reshape((4,4), order='C')
+
+    # pinv = inv(np.matrix(p))
+    # point = np.array([x, y, 1, 1], dtype=np.float32)
+    # result = np.dot(point, pinv)
+    # print(result)
+
+    # forward = normalize(self.position - self.target)
+    # right = normalize(cross(self.up, forward))
+    # up = normalize(cross(forward, right))
+
+    # translate = -Vector3(right * self.position, up * self.position, forward * self.position)
+
+    # c = np.array([[right.x,     up.x,        forward.x,   0.0],
+    #                    [right.y,     up.y,        forward.y,   0.0],
+    #                    [right.z,     up.z,        forward.z,   0.0], 
+    #                    [translate.x, translate.y, translate.z, 1.0]], np.float32)
+    # cmat = np.matrix(c)
+    # result = np.dot(point, cmat)
+    # print(result)
 
   def projection_matrix(self):
     fov = math.radians(60)
@@ -66,14 +124,11 @@ class Camera(Observer):
     zN, zF = (100, 10000.0)
     a = self.aspect
 
-    matrix = np.array([f/a, 0.0, 0.0,               0.0, 
-                       0.0, f,   0.0,               0.0, 
-                       0.0, 0.0, (zF+zN)/(zN-zF),  -1.0, 
-                       0.0, 0.0, 2.0*zF*zN/(zN-zF), 0.0], np.float32)
+    return Matrix4([f/a, 0.0, 0.0,               0.0, 
+                    0.0, f,   0.0,               0.0, 
+                    0.0, 0.0, (zF+zN)/(zN-zF),  -1.0, 
+                    0.0, 0.0, 2.0*zF*zN/(zN-zF), 0.0])
 
-    return matrix
-
-  def camera_matrix(self):
-    world_to_camera = spatial.Matrix4(self.camera_to_world.inverse())
-    
-    return np.array(world_to_camera.elements, dtype=np.float32)
+  @property
+  def world_to_camera(self):
+    return self.camera_to_world.inverse()
