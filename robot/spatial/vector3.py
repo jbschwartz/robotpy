@@ -1,6 +1,8 @@
 import math
 
-class Vector3:
+from .swizzler import Swizzler
+
+class Vector3(Swizzler):
   def __init__(self, x = 0, y = 0, z = 0):
     self.x = x
     self.y = y

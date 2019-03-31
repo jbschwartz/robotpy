@@ -1,6 +1,8 @@
 import math
 
-class Quaternion:
+from .swizzler import Swizzler
+
+class Quaternion(Swizzler):
   ''' 
   Class for representing quaternions of the form r + xi + yj + dk
   '''
