@@ -14,7 +14,7 @@ class Camera(Observer):
   '''
   For now a basic wrapper around a lookat function
   '''
-  def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 1, 0), aspect = 16/9):
+  def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), aspect = 16/9):
     self.position = position
     self.target = target
     self.up = up
