@@ -4,6 +4,7 @@ from .uniform import Uniform
 
 class ShaderProgram():
   def __init__(self, vertex_file, fragment_file):
+    self.uniforms = []
     self.program_id = glCreateProgram()
     vs_id = self.add_shader(vertex_file, GL_VERTEX_SHADER)
     frag_id = self.add_shader(fragment_file, GL_FRAGMENT_SHADER)
@@ -22,6 +23,18 @@ class ShaderProgram():
     glDeleteShader(frag_id)
 
     self.get_uniforms()
+
+  def __getattr__(self, attribute):
+    if attribute != 'uniforms' and attribute not in self.uniforms: 
+      raise AttributeError
+
+    return self.uniforms[attribute]
+
+  def __setattr__(self, attribute, value):
+    if attribute == 'uniforms' or attribute not in self.uniforms: 
+      super(ShaderProgram, self).__setattr__(attribute, value)
+    else:
+      self.uniforms[attribute].value = value
 
   def get_uniforms(self):
     self.uniforms = {}

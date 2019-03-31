@@ -32,6 +32,8 @@ class Scene(Observer):
   def update(self, delta = 0):
     for entity in self.entities:
       entity.update(delta)
+
+    self.light.position = self.camera.position 
   
   def draw(self):
     for entity in self.entities:
@@ -39,12 +41,12 @@ class Scene(Observer):
 
       glUseProgram(program.program_id)
 
-      program.uniforms['proj_matrix'].set_value(1, False, self.camera.projection_matrix())
-      program.uniforms['view_matrix'].set_value(1, False, self.camera.camera_matrix())
+      program.proj_matrix = self.camera.projection_matrix()
+      program.view_matrix = self.camera.world_to_camera
 
-      program.uniforms['light_position'].set_value(1, [*self.light.position])
-      program.uniforms['light_color'].set_value(1, [*self.light.color])
-      program.uniforms['light_intensity'].set_value(self.light.intensity)
+      program.light_position  = self.light.position
+      program.light_color     = self.light.color
+      program.light_intensity = self.light.intensity
       
       entity.draw()
 

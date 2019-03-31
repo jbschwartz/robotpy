@@ -9,7 +9,7 @@ from ..mesh           import Mesh
 from ..shader_program import ShaderProgram
 
 from robot.mech              import Joint, Link, Serial
-from robot.spatial           import Matrix4
+from robot.spatial           import Matrix4, Vector3, Frame
 from robot.visual.exceptions import ParserError
 from robot.visual.filetypes  import STLParser
 
@@ -104,22 +104,12 @@ class RobotEntity():
       self.serial.traj.reverse()
 
     self.serial.qs = self.serial.traj.advance(delta)
-    
-    transforms = self.serial.current_transforms()
-
-    matrix_floats = []
-    for transform in transforms:
-      matrix = Matrix4(transform)
-      matrix_floats.extend(matrix.elements)
-
-    self.link_matricies = np.array(matrix_floats, dtype=np.float32)
 
   def draw(self):
-    self.shader_program.uniforms['model_matrices'].set_value(7, GL_FALSE, self.link_matricies)
-
-    self.shader_program.uniforms['use_link_colors'].set_value(GL_FALSE)
-    self.shader_program.uniforms['link_colors'].set_value(7, self.link_colors)
-    self.shader_program.uniforms['robot_color'].set_value(1, 0.5, 0, 0.5)
+    self.shader_program.model_matrices  = self.serial.links_to_world()
+    self.shader_program.use_link_colors = False
+    self.shader_program.link_colors     = self.link_colors
+    self.shader_program.robot_color     = (1, 0.5, 0)
 
     glBindVertexArray(self.vao)
 

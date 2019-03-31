@@ -28,8 +28,8 @@ class Serial:
     correctElbow = math.isclose(self.joints[1].dh['alpha'], 0) or math.isclose(self.joints[1].dh['alpha'], math.pi)
     assert correctElbow, 'Robot does not have a recognized elbow configuration'
 
-  def current_transforms(self) -> list: 
-    ts = [ Transform() ]
+  def links_to_world(self) -> list: 
+    ts = [ Transform(translation=self.position) ]
     
     for joint, value in itertools.zip_longest(self.joints, self.qs, fillvalue=0):
       # Get last frame
@@ -40,11 +40,11 @@ class Serial:
     return ts
 
   def pose(self) -> Frame: 
-    ts = self.current_transforms()
+    ts = self.links_to_world()
     return Frame(ts[-1])
 
   def poses(self) -> list: 
-    ts = self.current_transforms()
+    ts = self.links_to_world()
     return [ Frame(t) for t in ts ]
 
   def upper_arm_length(self):
