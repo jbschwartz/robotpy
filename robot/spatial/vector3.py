@@ -74,6 +74,7 @@ class Vector3(Swizzler):
     self.x /= length
     self.y /= length
     self.z /= length
+    return self
 
 def angle_between(v1, v2):
   dot = v1 * v2
