@@ -3,11 +3,9 @@ import numpy as np
 
 from .observer import Observer
 
-from ..spatial import vector3
+import robot.spatial as spatial
 
-Vector3 = vector3.Vector3
-normalize = vector3.normalize
-cross = vector3.cross
+Vector3 = spatial.vector3.Vector3
 
 class Camera(Observer):
   ZOOM_SPEED = 15
@@ -15,11 +13,25 @@ class Camera(Observer):
   For now a basic wrapper around a lookat function
   '''
   def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), aspect = 16/9):
-    self.position = position
-    self.target = target
-    self.up = up
     self.aspect = aspect
-    self.theta = 0
+
+    self.look_at(position, target, up)
+
+  def look_at(self, position, target, up):
+    forward = (position - target).normalize()
+    right = (up % forward).normalize()
+
+    angle = math.acos(up * forward)
+
+    up = (forward % right).normalize()
+
+    self.camera_to_world = spatial.Transform(axis=right, angle=angle, translation=position)
+
+  def position(self):
+    return self.camera_to_world.translation()
+
+  def target(self):
+    return -self.camera_to_world.z()
 
   def orbit(self, direction, center = None):
     if not center:
@@ -62,18 +74,6 @@ class Camera(Observer):
     return matrix
 
   def camera_matrix(self):
-    forward = normalize(self.position - self.target)
-    right = normalize(cross(self.up, forward))
-    up = normalize(cross(forward, right))
-
-    translate = -Vector3(right * self.position, up * self.position, forward * self.position)
-
-    matrix = np.array([[right.x,     up.x,        forward.x,   0.0],
-                       [right.y,     up.y,        forward.y,   0.0],
-                       [right.z,     up.z,        forward.z,   0.0], 
-                       [translate.x, translate.y, translate.z, 1.0]], np.float32)
+    world_to_camera = spatial.Matrix4(self.camera_to_world.inverse())
     
-    # Inverse the matrix as the transformation moves from camera space to world space (and not the other way around)
-    matrix = np.transpose(matrix).reshape(16, order='F')
-
-    return matrix
+    return np.array(world_to_camera.elements, dtype=np.float32)
