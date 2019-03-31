@@ -22,6 +22,7 @@ class TestLinearJS(unittest.TestCase):
 
     [self.assertAlmostEqual(result, expected) for result, expected in zip(results, expecteds)]
 
+  @unittest.skip('Implement test')
   def test_is_done(self):
     expected = False
     self.assertEqual(self.traj.is_done(), expected)
