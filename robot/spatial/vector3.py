@@ -34,6 +34,9 @@ class Vector3(Swizzler):
 
   __rmul__ = __mul__
 
+  def __mod__(self, other):
+    return cross(self, other)
+
   def __truediv__(self, other):
     if isinstance(other, (int, float)):
       return Vector3(self.x / other, self.y / other, self.z / other)
