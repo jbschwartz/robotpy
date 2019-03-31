@@ -6,8 +6,9 @@ from .quaternion import Quaternion
 from .dual       import Dual
 from .vector3    import Vector3
 
-from ..visual.facet import Facet
-from ..visual.mesh  import Mesh
+# import robot.visual as visual
+# Facet = visual.facet.Facet
+# Mesh = visual.mesh.Mesh
 
 class Transform:
   '''
@@ -59,12 +60,14 @@ class Transform:
     return Vector3(*a.d.xyz)
 
   def transform_mesh(self, mesh):
+    from ..visual.mesh  import Mesh
     new_mesh = Mesh()
     new_mesh.facets = list(map(self.transform_facet, mesh.facets))
 
     return new_mesh
 
   def transform_facet(self, facet):
+    from ..visual.facet import Facet
     new_normal = self.transform_vector(facet.normal)
     new_vertices = list(map(self.transform_point, facet.vertices))
 
