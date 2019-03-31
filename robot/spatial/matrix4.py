@@ -2,15 +2,22 @@ from .dual      import Dual
 from .transform import Transform
 
 class Matrix4:
-  def __init__(self, arg = None):
+  def __init__(self, construct_from = None):
+    '''
+    4x4 Matrix in _column-major_ order.
+
+    That is: contiguous elements in the list form columns (e.g. self.elements[0:4] is the first column of the matrix)
+    '''
     self.elements = [0.0] * 16
     for diag_index in [0, 5, 10, 15]: 
       self.elements[diag_index]  = 1.0
 
-    if isinstance(arg, Dual):
-      self.construct_from_dual(arg)
-    elif isinstance(arg, Transform):
-      self.construct_from_dual(arg.dual)
+    if isinstance(construct_from, Dual):
+      self.construct_from_dual(construct_from)
+    elif isinstance(construct_from, Transform):
+      self.construct_from_dual(construct_from.dual)
+    elif isinstance(construct_from, list) and len(construct_from) == 16:
+      self.elements = construct_from
   
   def construct_from_dual(self, d : Dual):
     drx2 = d.r.x ** 2
