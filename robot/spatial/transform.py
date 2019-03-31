@@ -6,8 +6,8 @@ from .quaternion import Quaternion
 from .dual       import Dual
 from .vector3    import Vector3
 
-from robot.visual.facet import Facet
-from robot.visual.mesh  import Mesh
+from ..visual.facet import Facet
+from ..visual.mesh  import Mesh
 
 class Transform:
   '''
@@ -49,14 +49,14 @@ class Transform:
       return self.transform_mesh(other)
         
   def transform_vector(self, vector):
-    d = Dual(Quaternion(0, vector.x, vector.y, vector.z), Quaternion(0, 0, 0, 0))
+    d = Dual(Quaternion(0, *vector.xyz), Quaternion(0, 0, 0, 0))
     a = self.dual * d * dual.conjugate(self.dual)
-    return Vector3(a.r.x, a.r.y, a.r.z)
+    return Vector3(*a.r.xyz)
 
   def transform_point(self, point):
-    d = Dual(Quaternion(), Quaternion(0, point.x, point.y, point.z))
+    d = Dual(Quaternion(), Quaternion(0, *point.xyz))
     a = self.dual * d * dual.conjugate(self.dual)
-    return Vector3(a.d.x, a.d.y, a.d.z)
+    return Vector3(*a.d.xyz)
 
   def transform_mesh(self, mesh):
     new_mesh = Mesh()
@@ -73,7 +73,7 @@ class Transform:
   def translation(self) -> Vector3:
     # "Undo" what was done in the __init__ function by working backwards
     t = 2 * self.dual.d * quaternion.conjugate(self.dual.r)
-    return Vector3(t.x, t.y, t.z)
+    return Vector3(*t.xyz)
 
   def rotation(self) -> Quaternion:
     return self.dual.r

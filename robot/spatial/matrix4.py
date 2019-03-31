@@ -26,10 +26,10 @@ class Matrix4:
     r_star = conjugate(d.r)
     for basis in [(0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)]:
       transformed_basis = d.r * Quaternion(*basis) * r_star
-      self.elements.extend([transformed_basis.x, transformed_basis.y, transformed_basis.z, 0])
+      self.elements.extend([*transformed_basis.xyz, 0])
 
     translation = 2 * d.d * r_star
-    self.elements.extend([translation.x, translation.y, translation.z, 1])
+    self.elements.extend([*translation.xyz, 1])
 
   def __str__(self):
     # Get the width of "widest" floating point number
