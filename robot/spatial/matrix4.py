@@ -32,45 +32,13 @@ class Matrix4:
     self.elements.extend([translation.x, translation.y, translation.z, 1])
 
   def __str__(self):
-    def is_negative(string):
-      return string[0] == '-'
+    # Get the width of "widest" floating point number
+    longest = max(map(len, map('{:.4f}'.format, self.elements)))
+    # Pad the left of each element to the widest number found 
+    padded = list(map(lambda elem: f'{elem:>{longest}.4f}', self.elements))
 
-    element_strings = list(map(str, self.elements))
-    element_columns = [element_strings[i::4] for i in range(4)]
+    # Since the values are stored column-major, we need to "transpose" 
+    columns = [ padded[i:i+4] for i in range(0, 15, 4) ]
   
-    has_negative = [False] * 4
-    longest_elems = [0] * 4
-
-    # Preprocess each column to see if a negative exists and what the longest element is
-    for index, column in enumerate(element_columns):
-      for element in column:
-        if not has_negative[index] and is_negative(element):
-          has_negative[index] = True
-        
-        if len(element) > longest_elems[index]:
-          longest_elems[index] = len(element)
-
-    lines = []
-    for row_tuple in zip(*element_columns):
-      row = []
-
-      # In each row, look at each column
-      for elem, col_is_negative, longest_elem in zip(row_tuple, has_negative, longest_elems):
-        # Pad in front of the float if there is a negative in the column
-        if col_is_negative and not is_negative(elem):
-          elem = ' ' + elem
-        
-        # Pad behind the float if there is a longer element above or below
-        elem += ' ' * (longest_elem - len(elem))
-
-        row.append(elem)
-
-      # Construct each line
-      lines.append(", ".join(row))
-
-    for index, line in enumerate(lines[1:], 1):
-      lines[index] = '  ' + line
-
-    separator = '\n'
-
-    return f'[ {separator.join(lines)} ]'
+    # Join columns by commas and rows by new lines 
+    return '\n'.join(map(', '.join, zip(*columns)))
