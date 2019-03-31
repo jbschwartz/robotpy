@@ -1,5 +1,6 @@
-from .dual      import Dual
-from .transform import Transform
+from .dual       import Dual
+from .transform  import Transform
+from .quaternion import conjugate, Quaternion
 
 class Matrix4:
   def __init__(self, construct_from = None):
@@ -20,33 +21,15 @@ class Matrix4:
       self.elements = construct_from
   
   def construct_from_dual(self, d : Dual):
-    drx2 = d.r.x ** 2
-    dry2 = d.r.y ** 2
-    drz2 = d.r.z ** 2
+    self.elements = []
 
-    drxy = d.r.x * d.r.y
-    drxz = d.r.x * d.r.z
-    dryz = d.r.y * d.r.z
-    drxr = d.r.x * d.r.r
-    dryr = d.r.y * d.r.r
-    drzr = d.r.z * d.r.r
+    r_star = conjugate(d.r)
+    for basis in [(0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)]:
+      transformed_basis = d.r * Quaternion(*basis) * r_star
+      self.elements.extend([transformed_basis.x, transformed_basis.y, transformed_basis.z, 0])
 
-    self.elements[0]  = 1.0 - 2.0 * (dry2 + drz2)
-    self.elements[1]  = 2.0 * (drxy + drzr)
-    self.elements[2]  = 2.0 * (drxz - dryr)
-    self.elements[3]  = 0.0
-    self.elements[4]  = 2.0 * (drxy - drzr)
-    self.elements[5]  = 1.0 - 2.0 * (drx2 + drz2)
-    self.elements[6]  = 2.0 * (dryz + drxr)
-    self.elements[7]  = 0.0
-    self.elements[8]  = 2.0 * (drxz + dryr)
-    self.elements[9]  = 2.0 * (dryz - drxr)
-    self.elements[10] = 1.0 - 2.0 * (drx2 + dry2)
-    self.elements[11] = 0.0
-    self.elements[12] = 2.0 * (-d.d.r * d.r.x + d.d.x * d.r.r - d.d.y * d.r.z + d.d.z * d.r.y)
-    self.elements[13] = 2.0 * (-d.d.r * d.r.y + d.d.x * d.r.z + d.d.y * d.r.r - d.d.z * d.r.x)
-    self.elements[14] = 2.0 * (-d.d.r * d.r.z - d.d.x * d.r.y + d.d.y * d.r.x + d.d.z * d.r.r)
-    self.elements[15] = 1.0
+    translation = 2 * d.d * r_star
+    self.elements.extend([translation.x, translation.y, translation.z, 1])
 
   def __str__(self):
     def is_negative(string):
