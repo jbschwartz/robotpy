@@ -41,7 +41,7 @@ class Scene(Observer):
 
       glUseProgram(program.program_id)
 
-      program.proj_matrix = self.camera.projection_matrix()
+      program.proj_matrix = self.camera.projection
       program.view_matrix = self.camera.world_to_camera
 
       program.light_position  = self.light.position

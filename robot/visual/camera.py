@@ -9,11 +9,11 @@ Matrix4 = spatial.matrix4.Matrix4
 
 class Camera(Observer):
   ZOOM_SPEED = 15
-  '''
-  For now a basic wrapper around a lookat function
-  '''
+
   def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), aspect = 16/9):
     self.aspect = aspect
+
+    self.calculate_projection(60, 100, 10000, aspect)
 
     self.look_at(position, target, up)
 
@@ -118,16 +118,40 @@ class Camera(Observer):
     # result = np.dot(point, cmat)
     # print(result)
 
-  def projection_matrix(self):
-    fov = math.radians(60)
-    f = 1.0/math.tan(fov/2.0)
-    zN, zF = (100, 10000.0)
-    a = self.aspect
+  def calculate_projection(self, fov, z_near, z_far, aspect):
+    fov = math.radians(fov)
+    f = 1.0 / math.tan(fov / 2.0)
+    z_width = z_far - z_near
 
-    return Matrix4([f/a, 0.0, 0.0,               0.0, 
-                    0.0, f,   0.0,               0.0, 
-                    0.0, 0.0, (zF+zN)/(zN-zF),  -1.0, 
-                    0.0, 0.0, 2.0*zF*zN/(zN-zF), 0.0])
+    m11 = f / aspect
+    m22 = f
+    m33 = (z_far + z_near) / (-z_width)
+    m34 = 2 * z_far * z_near / (-z_width)
+
+    # Remember: the elements of the matrix look transposed 
+    self.projection = Matrix4([m11,  0.0,  0.0,  0.0, 
+                               0.0,  m22,  0.0,  0.0, 
+                               0.0,  0.0,  m33, -1.0, 
+                               0.0,  0.0,  m34,  0.0])
+
+    self.calculate_inverse_projection()
+
+  def calculate_inverse_projection(self):
+    p11 = self.projection.elements[0]
+    p22 = self.projection.elements[5]
+    p33 = self.projection.elements[10]
+    p34 = self.projection.elements[14]
+
+    m11 = 1 / p11
+    m22 = 1 / p22
+    m43 = 1 / p34 
+    m44 = p33 / p34
+
+    # Remember: the elements of the matrix look transposed 
+    self.inverse_projection = Matrix4([m11, 0.0,  0.0, 0.0, 
+                                       0.0, m22,  0.0, 0.0, 
+                                       0.0, 0.0,  0.0, m43, 
+                                       0.0, 0.0, -1.0, m44])
 
   @property
   def world_to_camera(self):
