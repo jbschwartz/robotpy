@@ -1,5 +1,5 @@
-from ..spatial import Frame
-from ..mech import Serial
+from robot.mech.serial   import Serial
+from robot.spatial.frame import Frame
 
 def solve_wrist(target : Frame, arm_angles : list, robot : Serial):
   '''

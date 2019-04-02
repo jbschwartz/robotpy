@@ -1,6 +1,6 @@
 import math
 
-from .swizzler import Swizzler
+from robot.spatial.swizzler import Swizzler
 
 class Quaternion(Swizzler):
   ''' 

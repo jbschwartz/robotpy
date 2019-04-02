@@ -1,11 +1,9 @@
 import numpy as np
 from OpenGL.GL import *
 
-from ..spatial import matrix4, transform, vector3
-
-Matrix4   = matrix4.Matrix4
-Transform = transform.Transform
-Vector3   = vector3.Vector3
+from robot.spatial.matrix4   import Matrix4
+from robot.spatial.transform import Transform
+from robot.spatial.vector3   import Vector3
 
 def scalar_decorator(gl_function):
   def wrapper(location, *args):

@@ -1,6 +1,6 @@
 import math
 
-from .swizzler import Swizzler
+from robot.spatial.swizzler import Swizzler
 
 class Vector3(Swizzler):
   def __init__(self, x = 0, y = 0, z = 0):

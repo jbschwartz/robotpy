@@ -1,8 +1,8 @@
-import enum, math, struct
+import enum, struct
 
 from .stl_type import STLType
 
-from robot.common       import Timer
+from robot.common.timer import Timer
 from robot.exceptions   import *
 from robot.spatial      import vector3
 from robot.visual.facet import Facet

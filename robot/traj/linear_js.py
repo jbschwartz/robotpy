@@ -1,6 +1,4 @@
-import math
-
-from .trajectory_js import TrajectoryJS
+from robot.traj.trajectory_js import TrajectoryJS
 
 def interpolate(start, end, t):
   '''

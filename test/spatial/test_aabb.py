@@ -1,7 +1,7 @@
 import unittest
 
-from robot.spatial import AABB
-from robot.spatial import Vector3
+from robot.spatial.aabb    import AABB
+from robot.spatial.vector3 import Vector3
 
 class TestAABB(unittest.TestCase):
   def setUp(self):

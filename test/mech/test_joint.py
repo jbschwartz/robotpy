@@ -1,8 +1,8 @@
-import unittest
-import math
+import math, unittest
 
-from robot.spatial import Vector3, Transform
-from robot.mech import Joint
+from robot.mech.joint        import Joint
+from robot.spatial.vector3   import Vector3
+from robot.spatial.transform import Transform
 
 class TestJoint(unittest.TestCase):
   def setUp(self):

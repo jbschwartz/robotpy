@@ -1,6 +1,4 @@
-import math
-
-from .facet import Facet 
+from robot.visual.facet import Facet 
 
 class Mesh:
   def __init__(self, name = None):

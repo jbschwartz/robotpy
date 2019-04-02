@@ -1,6 +1,6 @@
 import math
 
-from .. import constant
+from robot import constant
 
 def is_singular(r, s, upper_arm_length, fore_arm_length):
   '''

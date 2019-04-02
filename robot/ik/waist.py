@@ -1,6 +1,6 @@
 import math
 
-from .. import constant, utils
+from robot import constant, utils
 
 def solve_waist(x, y, wristOffset = 0):
   '''

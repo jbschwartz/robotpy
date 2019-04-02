@@ -1,8 +1,7 @@
-import unittest
-import math
+import math, unittest
 
-from robot.spatial import Quaternion, Vector3
-import robot.spatial.quaternion as quaternion
+from robot.spatial.quaternion import conjugate, Quaternion
+from robot.spatial.vector3 import Vector3
 
 class TestQuaternion(unittest.TestCase):
   def setUp(self):
@@ -85,7 +84,7 @@ class TestQuaternion(unittest.TestCase):
     self.assertAlmostEqual(self.q.norm(), 1)
 
   def test_quaternion_conjugate(self):
-    result = quaternion.conjugate(self.q)
+    result = conjugate(self.q)
 
     self.q.conjugate()
     expected = self.q

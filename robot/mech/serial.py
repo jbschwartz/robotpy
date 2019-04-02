@@ -1,10 +1,11 @@
-import copy, itertools, json, math
+import copy, itertools, math
 
-from .joint import Joint
-from .link import Link
-
-from ..spatial import Dual, Quaternion, Transform, Frame, Vector3
-from robot import constant
+from robot                   import constant
+from robot.mech.joint        import Joint
+from robot.mech.link         import Link
+from robot.spatial.frame     import Frame
+from robot.spatial.transform import Transform
+from robot.spatial.vector3   import Vector3
 
 class Serial:
   def __init__(self, joints : list, links = []):

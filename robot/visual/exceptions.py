@@ -1,4 +1,4 @@
-from ..exceptions import RobotError
+from robot.exceptions import RobotError
 
 class ParserError(RobotError):
   def __init__(self, line, msg):

@@ -1,8 +1,7 @@
-import unittest
-import math
+import math, unittest
 
-from robot.spatial import Quaternion, Transform, Vector3
-import robot.spatial.quaternion as quaternion
+from robot.spatial.transform import Transform
+from robot.spatial.vector3   import Vector3
 
 class TestTransform(unittest.TestCase):
   def setUp(self):

@@ -1,9 +1,8 @@
 import math
 
-from .arm import solve_arm
-from .wrist import solve_wrist
-
-from ..spatial import Frame
+from robot.ik.arm        import solve_arm
+from robot.ik.wrist      import solve_wrist
+from robot.spatial.frame import Frame
 
 def redundant_solutions(solutions, robot):
   # TODO: This can probably be more concise

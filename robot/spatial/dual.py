@@ -1,4 +1,4 @@
-from . import quaternion
+from robot.spatial import quaternion
 Quaternion = quaternion.Quaternion
 
 class Dual:

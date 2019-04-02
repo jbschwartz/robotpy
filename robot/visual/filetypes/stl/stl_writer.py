@@ -1,6 +1,6 @@
 import ctypes, struct
 
-from .stl_type import STLType
+from robot.visual.filetypes.stl.stl_type import STLType
 
 class STLWriter():
   FILE_EXTENSION = '.stl'

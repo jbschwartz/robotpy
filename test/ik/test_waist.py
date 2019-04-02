@@ -1,7 +1,7 @@
-import unittest
-import math
+import math, unittest
 
-from robot import ik, utils
+import robot.ik    as ik
+import robot.utils as utils
 
 class TestWaist(unittest.TestCase):
   def setUp(self):

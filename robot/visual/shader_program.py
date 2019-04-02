@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 
-from .uniform import Uniform
+from robot.visual.uniform import Uniform
 
 class ShaderProgram():
   def __init__(self, vertex_file, fragment_file):

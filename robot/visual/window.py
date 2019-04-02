@@ -1,12 +1,10 @@
-import sys
-
-import glfw
+import glfw, sys
 
 from OpenGL.GL import GL_FALSE
 
-from .window_events import WindowEvents
-
-from ..spatial.vector3 import Vector3
+from robot.common.timer         import Timer
+from robot.spatial.vector3      import Vector3
+from robot.visual.window_events import WindowEvents
 
 class Window():
   def __init__(self, x, y, title):

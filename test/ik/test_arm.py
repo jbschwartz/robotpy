@@ -1,8 +1,8 @@
-import unittest
-import math
+import math, unittest
 
-from robot import ik, utils
-from robot.spatial import Vector3
+import robot.ik    as ik 
+import robot.utils as utils
+from robot.spatial.vector3 import Vector3
 
 class TestArm(unittest.TestCase):
   def setUp(self):

@@ -1,9 +1,19 @@
 import math
 
-from robot.spatial         import Vector3
-from robot.traj            import LinearJS
-from robot.visual          import AmbientLight, Camera, Scene, ShaderProgram, Window, WindowEvents
-from robot.visual.entities import robot_entity, RobotEntity
+from robot.spatial import vector3
+Vector3 = vector3.Vector3
+
+from robot.common.timer          import Timer
+from robot.traj.linear_js        import LinearJS
+from robot.visual.ambient_light  import AmbientLight
+from robot.visual.camera         import Camera
+from robot.visual.entities       import robot_entity
+from robot.visual.scene          import Scene
+from robot.visual.shader_program import ShaderProgram
+from robot.visual.window         import Window
+from robot.visual.window_events  import WindowEvents
+
+RobotEntity = robot_entity.RobotEntity
 
 if __name__ == "__main__":
   window = Window(900, 900, "robotpy")

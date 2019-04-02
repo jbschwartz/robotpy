@@ -1,11 +1,9 @@
 import math
 
-from .observer import Observer
-
-import robot.spatial as spatial
-
-Vector3 = spatial.vector3.Vector3
-Matrix4 = spatial.matrix4.Matrix4
+from robot.spatial.matrix4   import Matrix4
+from robot.spatial.transform import Transform
+from robot.spatial.vector3   import Vector3
+from robot.visual.observer   import Observer
 
 class Camera(Observer):
   ZOOM_SPEED = 15
@@ -25,7 +23,7 @@ class Camera(Observer):
 
     up = (forward % right).normalize()
 
-    self.camera_to_world = spatial.Transform(axis=right, angle=angle, translation=position)
+    self.camera_to_world = Transform(axis=right, angle=angle, translation=position)
 
   @property
   def position(self):
@@ -85,7 +83,7 @@ class Camera(Observer):
     Move the camera in or out along its line of sight
     '''
     movement = Vector3(0, 0, self.ZOOM_SPEED * direction)
-    self.camera_to_world = spatial.Transform(translation=movement) * self.camera_to_world
+    self.camera_to_world = Transform(translation=movement) * self.camera_to_world
 
   def click(self, x, y):
     pass

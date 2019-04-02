@@ -1,6 +1,9 @@
 import math
 
-from ..spatial import Transform, Vector3, Quaternion, Dual
+from robot.spatial.dual       import Dual
+from robot.spatial.quaternion import Quaternion
+from robot.spatial.transform  import Transform
+from robot.spatial.vector3    import Vector3
 
 # TODO: Generalize this class to potentially handle prismatic case
 

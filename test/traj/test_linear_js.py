@@ -1,6 +1,6 @@
 import math, unittest
 
-from robot.traj import LinearJS
+from robot.traj.linear_js import LinearJS
 
 class TestLinearJS(unittest.TestCase):
   def setUp(self):

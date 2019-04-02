@@ -5,13 +5,16 @@ from OpenGL.GL import *
 
 from ctypes import c_void_p
 
-from ..mesh           import Mesh
-from ..shader_program import ShaderProgram
-
-from robot.mech              import Joint, Link, Serial
-from robot.spatial           import Matrix4, Vector3, Frame
-from robot.visual.exceptions import ParserError
-from robot.visual.filetypes  import STLParser
+from robot.mech.joint                      import Joint
+from robot.mech.link                       import Link
+from robot.mech.serial                     import Serial
+from robot.spatial.frame                   import Frame
+from robot.spatial.matrix4                 import Matrix4
+from robot.spatial.vector3                 import Vector3
+from robot.visual.exceptions               import ParserError
+from robot.visual.filetypes.stl.stl_parser import STLParser
+from robot.visual.mesh                     import Mesh
+from robot.visual.shader_program           import ShaderProgram
 
 def load(filename):
   joints = []

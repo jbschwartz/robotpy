@@ -1,8 +1,8 @@
 from OpenGL.GL import *
 
-from .camera        import Camera
-from .observer      import Observer
-from .window_events import WindowEvents
+from robot.visual.camera        import Camera
+from robot.visual.observer      import Observer
+from robot.visual.window_events import WindowEvents
 
 class Scene(Observer):
   def __init__(self, camera, light):

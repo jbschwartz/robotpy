@@ -1,5 +1,4 @@
-import unittest
-import math
+import math, unittest
 
 from robot import ik, utils
 

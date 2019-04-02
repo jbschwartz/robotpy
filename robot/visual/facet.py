@@ -1,10 +1,7 @@
 import math
 
-from .exceptions import DegenerateTriangleError
-
-from robot.spatial import vector3
-
-Vector3 = vector3.Vector3
+from robot.spatial.vector3   import Vector3
+from robot.visual.exceptions import DegenerateTriangleError
 
 class Facet:
   def __init__(self, vertices = [], normal = Vector3()):
@@ -27,7 +24,7 @@ class Facet:
 
   def computed_normal(self):
     edges = self.compute_edges()
-    normal = vector3.cross(edges[0], edges[1])
+    normal = edges[0] % edges[1]
 
     if math.isclose(normal.length(), 0.0):
       raise DegenerateTriangleError('Degenerate triangle found')

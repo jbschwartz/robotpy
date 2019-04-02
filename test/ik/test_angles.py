@@ -1,5 +1,4 @@
-import unittest
-import math
+import math, unittest
 from operator import itemgetter
 
 from robot import ik

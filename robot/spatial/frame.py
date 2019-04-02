@@ -1,11 +1,8 @@
 import math
 
-from . import dual, euler, quaternion, vector3, transform
-
-Dual = dual.Dual
-Quaternion = quaternion.Quaternion
-Vector3 = vector3.Vector3
-Transform = transform.Transform
+import robot.spatial.euler as euler
+from robot.spatial.vector3   import Vector3
+from robot.spatial.transform import Transform
 
 class Frame:
   def __init__(self, transform : Transform = Transform()):
@@ -24,7 +21,7 @@ class Frame:
     '''
     return self.transform.translation()
   
-  def orientation(self) -> Quaternion:
+  def orientation(self):
     '''
     Frame orientation quaternion
     '''

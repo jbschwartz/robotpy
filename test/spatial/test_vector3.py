@@ -1,8 +1,6 @@
-import unittest
-import math
+import math, unittest
 
-from robot.spatial import Vector3
-import robot.spatial.vector3 as vector3
+from robot.spatial.vector3 import angle_between, normalize, Vector3
 
 class TestVector3(unittest.TestCase):
   def setUp(self):
@@ -68,7 +66,7 @@ class TestVector3(unittest.TestCase):
     self.assertAlmostEqual(self.v1.length_sq(), expected)
 
   def test_is_unit(self):
-    unit_vector = vector3.normalize(self.v1)
+    unit_vector = normalize(self.v1)
     self.assertFalse(self.v1.is_unit())
     self.assertTrue(unit_vector.is_unit())
 
@@ -81,7 +79,7 @@ class TestVector3(unittest.TestCase):
     self.assertAlmostEqual(self.v1.length(), 1)
 
   def test_vector3_normalize(self):
-    result = vector3.normalize(self.v1)
+    result = normalize(self.v1)
 
     self.v1.normalize()
     expected = self.v1
@@ -90,27 +88,27 @@ class TestVector3(unittest.TestCase):
 
   def test_vector3_angle_between(self):
     expected = 0
-    self.assertAlmostEqual(vector3.angle_between(self.v1, 5 * self.v1), expected)
+    self.assertAlmostEqual(angle_between(self.v1, 5 * self.v1), expected)
 
     x = Vector3(1, 0, 0)
     y = Vector3(0, 1, 0)
 
     expected = math.radians(90)
-    self.assertAlmostEqual(vector3.angle_between(x, y), expected)
-    self.assertAlmostEqual(vector3.angle_between(y, x), expected)
+    self.assertAlmostEqual(angle_between(x, y), expected)
+    self.assertAlmostEqual(angle_between(y, x), expected)
 
     p = Vector3(45, 45, 0)
 
     expected = math.radians(45)
-    self.assertAlmostEqual(vector3.angle_between(x, p), expected)
-    self.assertAlmostEqual(vector3.angle_between(p, x), expected)
+    self.assertAlmostEqual(angle_between(x, p), expected)
+    self.assertAlmostEqual(angle_between(p, x), expected)
 
   def test_vector3_cross(self):
     expected = Vector3(-9, -3, 1)
-    self.assertAlmostEqual(vector3.cross(self.v1, self.v2), expected)
+    self.assertAlmostEqual(self.v1 % self.v2, expected)
 
     expected = Vector3(9, 3, -1)
-    self.assertAlmostEqual(vector3.cross(self.v2, self.v1), expected)
+    self.assertAlmostEqual(self.v2 % self.v1, expected)
 
   @unittest.skip("Need to write test")
   def test_almost_equal(self):
