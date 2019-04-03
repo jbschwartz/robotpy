@@ -82,7 +82,7 @@ class Camera(Observer):
     '''
     Move the camera in or out along its line of sight
     '''
-    movement = Vector3(0, 0, self.ZOOM_SPEED * direction)
+    movement = self.camera_to_world(Vector3(0, 0, self.ZOOM_SPEED * -direction), type="vector")
     self.camera_to_world = Transform(translation=movement) * self.camera_to_world
 
   def click(self, x, y):
