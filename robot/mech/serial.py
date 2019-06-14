@@ -11,12 +11,12 @@ class Serial:
   def __init__(self, joints : list, links = []):
     self.joints = joints
     self.links = links
-    self.position = Vector3()
-
     self.traj = None
     self.qs = [0] * 6
 
     self.checkStructure()
+
+    self.update_links()
 
   def checkStructure(self):
     # TODO: Check the structure of the robot to see if it is 6R with spherical wrist
@@ -29,24 +29,32 @@ class Serial:
     correctElbow = math.isclose(self.joints[1].dh['alpha'], 0) or math.isclose(self.joints[1].dh['alpha'], math.pi)
     assert correctElbow, 'Robot does not have a recognized elbow configuration'
 
-  def links_to_world(self) -> list: 
-    ts = [ Transform(translation=self.position) ]
-    
-    for joint, value in itertools.zip_longest(self.joints, self.qs, fillvalue=0):
-      # Get last frame
-      t = copy.deepcopy(ts[-1])
-      t *= joint.transform(value)
-      ts.append(t)
-    
-    return ts
+  @property
+  def angles(self):
+    return [joint.angle for joint in self.joints]
+
+  @angles.setter
+  def angles(self, angles):
+    for angle, joint in zip(angles, self.joints):
+      joint.angle = angle
+
+    self.update_links()
+
+  def position(self, v):
+    transform = Transform(translation = v)
+    self.links[0].frame = transform * self.links[0].frame 
+
+  def update_links(self):
+    last_frame = self.links[0].frame
+    for link, joint in zip(self.links[1:], self.joints):
+      link.frame = joint.transform * last_frame 
+      last_frame = link.frame
 
   def pose(self) -> Frame: 
-    ts = self.links_to_world()
-    return Frame(ts[-1])
+    return self.links[-1].frame
 
   def poses(self) -> list: 
-    ts = self.links_to_world()
-    return [ Frame(t) for t in ts ]
+    return [link.frame for link in self.links]
 
   def upper_arm_length(self):
     return self.joints[1].dh['a']

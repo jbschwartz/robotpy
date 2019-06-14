@@ -20,7 +20,7 @@ class TestAngles(unittest.TestCase):
       [angle, angle, angle, -math.radians(135), -angle, math.radians(225)],
     ]
 
-    self.ABB_IRB_120.qs = solutions[0]
+    self.ABB_IRB_120.angles = solutions[0]
     f = self.ABB_IRB_120.pose()
 
     results = ik.solve_angles(f, self.ABB_IRB_120)
