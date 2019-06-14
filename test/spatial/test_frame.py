@@ -31,6 +31,23 @@ class TestFrame(unittest.TestCase):
     expected = Vector3(0, 0, 1)
     self.assertEqual(self.f0.z(), expected)
 
+  def test_rmul(self):
+    transform = Transform(axis = Vector3(1, 0, 0), angle = math.radians(90), translation = Vector3(0, 0, 100))
+    
+    new_frame = transform * self.f0 
+
+    expected = Vector3(1, 0, 0)
+    self.assertAlmostEqual(new_frame.x(), expected)
+
+    expected = Vector3(0, 0, 1)
+    self.assertAlmostEqual(new_frame.y(), expected)
+
+    expected = Vector3(0, -1, 0)
+    self.assertAlmostEqual(new_frame.z(), expected)
+
+    expected = Vector3(0, 0, 100)
+    self.assertAlmostEqual(new_frame.position(), expected)
+
   def test_x(self):
     expected = self.t(Vector3(1, 0, 0))
     self.assertEqual(self.f2.x(), expected)

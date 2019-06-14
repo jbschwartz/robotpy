@@ -13,7 +13,9 @@ class Frame:
     Transformation of a frame
     '''
     if isinstance(other, Transform):
-      return Frame(other * self.transform)
+      # TODO: Why does this work?
+      #   This behaves intrinsically-- which is what we want
+      return Frame(self.transform * other)
 
   def position(self) -> Vector3:
     '''
