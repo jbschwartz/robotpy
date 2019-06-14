@@ -57,8 +57,6 @@ class RobotEntity():
     self.serial = serial
     self.meshes = meshes
 
-    self.link_matricies = np.array([], dtype=np.float32)
-
   def use_shader(self, shader_program):
     self.shader_program = shader_program
 
