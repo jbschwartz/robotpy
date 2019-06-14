@@ -103,8 +103,12 @@ class RobotEntity():
     glBindVertexArray(0)
 
   def update(self, delta):
-    if self.serial.traj.is_done():
-      self.serial.traj.reverse()
+    # TODO: Move to more "direct" function calls, e.g.:
+    # if not self.serial.is_moving():
+    #   self.serial.reverse()
+    if self.serial.traj:
+      if self.serial.traj.is_done():
+        self.serial.traj.reverse()
 
     self.serial.qs = self.serial.traj.advance(delta)
 
