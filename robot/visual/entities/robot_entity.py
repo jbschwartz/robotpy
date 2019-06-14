@@ -57,16 +57,6 @@ class RobotEntity():
     self.serial = serial
     self.meshes = meshes
 
-    self.link_colors = [
-      (0.5, 0.15, 0.85),
-      (0.25, 0.25, 1),
-      (0.5, 0.25, 1),
-      (1, 1, 0),
-      (1, 0, 1),
-      (0, 1, 1),
-      (0.5, 1, 0.25)
-    ]
-
     self.link_matricies = np.array([], dtype=np.float32)
 
   def use_shader(self, shader_program):
@@ -116,7 +106,7 @@ class RobotEntity():
   def draw(self):
     self.shader_program.model_matrices  = [frame.transform for frame in self.serial.poses()]
     self.shader_program.use_link_colors = False
-    self.shader_program.link_colors     = self.link_colors
+    self.shader_program.link_colors     = [link.color for link in self.serial.links]
     self.shader_program.robot_color     = self.color
 
     glBindVertexArray(self.vao)
