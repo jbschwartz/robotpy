@@ -110,10 +110,10 @@ class RobotEntity():
       if self.serial.traj.is_done():
         self.serial.traj.reverse()
 
-    self.serial.qs = self.serial.traj.advance(delta)
+      self.serial.angles = self.serial.traj.advance(delta)
 
   def draw(self):
-    self.shader_program.model_matrices  = self.serial.links_to_world()
+    self.shader_program.model_matrices  = [frame.transform for frame in self.serial.poses()]
     self.shader_program.use_link_colors = False
     self.shader_program.link_colors     = self.link_colors
     self.shader_program.robot_color     = (1, 0.5, 0)
