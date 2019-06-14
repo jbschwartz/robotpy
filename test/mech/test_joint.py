@@ -28,7 +28,8 @@ class TestJoint(unittest.TestCase):
     alpha = Transform(axis = Vector3(1, 0, 0), angle = self.joint.dh['alpha'])
 
     expected = d * theta * a * alpha
-    result = self.joint.transform(q)
+    self.joint.angle = q
+    result = self.joint.transform
 
     self.assertAlmostEqual(result.dual, expected.dual)
 

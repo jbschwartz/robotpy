@@ -20,6 +20,7 @@ class Joint:
     self.a = a
     self.theta = theta
     self.d = d
+    self.angle = 0
 
     self.limits = {}
     if all(key in limits for key in ('low', 'high')):
@@ -36,15 +37,16 @@ class Joint:
     self.a_alpha = self.a * self.alpha
     self.d = Quaternion(0, 0, 0, self.dh['d'])
 
-  def transform(self, q):
+  @property
+  def transform(self):
     '''
     Create transformation from Denavit-Hartenberg parameters
     
     Transform = Translate_z(d) * Rotate_z(theta) * Translate_x(a) * Rotate_x(alpha)
     '''
 
-    sum = self.dh['theta'] + q
-    theta = Quaternion(axis = Vector3(0, 0, 1), angle = sum)
+    angle_sum = self.dh['theta'] + self.angle
+    theta = Quaternion(axis = Vector3(0, 0, 1), angle = angle_sum)
     r = theta * self.alpha
     dual = Dual(r, 0.5 * (theta * self.a_alpha + self.d * r))
   
