@@ -12,6 +12,7 @@ from robot.spatial.frame                   import Frame
 from robot.spatial.matrix4                 import Matrix4
 from robot.spatial.vector3                 import Vector3
 from robot.visual.exceptions               import ParserError
+from robot.visual.entities.entity          import Entity
 from robot.visual.filetypes.stl.stl_parser import STLParser
 from robot.visual.mesh                     import Mesh
 from robot.visual.shader_program           import ShaderProgram
@@ -46,19 +47,12 @@ def load(filename):
 
   return RobotEntity(Serial(joints, links), meshes)
 
-class RobotEntity():
+class RobotEntity(Entity):
   def __init__(self, serial : Serial, meshes, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):
-    self.vao = -1 if not bool(glGenVertexArrays) else glGenVertexArrays(1)
-    self.vbo = -1 if not bool(glGenBuffers) else glGenBuffers(1)
-    self.buffer = []
-    self.color = color
-    self.shader_program = shader_program
-
     self.serial = serial
     self.meshes = meshes
 
-  def use_shader(self, shader_program):
-    self.shader_program = shader_program
+    Entity.__init__(self, shader_program, color)
 
   def build_buffer(self):
     data_list = []
