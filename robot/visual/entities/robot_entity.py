@@ -47,10 +47,11 @@ def load(filename):
   return RobotEntity(Serial(joints, links), meshes)
 
 class RobotEntity():
-  def __init__(self, serial : Serial, meshes, shader_program : ShaderProgram = None):
+  def __init__(self, serial : Serial, meshes, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):
     self.vao = -1 if not bool(glGenVertexArrays) else glGenVertexArrays(1)
     self.vbo = -1 if not bool(glGenBuffers) else glGenBuffers(1)
     self.buffer = []
+    self.color = color
     self.shader_program = shader_program
 
     self.serial = serial
@@ -116,7 +117,7 @@ class RobotEntity():
     self.shader_program.model_matrices  = [frame.transform for frame in self.serial.poses()]
     self.shader_program.use_link_colors = False
     self.shader_program.link_colors     = self.link_colors
-    self.shader_program.robot_color     = (1, 0.5, 0)
+    self.shader_program.robot_color     = self.color
 
     glBindVertexArray(self.vao)
 
