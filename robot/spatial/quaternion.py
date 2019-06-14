@@ -100,6 +100,7 @@ class Quaternion(Swizzler):
     self.y = -self.y
     self.z = -self.z
 
+  # TODO: I need to make the naming consistent across all objects (i.e., I use length in Vector3)
   def norm(self):
     return math.sqrt(self.r**2 + self.x**2 + self.y**2 + self.z**2)
 

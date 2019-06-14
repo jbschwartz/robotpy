@@ -8,6 +8,9 @@ def interpolate(start, end, t):
   return slope * t + start
 
 class LinearJS(TrajectoryJS):
+  '''
+  Linear trajectory in robot joint space
+  '''
   def __init__(self, starts, ends, duration = 1):
     self.starts = starts
     self.ends = ends

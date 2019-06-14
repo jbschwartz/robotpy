@@ -92,5 +92,5 @@ class Uniform:
   def value(self, *args):
     self.set_function(self.location, *args)
   
-  # value property has no need for a getter
+  # 'value' property has no need for a getter
   value = property(None, value)
