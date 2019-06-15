@@ -1,3 +1,5 @@
+import glfw
+
 from robot.visual.camera   import Camera
 from robot.visual.observer import Observer
 
@@ -12,7 +14,8 @@ class CameraController(Observer):
     pass
   
   def key(self, key, action):
-    pass
+    if key == glfw.KEY_R and action == glfw.RELEASE:
+      self.camera.reset()
 
   def scroll(self, direction):
     pass
