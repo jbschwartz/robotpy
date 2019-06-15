@@ -11,6 +11,8 @@ class WindowEvents(enum.Enum):
   WINDOW_RESIZE  = enum.auto()
   CURSOR         = enum.auto()
   ZOOM           = enum.auto()
+  CLICK          = enum.auto()
+  RESET          = enum.auto()
 
   def __str__(self):
     return self.name.lower()
