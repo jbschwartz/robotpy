@@ -4,6 +4,7 @@ from robot.spatial import vector3
 Vector3 = vector3.Vector3
 
 from robot.common.timer                      import Timer
+from robot.spatial.frame                     import Frame
 from robot.traj.linear_js                    import LinearJS
 from robot.visual.ambient_light              import AmbientLight
 from robot.visual.camera                     import Camera
@@ -44,9 +45,12 @@ if __name__ == "__main__":
 
   camera = Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
   window.register_observer(camera, [ WindowEvents.ORBIT, WindowEvents.ZOOM, WindowEvents.CLICK, WindowEvents.RESET ])
+
+  world_frame = FrameEntity(Frame(), flat_program)
   light = AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
 
   scene = Scene(camera, light)
+  scene.entities.append(world_frame)
   scene.entities.append(robot)
   scene.entities.append(robot2)
   scene.entities.append(triangle)
