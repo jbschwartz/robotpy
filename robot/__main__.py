@@ -14,7 +14,7 @@ from robot.visual.entities.frame_entity      import FrameEntity
 from robot.visual.scene                      import Scene
 from robot.visual.shader_program             import ShaderProgram
 from robot.visual.window                     import Window
-from robot.visual.window_events              import WindowEvent
+from robot.visual.window_event               import WindowEvent
 
 RobotEntity = robot_entity.RobotEntity
 

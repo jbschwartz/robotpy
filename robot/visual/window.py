@@ -4,7 +4,7 @@ from OpenGL.GL import GL_FALSE
 
 from robot.common.timer         import Timer
 from robot.spatial.vector3      import Vector3
-from robot.visual.window_events import WindowEvent
+from robot.visual.window_event  import WindowEvent
 
 class Window():
   def __init__(self, x, y, title):

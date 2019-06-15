@@ -1,4 +1,4 @@
-from robot.visual.window_events import WindowEvent
+from robot.visual.window_event import WindowEvent
 
 class Observer:
   def notify(self, event, *args, **kwargs):
