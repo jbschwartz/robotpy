@@ -28,6 +28,8 @@ class Window():
 
     glfw.make_context_current(self.window)
 
+    self.last_cursor_position = self.get_cursor()
+
   def window_hints(self):
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 6)
@@ -59,8 +61,15 @@ class Window():
     self.dragging = button if action == glfw.PRESS else None
 
   def cursor_pos_callback(self, window, x, y):
+    cursor = Vector3(x, y)
+
+    if self.last_cursor_position:
+      cursor_delta = (self.last_cursor_position - cursor)
+      
+    self.last_cursor_position = cursor
+
     event = WindowEvent.DRAG if self.dragging is not None else WindowEvent.CURSOR
-    self.emit(event, self.dragging, None, Vector3(x, y, 0))
+    self.emit(event, self.dragging, cursor_delta)
 
   def get_cursor(self):
     return Vector3(*glfw.get_cursor_pos(self.window), 0)

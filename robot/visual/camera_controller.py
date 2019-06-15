@@ -1,8 +1,10 @@
 import glfw
 
-from robot.spatial.vector3 import Vector3
+from robot.spatial         import vector3
 from robot.visual.camera   import Camera
 from robot.visual.observer import Observer
+
+Vector3 = vector3.Vector3
 
 class CameraController(Observer):
   ORBIT_SPEED = 0.05
@@ -15,12 +17,9 @@ class CameraController(Observer):
   def click(self, button, cursor):
     pass
   
-  def drag(self, button, cursor):
-    if self.last_cursor_position:
-      difference = (self.last_cursor_position - cursor).normalize()
-      self.request_orbit(difference.y, difference.x)
-
-    self.last_cursor_position = cursor
+  def drag(self, button, cursor_delta):
+    direction = vector3.normalize(cursor_delta)
+    self.request_orbit(*direction.yx)
   
   def key(self, key, action):
     if key == glfw.KEY_R and action == glfw.RELEASE:
