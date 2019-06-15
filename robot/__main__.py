@@ -8,6 +8,7 @@ from robot.spatial.frame                     import Frame
 from robot.traj.linear_js                    import LinearJS
 from robot.visual.ambient_light              import AmbientLight
 from robot.visual.camera                     import Camera
+from robot.visual.camera_controller          import CameraController
 from robot.visual.entities                   import robot_entity
 from robot.visual.entities.triangle_entity   import TriangleEntity
 from robot.visual.entities.frame_entity      import FrameEntity
@@ -44,6 +45,15 @@ if __name__ == "__main__":
   triangle = TriangleEntity(flat_program)
 
   camera = Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
+
+  camera_controller = CameraController(camera)
+
+  window.register_observer(camera_controller, [ 
+    WindowEvent.CLICK, 
+    WindowEvent.CURSOR, 
+    WindowEvent.RESET,
+    WindowEvent.SCROLL 
+  ])
 
   world_frame = FrameEntity(Frame(), flat_program)
   light = AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
