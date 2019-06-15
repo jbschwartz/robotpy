@@ -10,15 +10,15 @@ class Window():
   def __init__(self, x, y, title):
     self.observers = []
     self.pause = False
-    self.track_mouse = False
-    self.last_mouse_position = None
+    self.dragging = False
 
     if not glfw.init():
       sys.exit('GLFW initialization failed')
     
     self.window_hints()
 
-    self.window = glfw.create_window(x, y, title, None, None)
+    with Timer('Create Window') as t:
+      self.window = glfw.create_window(x, y, title, None, None)
     
     if not self.window:
       glfw.terminate()
@@ -79,7 +79,8 @@ class Window():
         observer.notify(event_type, *args, **kwargs)
 
   def run(self, fps_limit = None):
-    self.emit(WindowEvents.START_RENDERER)
+    with Timer('START_RENDERER') as t:
+      self.emit(WindowEvents.START_RENDERER)
 
     now = glfw.get_time()
     last_frame = now
