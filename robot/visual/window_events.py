@@ -10,7 +10,7 @@ class WindowEvents(enum.Enum):
   END_RENDERER   = enum.auto()
   WINDOW_RESIZE  = enum.auto()
   CURSOR         = enum.auto()
-  ZOOM           = enum.auto()
+  SCROLL         = enum.auto()
   CLICK          = enum.auto()
   RESET          = enum.auto()
 

@@ -61,10 +61,7 @@ class Window():
       self.pause = not self.pause
 
   def scroll_callback(self, window, x_direction, y_direction):
-    if y_direction:
-      self.emit(WindowEvents.ZOOM, y_direction)
-    # if x_direction:
-    #   self.emit(WindowEvents.ORBIT, Vector3(x_direction, 0, 0))
+    self.emit(WindowEvents.SCROLL, Vector3(x_direction, y_direction))
 
   def mouse_button_callback(self, window, button, action, mods):
     if button is glfw.MOUSE_BUTTON_LEFT:
