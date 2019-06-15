@@ -9,7 +9,7 @@ class WindowEvents(enum.Enum):
   END_FRAME      = enum.auto()
   END_RENDERER   = enum.auto()
   WINDOW_RESIZE  = enum.auto()
-  ORBIT          = enum.auto()
+  CURSOR         = enum.auto()
   ZOOM           = enum.auto()
 
   def __str__(self):
