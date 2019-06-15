@@ -50,54 +50,7 @@ class Camera(Observer):
   def position(self):
     return self.camera_to_world.translation()
 
-  def target(self):
-    return -self.camera_to_world.z()
 
-  def orbit(self, direction, center = None):
-    if not center:
-      center = self.target
-
-    if direction.x > 0:
-      theta = +1
-    elif direction.x < 0:
-      theta = -1
-    else:
-      theta = 0
-
-    if direction.y > 0:
-      phi = 1
-    elif direction.y < 0:
-      phi = -1
-    else:
-      phi = 0
-
-    # axis = self.camera_to_world(Vector3(0,0,1), type="vector")
-    # axis = Vector3(0,0,1)
-    # rotate_z = spatial.Transform(axis=axis, angle=math.radians(theta))
-    # rotate_x = spatial.Transform(axis=spatial.Vector3(0,1,0), angle=math.radians(phi))
-
-    # position = -self.camera_to_world.translation()
-
-    # print(spatial.Frame(self.camera_to_world).position())
-
-
-    # # self.camera_to_world = spatial.Transform(translation=position) * self.camera_to_world
-    # self.camera_to_world = rotate_z * self.camera_to_world
-    # self.camera_to_world = rotate_x * self.camera_to_world
-    # self.camera_to_world = spatial.Transform(axis=axis, angle=math.radians(theta)) * self.camera_to_world
-    # self.camera_to_world = spatial.Transform(translation=-position) * self.camera_to_world
-
-    # print(spatial.Frame(self.camera_to_world).orientation())
-
-    # # ... TODO: Movement along the surface of a sphere
-
-    # forward = self.position - self.target
-    # radius = forward.length()
-
-    # x = radius * math.cos(math.radians(self.theta - 90))
-    # y = radius * math.sin(math.radians(self.theta - 90))
-
-    # self.position = Vector3(x, y, 350)
 
   def zoom(self, direction):
     '''
