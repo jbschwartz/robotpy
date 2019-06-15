@@ -43,9 +43,19 @@ class Window():
 
   def key_callback(self, window, key, scancode, action, mods):
     # TODO: Key bindings class?
-    if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT] and action in [glfw.PRESS, glfw.REPEAT]:
-      x_direction = 1 if key == glfw.KEY_RIGHT else -1
-      self.emit(WindowEvents.ORBIT, Vector3(x_direction, 0, 0))
+    if key == glfw.KEY_R:
+      self.emit(WindowEvents.RESET)
+
+    # if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT, glfw.KEY_UP, glfw.KEY_DOWN]:
+    #   x_direction = 0
+    #   y_direction = 0
+      
+    #   if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT] and action in [glfw.PRESS, glfw.REPEAT]:
+    #     x_direction = 1 if key == glfw.KEY_RIGHT else -1
+    #   if key in [glfw.KEY_UP, glfw.KEY_DOWN] and action in [glfw.PRESS, glfw.REPEAT]:
+    #     y_direction = 1 if key == glfw.KEY_UP else -1
+
+    #   self.emit(WindowEvents.ORBIT, Vector3(x_direction, y_direction, 0))
 
     if key == glfw.KEY_SPACE and action == glfw.PRESS:
       self.pause = not self.pause
@@ -53,22 +63,20 @@ class Window():
   def scroll_callback(self, window, x_direction, y_direction):
     if y_direction:
       self.emit(WindowEvents.ZOOM, y_direction)
-    if x_direction:
-      self.emit(WindowEvents.ORBIT, Vector3(x_direction, 0, 0))
+    # if x_direction:
+    #   self.emit(WindowEvents.ORBIT, Vector3(x_direction, 0, 0))
 
   def mouse_button_callback(self, window, button, action, mods):
     if button is glfw.MOUSE_BUTTON_LEFT:
-      self.track_mouse = True if action == glfw.PRESS else False
+      if action == glfw.PRESS:
+        cursor_position = Vector3(*glfw.get_cursor_pos(self.window), 0)
+        self.emit(WindowEvents.CLICK, cursor_position, action)
+
+      self.dragging = action == glfw.PRESS
 
   def cursor_pos_callback(self, window, x, y):
-    current_mouse_position = Vector3(x, y)
-
-    if self.track_mouse:
-      delta = current_mouse_position - self.last_mouse_position
-      print(delta)
-      self.emit(WindowEvents.ORBIT, delta)
-
-    self.last_mouse_position = current_mouse_position
+    if self.dragging:
+      self.emit(WindowEvents.CURSOR, Vector3(x, y, 0))
 
   def register_observer(self, observer, events = []):
     # If valid_events is empty, subscribe the observer to all events
