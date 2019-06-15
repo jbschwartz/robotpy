@@ -29,11 +29,22 @@ class Camera(Observer):
     forward = (position - target).normalize()
     right = (up % forward).normalize()
 
-    angle = math.acos(up * forward)
+    angle_z = math.acos(up * forward)
+    align_z = Transform(axis=right, angle=angle_z)
 
-    up = (forward % right).normalize()
+    intermediate_x = align_z(Vector3(1, 0, 0), type="vector")
+    # TODO: Look into ValueError: math domain error for following parameters:
+    #   camera = Camera(Vector3(0, -350, 350), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
+    angle_x = math.acos(right * intermediate_x)
+    
+    # Check which direction we need to rotate by angle_x (dot product tells us how much, but not which way)
+    # See if the calculated normal vector is parallel or anti-parallel with the z vector
+    calculated_normal = (right % intermediate_x)
+    rotation_direction = 1 if calculated_normal * forward > 0 else -1
 
-    self.camera_to_world = Transform(axis=right, angle=angle, translation=position)
+    align_x = Transform(axis=(rotation_direction * forward), angle=angle_x, translation=position)
+
+    self.camera_to_world = align_x * align_z 
 
   @property
   def position(self):
