@@ -7,11 +7,17 @@ from robot.visual.observer   import Observer
 
 class Camera(Observer):
   ZOOM_SPEED = 15
+  ORBIT_SPEED = 0.1
 
   def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), aspect = 16/9):
     self.aspect = aspect
+    self.target = target
+    self.start_position = position
+    self.last_cursor_pos = None
 
     self.calculate_projection(60, 100, 10000, aspect)
+
+    self.distance_to_target = (self.target - self.start_position).length()
 
     self.look_at(position, target, up)
 
@@ -50,7 +56,19 @@ class Camera(Observer):
   def position(self):
     return self.camera_to_world.translation()
 
+  def orbit(self, angle_x = 0, angle_z = 0):
+    # Move camera to target
+    self.camera_to_world *= Transform(translation = Vector3(0, 0, -self.distance_to_target))
 
+    if angle_x != 0:
+      # Rotation around camera X
+      self.camera_to_world *= Transform(axis = Vector3(1, 0, 0), angle = angle_x)
+    if angle_z != 0:
+      # Rotation around world Z
+      self.camera_to_world = Transform(axis = Vector3(0, 0, 1), angle = angle_z) * self.camera_to_world
+    
+    # Move target to camera
+    self.camera_to_world *= Transform(translation = Vector3(0, 0, self.distance_to_target))
 
   def zoom(self, direction):
     '''
@@ -60,36 +78,24 @@ class Camera(Observer):
     movement = self.camera_to_world(Vector3(0, 0, self.ZOOM_SPEED * -direction), type="vector")
     self.camera_to_world = Transform(translation=movement) * self.camera_to_world
 
-  def click(self, x, y):
-    pass
-    # fov = math.radians(60)
-    # f = 1.0/math.tan(fov/2.0)
-    # zN, zF = (100, 10000.0)
-    # a = self.aspect
+  def reset(self):
+    self.look_at(self.start_position, self.target, Vector3(0,0,1))
 
-    # p = np.array([f/a, 0.0, 0.0,               0.0, 
-    #               0.0, f,   0.0,               0.0, 
-    #               0.0, 0.0, (zF+zN)/(zN-zF),  -1.0, 
-    #               0.0, 0.0, 2.0*zF*zN/(zN-zF), 0.0], np.float32).reshape((4,4), order='C')
+  def click(self, cursor, action):
+    self.last_cursor_pos = Vector3(*cursor.xy, 0)
+  
+  def cursor(self, cursor):
+    new_pos = Vector3(*cursor.xy, 0)
 
-    # pinv = inv(np.matrix(p))
-    # point = np.array([x, y, 1, 1], dtype=np.float32)
-    # result = np.dot(point, pinv)
-    # print(result)
+    if self.last_cursor_pos:
+      difference = self.last_cursor_pos - new_pos
+      
+      angle_x = math.radians(self.ORBIT_SPEED * difference.y) 
+      angle_z = math.radians(self.ORBIT_SPEED * difference.x) 
+      
+      self.orbit(angle_x, angle_z)
 
-    # forward = normalize(self.position - self.target)
-    # right = normalize(cross(self.up, forward))
-    # up = normalize(cross(forward, right))
-
-    # translate = -Vector3(right * self.position, up * self.position, forward * self.position)
-
-    # c = np.array([[right.x,     up.x,        forward.x,   0.0],
-    #                    [right.y,     up.y,        forward.y,   0.0],
-    #                    [right.z,     up.z,        forward.z,   0.0], 
-    #                    [translate.x, translate.y, translate.z, 1.0]], np.float32)
-    # cmat = np.matrix(c)
-    # result = np.dot(point, cmat)
-    # print(result)
+    self.last_cursor_pos = new_pos
 
   def calculate_projection(self, fov, z_near, z_far, aspect):
     fov = math.radians(fov)
