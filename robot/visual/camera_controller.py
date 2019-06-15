@@ -6,8 +6,12 @@ from robot.visual.observer import Observer
 
 Vector3 = vector3.Vector3
 
+# TODO: Mouse picking on all actions
+# This is what makes most CAD cameras feel very natural (I think)
+
 class CameraController(Observer):
   ORBIT_SPEED = 0.05
+  TRACK_SPEED = 1
   ZOOM_SPEED  = 100
 
   def __init__(self, camera : Camera):
@@ -20,7 +24,7 @@ class CameraController(Observer):
   def drag(self, button, cursor_delta, modifiers):
     if button == glfw.MOUSE_BUTTON_MIDDLE:
       if modifiers & glfw.MOD_CONTROL:
-        pass
+        self.request_track(cursor_delta.x, -cursor_delta.y)
       else:
         direction = vector3.normalize(cursor_delta)
         self.request_orbit(*direction.yx)
@@ -48,6 +52,9 @@ class CameraController(Observer):
 
   def request_orbit(self, x, z):
     self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z)
+
+  def request_track(self, x, y):
+    self.camera.track(self.TRACK_SPEED * x, self.TRACK_SPEED * y)
 
   def scroll(self, direction):
     direction.normalize()

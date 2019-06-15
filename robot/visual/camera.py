@@ -77,6 +77,13 @@ class Camera():
     self.camera_to_world = Transform(translation=movement) * self.camera_to_world
     self.distance_to_target = (self.target - self.position).length()
 
+  def track(self, x, y):
+    camera_displacement_in_world = self.camera_to_world(Vector3(x, y), type="vector")
+
+    self.target += camera_displacement_in_world
+
+    self.camera_to_world = Transform(translation = camera_displacement_in_world) * self.camera_to_world
+
   def reset(self):
     # TODO: Move this out to the CameraController
     self.target = self.start_target
