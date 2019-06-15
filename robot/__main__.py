@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
   window.register_observer(camera_controller, [ 
     WindowEvent.CLICK,
-    WindowEvent.CURSOR,
+    WindowEvent.DRAG,
     WindowEvent.KEY,
     WindowEvent.RESET,
     WindowEvent.SCROLL

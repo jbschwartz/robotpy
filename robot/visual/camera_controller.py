@@ -15,7 +15,7 @@ class CameraController(Observer):
   def click(self, button, cursor):
     pass
   
-  def cursor(self, cursor):
+  def drag(self, button, cursor):
     if self.last_cursor_position:
       difference = (self.last_cursor_position - cursor).normalize()
       self.request_orbit(difference.y, difference.x)

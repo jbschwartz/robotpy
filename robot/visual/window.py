@@ -10,7 +10,7 @@ class Window():
   def __init__(self, x, y, title):
     self.observers = []
     self.pause = False
-    self.dragging = False
+    self.dragging = None
 
     if not glfw.init():
       sys.exit('GLFW initialization failed')
@@ -56,11 +56,12 @@ class Window():
       cursor = Vector3(*glfw.get_cursor_pos(self.window), 0)
       self.emit(WindowEvent.CLICK, button, cursor)
 
-      self.dragging = action == glfw.PRESS
+    # Record which mouse button is being dragged
+    self.dragging = button if action == glfw.PRESS else None
 
   def cursor_pos_callback(self, window, x, y):
-    if self.dragging:
-      self.emit(WindowEvent.CURSOR, Vector3(x, y, 0))
+    event = WindowEvent.DRAG if self.dragging is not None else WindowEvent.CURSOR
+    self.emit(event, self.dragging, None, Vector3(x, y, 0))
 
   def register_observer(self, observer, events = []):
     # If valid_events is empty, subscribe the observer to all events
