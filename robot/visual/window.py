@@ -53,8 +53,7 @@ class Window():
 
   def mouse_button_callback(self, window, button, action, mods):
     if action == glfw.PRESS:
-      cursor = Vector3(*glfw.get_cursor_pos(self.window), 0)
-      self.emit(WindowEvent.CLICK, button, cursor)
+      self.emit(WindowEvent.CLICK, button, self.get_cursor())
 
     # Record which mouse button is being dragged
     self.dragging = button if action == glfw.PRESS else None
@@ -62,6 +61,9 @@ class Window():
   def cursor_pos_callback(self, window, x, y):
     event = WindowEvent.DRAG if self.dragging is not None else WindowEvent.CURSOR
     self.emit(event, self.dragging, None, Vector3(x, y, 0))
+
+  def get_cursor(self):
+    return Vector3(*glfw.get_cursor_pos(self.window), 0)
 
   def register_observer(self, observer, events = []):
     # If valid_events is empty, subscribe the observer to all events
