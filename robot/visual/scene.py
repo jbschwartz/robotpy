@@ -2,7 +2,6 @@ from OpenGL.GL import *
 
 from robot.visual.camera        import Camera
 from robot.visual.observer      import Observer
-from robot.visual.window_events import WindowEvent
 
 class Scene(Observer):
   def __init__(self, camera, light):
