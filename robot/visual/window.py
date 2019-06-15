@@ -42,21 +42,9 @@ class Window():
     glfw.set_cursor_pos_callback(self.window, self.cursor_pos_callback)
 
   def key_callback(self, window, key, scancode, action, mods):
-    # TODO: Key bindings class?
-    if key == glfw.KEY_R:
-      self.emit(WindowEvents.RESET)
+    self.emit(WindowEvents.KEY, key, action)
 
-    # if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT, glfw.KEY_UP, glfw.KEY_DOWN]:
-    #   x_direction = 0
-    #   y_direction = 0
-      
-    #   if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT] and action in [glfw.PRESS, glfw.REPEAT]:
-    #     x_direction = 1 if key == glfw.KEY_RIGHT else -1
-    #   if key in [glfw.KEY_UP, glfw.KEY_DOWN] and action in [glfw.PRESS, glfw.REPEAT]:
-    #     y_direction = 1 if key == glfw.KEY_UP else -1
-
-    #   self.emit(WindowEvents.ORBIT, Vector3(x_direction, y_direction, 0))
-
+    # This may be better suited in some sort of simulation controller class
     if key == glfw.KEY_SPACE and action == glfw.PRESS:
       self.pause = not self.pause
 

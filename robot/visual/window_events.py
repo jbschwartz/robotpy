@@ -13,6 +13,7 @@ class WindowEvents(enum.Enum):
   SCROLL         = enum.auto()
   CLICK          = enum.auto()
   RESET          = enum.auto()
+  KEY            = enum.auto()
 
   def __str__(self):
     return self.name.lower()
