@@ -17,6 +17,7 @@ class Transform:
     translation = Vector3() if 'translation' not in kwargs else kwargs['translation']
     t = Quaternion(0, *translation)
     if all(params in kwargs for params in ['axis', 'angle']):
+      kwargs['axis'].normalize()
       r = Quaternion(axis = kwargs['axis'], angle = kwargs['angle'])
 
       self.dual = Dual(r, 0.5 * t * r)
