@@ -17,9 +17,13 @@ class CameraController(Observer):
   def click(self, button, cursor):
     pass
   
-  def drag(self, button, cursor_delta):
-    direction = vector3.normalize(cursor_delta)
-    self.request_orbit(*direction.yx)
+  def drag(self, button, cursor_delta, modifiers):
+    if button == glfw.MOUSE_BUTTON_MIDDLE:
+      if modifiers & glfw.MOD_CONTROL:
+        pass
+      else:
+        direction = vector3.normalize(cursor_delta)
+        self.request_orbit(*direction.yx)
   
   def key(self, key, action):
     if key == glfw.KEY_R and action == glfw.RELEASE:

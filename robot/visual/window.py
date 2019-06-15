@@ -11,6 +11,7 @@ class Window():
     self.observers = []
     self.pause = False
     self.dragging = None
+    self.modifiers = 0
 
     if not glfw.init():
       sys.exit('GLFW initialization failed')
@@ -44,6 +45,8 @@ class Window():
     glfw.set_cursor_pos_callback(self.window, self.cursor_pos_callback)
 
   def key_callback(self, window, key, scancode, action, mods):
+    self.modifiers = mods
+
     self.emit(WindowEvent.KEY, key, action)
 
     # This may be better suited in some sort of simulation controller class
@@ -69,7 +72,7 @@ class Window():
     self.last_cursor_position = cursor
 
     event = WindowEvent.DRAG if self.dragging is not None else WindowEvent.CURSOR
-    self.emit(event, self.dragging, cursor_delta)
+    self.emit(event, self.dragging, cursor_delta, self.modifiers)
 
   def get_cursor(self):
     return Vector3(*glfw.get_cursor_pos(self.window), 0)
