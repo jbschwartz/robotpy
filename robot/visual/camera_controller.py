@@ -12,7 +12,7 @@ class CameraController(Observer):
     self.camera = camera
     self.last_cursor_position = None
 
-  def click(self, cursor, action):
+  def click(self, button, cursor):
     pass
   
   def cursor(self, cursor):
