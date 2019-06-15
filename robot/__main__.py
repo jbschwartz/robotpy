@@ -49,11 +49,11 @@ if __name__ == "__main__":
   camera_controller = CameraController(camera)
 
   window.register_observer(camera_controller, [ 
-    WindowEvent.CLICK, 
-    WindowEvent.CURSOR, 
+    WindowEvent.CLICK,
+    WindowEvent.CURSOR,
     WindowEvent.KEY,
     WindowEvent.RESET,
-    WindowEvent.SCROLL 
+    WindowEvent.SCROLL
   ])
 
   world_frame = FrameEntity(Frame(), flat_program)
