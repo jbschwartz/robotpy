@@ -8,7 +8,7 @@ Vector3 = vector3.Vector3
 
 class CameraController(Observer):
   ORBIT_SPEED = 0.05
-  ZOOM_SPEED = 50
+  ZOOM_SPEED  = 100
 
   def __init__(self, camera : Camera):
     self.camera = camera
