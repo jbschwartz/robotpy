@@ -16,6 +16,16 @@ class Camera(Observer):
     self.look_at(position, target, up)
 
   def look_at(self, position, target, up):
+    '''
+    Calcuate look-at transformation.
+
+    Uses a geometrically intuitive method with quaternions.
+    (instead of a more efficient computation converting from a matrix directly)
+    '''
+
+    # FIXME: Broken up vector (e.g.):
+    #   camera = Camera(Vector3(375, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
+
     forward = (position - target).normalize()
     right = (up % forward).normalize()
 
@@ -82,6 +92,7 @@ class Camera(Observer):
     '''
     Move the camera in or out along its line of sight
     '''
+    # FIXME: There is an issue with the target
     movement = self.camera_to_world(Vector3(0, 0, self.ZOOM_SPEED * -direction), type="vector")
     self.camera_to_world = Transform(translation=movement) * self.camera_to_world
 
