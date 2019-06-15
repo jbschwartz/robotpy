@@ -69,9 +69,9 @@ class Camera():
     '''
     Move the camera in or out along its line of sight
     '''
-    # FIXME: There is an issue with the target
     movement = self.camera_to_world(Vector3(0, 0, amount), type="vector")
     self.camera_to_world = Transform(translation=movement) * self.camera_to_world
+    self.distance_to_target = (self.target - self.position).length()
 
   def reset(self):
     self.look_at(self.start_position, self.target, Vector3(0,0,1))

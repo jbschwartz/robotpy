@@ -6,6 +6,7 @@ from robot.visual.observer import Observer
 
 class CameraController(Observer):
   ORBIT_SPEED = 0.05
+  ZOOM_SPEED = 50
 
   def __init__(self, camera : Camera):
     self.camera = camera
@@ -46,4 +47,9 @@ class CameraController(Observer):
     self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z)
 
   def scroll(self, direction):
-    pass
+    direction.normalize()
+
+    if direction.x:
+      self.request_orbit(0, direction.x)
+    if direction.y:
+      self.camera.zoom(self.ZOOM_SPEED * direction.y)
