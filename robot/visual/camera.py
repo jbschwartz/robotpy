@@ -9,6 +9,7 @@ class Camera():
     self.aspect = aspect
     self.target = target
     self.start_position = position
+    self.start_target = target
 
     self.calculate_projection(60, 100, 10000, aspect)
 
@@ -74,6 +75,8 @@ class Camera():
     self.distance_to_target = (self.target - self.position).length()
 
   def reset(self):
+    # TODO: Move this out to the CameraController
+    self.target = self.start_target
     self.look_at(self.start_position, self.target, Vector3(0,0,1))
 
   def calculate_projection(self, fov, z_near, z_far, aspect):
