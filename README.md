@@ -1,4 +1,6 @@
-# Robot
+# Robotpy
+
+![Robotpy](http://schwartz.engineer/images/robotpy.png)
 
 Robot kinematics and dynamics written in Python 3.
 
