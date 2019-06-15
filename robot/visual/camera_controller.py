@@ -5,16 +5,28 @@ from robot.visual.camera   import Camera
 from robot.visual.observer import Observer
 
 class CameraController(Observer):
-  ORBIT_SPEED = 0.1
+  ORBIT_SPEED = 0.05
 
   def __init__(self, camera : Camera):
     self.camera = camera
+    self.last_cursor_position = None
 
   def click(self, cursor, action):
     pass
   
   def cursor(self, cursor):
-    pass
+    position = Vector3(*cursor.xy, 0)
+
+    if self.last_cursor_position:
+      difference = (self.last_cursor_position - position).normalize()
+      
+      angle = Vector3()
+      angle.x = self.ORBIT_SPEED * difference.y 
+      angle.z = self.ORBIT_SPEED * difference.x 
+      
+      self.camera.orbit(angle.x, angle.z)
+
+    self.last_cursor_position = position
   
   def key(self, key, action):
     if key == glfw.KEY_R and action == glfw.RELEASE:
