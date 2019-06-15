@@ -53,18 +53,21 @@ class Camera():
     return self.camera_to_world.translation()
 
   def orbit(self, angle_x = 0, angle_z = 0):
-    # Move camera to target
-    self.camera_to_world *= Transform(translation = Vector3(0, 0, -self.distance_to_target))
+    # Move camera to the origin
+    self.camera_to_world = Transform(translation = -self.position) * self.camera_to_world 
 
     if angle_x != 0:
-      # Rotation around camera X
+      # Rotation around camera x axis (camera tilt)
       self.camera_to_world *= Transform(axis = Vector3(1, 0, 0), angle = angle_x)
     if angle_z != 0:
-      # Rotation around world Z
+      # Rotation around world z axis
       self.camera_to_world = Transform(axis = Vector3(0, 0, 1), angle = angle_z) * self.camera_to_world
-    
-    # Move target to camera
+
+    # Move target to origin
     self.camera_to_world *= Transform(translation = Vector3(0, 0, self.distance_to_target))
+
+    # Move target back to position
+    self.camera_to_world = Transform(translation = self.target) * self.camera_to_world
 
   def zoom(self, amount):
     '''
