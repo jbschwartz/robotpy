@@ -71,6 +71,7 @@ class Window():
     self.last_mouse_position = current_mouse_position
 
   def register_observer(self, observer, events = []):
+    # If valid_events is empty, subscribe the observer to all events
     self.observers.append((observer, events))
 
   def emit(self, event_type, *args, **kwargs):
