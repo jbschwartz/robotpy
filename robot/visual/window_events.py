@@ -1,7 +1,6 @@
 import enum
 
-# TODO: Rename this enum or split it into multiple enums
-class WindowEvents(enum.Enum):
+class WindowEvent(enum.Enum):
   START_RENDERER = enum.auto()
   START_FRAME    = enum.auto()
   UPDATE         = enum.auto()

@@ -1,9 +1,9 @@
-from robot.visual.window_events import WindowEvents
+from robot.visual.window_events import WindowEvent
 
 class Observer:
   def notify(self, event, *args, **kwargs):
-    # Use the WindowEvents enum to whitelist the possible attributes
-    if isinstance(event, WindowEvents):
+    # Use the WindowEvent enum to whitelist the possible attributes
+    if isinstance(event, WindowEvent):
       # See if the object has a function with the same name as event
       fn = getattr(self, str(event), None)
 

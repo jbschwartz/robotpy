@@ -4,7 +4,7 @@ from OpenGL.GL import GL_FALSE
 
 from robot.common.timer         import Timer
 from robot.spatial.vector3      import Vector3
-from robot.visual.window_events import WindowEvents
+from robot.visual.window_events import WindowEvent
 
 class Window():
   def __init__(self, x, y, title):
@@ -35,33 +35,33 @@ class Window():
     glfw.window_hint(glfw.SAMPLES, 4)
 
   def set_callbacks(self):
-    glfw.set_window_size_callback(self.window, lambda *args: self.emit(WindowEvents.WINDOW_RESIZE, *args))
+    glfw.set_window_size_callback(self.window, lambda *args: self.emit(WindowEvent.WINDOW_RESIZE, *args))
     glfw.set_key_callback(self.window, self.key_callback)
     glfw.set_scroll_callback(self.window, self.scroll_callback)
     glfw.set_mouse_button_callback(self.window, self.mouse_button_callback)
     glfw.set_cursor_pos_callback(self.window, self.cursor_pos_callback)
 
   def key_callback(self, window, key, scancode, action, mods):
-    self.emit(WindowEvents.KEY, key, action)
+    self.emit(WindowEvent.KEY, key, action)
 
     # This may be better suited in some sort of simulation controller class
     if key == glfw.KEY_SPACE and action == glfw.PRESS:
       self.pause = not self.pause
 
   def scroll_callback(self, window, x_direction, y_direction):
-    self.emit(WindowEvents.SCROLL, Vector3(x_direction, y_direction))
+    self.emit(WindowEvent.SCROLL, Vector3(x_direction, y_direction))
 
   def mouse_button_callback(self, window, button, action, mods):
     if button is glfw.MOUSE_BUTTON_LEFT:
       if action == glfw.PRESS:
         cursor_position = Vector3(*glfw.get_cursor_pos(self.window), 0)
-        self.emit(WindowEvents.CLICK, cursor_position, action)
+        self.emit(WindowEvent.CLICK, cursor_position, action)
 
       self.dragging = action == glfw.PRESS
 
   def cursor_pos_callback(self, window, x, y):
     if self.dragging:
-      self.emit(WindowEvents.CURSOR, Vector3(x, y, 0))
+      self.emit(WindowEvent.CURSOR, Vector3(x, y, 0))
 
   def register_observer(self, observer, events = []):
     # If valid_events is empty, subscribe the observer to all events
@@ -74,7 +74,7 @@ class Window():
 
   def run(self, fps_limit = None):
     with Timer('START_RENDERER') as t:
-      self.emit(WindowEvents.START_RENDERER)
+      self.emit(WindowEvent.START_RENDERER)
 
     now = glfw.get_time()
     last_frame = now
@@ -88,21 +88,21 @@ class Window():
       last_update = now
 
       if not self.pause:
-        self.emit(WindowEvents.UPDATE, delta = delta_update)
+        self.emit(WindowEvent.UPDATE, delta = delta_update)
 
-      self.emit(WindowEvents.START_FRAME)
+      self.emit(WindowEvent.START_FRAME)
       
       delta_frame = now - last_frame
       if not fps_limit or (fps_limit and delta_frame >= frame_time):
-        self.emit(WindowEvents.DRAW)
+        self.emit(WindowEvent.DRAW)
         last_frame = now
       
-      self.emit(WindowEvents.END_FRAME)
+      self.emit(WindowEvent.END_FRAME)
 
       glfw.swap_buffers(self.window)
       glfw.poll_events()
 
-    self.emit(WindowEvents.END_RENDERER)
+    self.emit(WindowEvent.END_RENDERER)
 
 
 
