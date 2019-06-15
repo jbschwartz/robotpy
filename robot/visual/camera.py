@@ -3,17 +3,12 @@ import math
 from robot.spatial.matrix4   import Matrix4
 from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
-from robot.visual.observer   import Observer
 
-class Camera(Observer):
-  ZOOM_SPEED = 15
-  ORBIT_SPEED = 0.1
-
+class Camera():
   def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), aspect = 16/9):
     self.aspect = aspect
     self.target = target
     self.start_position = position
-    self.last_cursor_pos = None
 
     self.calculate_projection(60, 100, 10000, aspect)
 
@@ -70,32 +65,16 @@ class Camera(Observer):
     # Move target to camera
     self.camera_to_world *= Transform(translation = Vector3(0, 0, self.distance_to_target))
 
-  def zoom(self, direction):
+  def zoom(self, amount):
     '''
     Move the camera in or out along its line of sight
     '''
     # FIXME: There is an issue with the target
-    movement = self.camera_to_world(Vector3(0, 0, self.ZOOM_SPEED * -direction), type="vector")
+    movement = self.camera_to_world(Vector3(0, 0, amount), type="vector")
     self.camera_to_world = Transform(translation=movement) * self.camera_to_world
 
   def reset(self):
     self.look_at(self.start_position, self.target, Vector3(0,0,1))
-
-  def click(self, cursor, action):
-    self.last_cursor_pos = Vector3(*cursor.xy, 0)
-  
-  def cursor(self, cursor):
-    new_pos = Vector3(*cursor.xy, 0)
-
-    if self.last_cursor_pos:
-      difference = self.last_cursor_pos - new_pos
-      
-      angle_x = math.radians(self.ORBIT_SPEED * difference.y) 
-      angle_z = math.radians(self.ORBIT_SPEED * difference.x) 
-      
-      self.orbit(angle_x, angle_z)
-
-    self.last_cursor_pos = new_pos
 
   def calculate_projection(self, fov, z_near, z_far, aspect):
     fov = math.radians(fov)

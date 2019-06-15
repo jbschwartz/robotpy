@@ -44,7 +44,6 @@ if __name__ == "__main__":
   triangle = TriangleEntity(flat_program)
 
   camera = Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
-  window.register_observer(camera, [ WindowEvents.CURSOR, WindowEvents.CLICK, WindowEvents.ZOOM, WindowEvents.RESET ])
 
   world_frame = FrameEntity(Frame(), flat_program)
   light = AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
