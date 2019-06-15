@@ -43,8 +43,10 @@ class ShaderProgram():
 
     for uniform_index in range(0, num_uniforms):
       uniform = Uniform(self.program_id, uniform_index)
-
+    
       self.uniforms[uniform.name] = uniform
+
+    
 
   def get_attributes(self):
     num_attributes = glGetProgramInterfaceiv(self.program_id, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES)
