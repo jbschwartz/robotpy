@@ -25,10 +25,12 @@ if __name__ == "__main__":
     program = ShaderProgram('./robot/visual/glsl/vertex.glsl', './robot/visual/glsl/fragment.glsl')
     flat_program = ShaderProgram('./robot/visual/glsl/vertex-flat.glsl', './robot/visual/glsl/fragment-flat.glsl')
     
+  ee_frame = FrameEntity(Frame(), flat_program)
 
   with Timer('Initialize Robot') as t:
     robot = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
     robot.shader_program = program
+    robot.frame_entity = ee_frame
     robot.serial.position(Vector3(-500, 0, 0))
     robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 6)
 
@@ -39,8 +41,6 @@ if __name__ == "__main__":
   robot2.serial.traj = LinearJS([0] * 6, [math.radians(-45)] * 6, 4)
 
   triangle = TriangleEntity(flat_program)
-  frame = FrameEntity(flat_program)
-  robot.frame_entity = frame
 
   camera = Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
   window.register_observer(camera, [ WindowEvents.ORBIT, WindowEvents.ZOOM, WindowEvents.CLICK, WindowEvents.RESET ])
