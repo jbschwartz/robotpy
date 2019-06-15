@@ -13,9 +13,9 @@ from robot.visual.entities.entity import Entity
 from robot.visual.shader_program  import ShaderProgram
 
 class FrameEntity(Entity):
-  def __init__(self, shader_program : ShaderProgram = None, color = (0.5, 0, 0)):
+  def __init__(self, frame = Frame(), shader_program : ShaderProgram = None, color = (0.5, 0, 0)):
     self.buffer = []
-
+    self.frame = frame
     self.scale = 25
 
     Entity.__init__(self, shader_program, color)
@@ -64,7 +64,10 @@ class FrameEntity(Entity):
   def update(self, delta):
     pass
 
-  def draw(self, camera, light, transform):
+  def draw(self, camera, light, transform = None):
+    if not transform:
+      transform = self.frame.transform
+      
     glUseProgram(self.shader_program.program_id)
 
     self.shader_program.proj_matrix = camera.projection
