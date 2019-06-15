@@ -37,17 +37,6 @@ class Scene(Observer):
   
   def draw(self):
     for entity in self.entities:
-      program = entity.shader_program
-
-      glUseProgram(program.program_id)
-
-      program.proj_matrix = self.camera.projection
-      program.view_matrix = self.camera.world_to_camera
-
-      program.light_position  = self.light.position
-      program.light_color     = self.light.color
-      program.light_intensity = self.light.intensity
-      
-      entity.draw()
+      entity.draw(self.camera, self.light)
 
       glUseProgram(0)
