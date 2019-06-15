@@ -13,6 +13,7 @@ from robot.spatial.matrix4                 import Matrix4
 from robot.spatial.vector3                 import Vector3
 from robot.visual.exceptions               import ParserError
 from robot.visual.entities.entity          import Entity
+from robot.visual.entities.frame_entity    import FrameEntity
 from robot.visual.filetypes.stl.stl_parser import STLParser
 from robot.visual.mesh                     import Mesh
 from robot.visual.shader_program           import ShaderProgram
@@ -51,6 +52,7 @@ class RobotEntity(Entity):
   def __init__(self, serial : Serial, meshes, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):
     self.serial = serial
     self.meshes = meshes
+    self.frame_entity = None
 
     Entity.__init__(self, shader_program, color)
 
@@ -66,6 +68,9 @@ class RobotEntity(Entity):
     self.buffer = np.array(data_list, dtype=[('', np.float32, 6),('', np.int32, 1)])
 
   def load(self):
+    if self.frame_entity:
+      self.frame_entity.load()
+
     self.build_buffer()
 
     glBindVertexArray(self.vao)
@@ -117,3 +122,7 @@ class RobotEntity(Entity):
     glDrawArrays(GL_TRIANGLES, 0, self.buffer.size)
 
     glBindVertexArray(0)
+
+    if self.frame_entity:
+      # for link in self.serial.links:
+      self.frame_entity.draw(camera, light, Matrix4(self.serial.links[-1].frame.transform))
