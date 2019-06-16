@@ -65,7 +65,7 @@ class Camera():
       self.camera_to_world *= Transform(axis = Vector3(1, 0, 0), angle = pitch)
     if yaw != 0:
       # Rotation around world z axis
-      self.camera_to_world = Transform(axis = Vector3(0, 0, 1), angle = yaw) * self.camera_to_world
+      self.camera_to_world *= Transform(axis = Vector3(0, 1, 0), angle = yaw)# * self.camera_to_world
 
     # Move target to origin
     self.camera_to_world *= Transform(translation = Vector3(0, 0, self.distance_to_target))
@@ -89,6 +89,9 @@ class Camera():
     self.target += camera_displacement_in_world
 
     self.camera_to_world = Transform(translation = camera_displacement_in_world) * self.camera_to_world
+
+  def roll(self, angle):
+    self.camera_to_world *= Transform(axis = Vector3(0, 0, 1), angle = angle)
 
   def calculate_projection(self, fov, z_near, z_far, aspect):
     fov = math.radians(fov)

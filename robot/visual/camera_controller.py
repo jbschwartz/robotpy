@@ -14,6 +14,7 @@ class CameraController(Observer):
   TRACK_SPEED     = 1
   TRACK_SPEED_KEY = 20
   DOLLY_SPEED     = 100
+  ROLL_SPEED      = 0.005
 
   def __init__(self, camera : Camera):
     self.camera = camera
@@ -30,6 +31,9 @@ class CameraController(Observer):
     if button == glfw.MOUSE_BUTTON_MIDDLE:
       if modifiers & glfw.MOD_CONTROL:
         self.request_track(cursor_delta.x, -cursor_delta.y)
+      elif modifiers & glfw.MOD_ALT:
+        # TODO: Fix this so that direction doesn't reverse at the centerline of the screen
+        self.request_roll(-cursor_delta.y + cursor_delta.x)
       else:
         direction = vector3.normalize(cursor_delta)
         self.request_orbit(*direction.yx)
@@ -66,6 +70,9 @@ class CameraController(Observer):
 
   def request_track(self, x, y):
     self.camera.track(self.TRACK_SPEED * x, self.TRACK_SPEED * y)
+
+  def request_roll(self, angle):
+    self.camera.roll(self.ROLL_SPEED * angle)
 
   def reset(self):
     self.camera.look_at(self.start_position, self.start_target, Vector3(0, 0, 1))
