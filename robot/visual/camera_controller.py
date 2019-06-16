@@ -1,10 +1,19 @@
-import math, glfw
+import enum, math, glfw
 
 from robot.spatial         import vector3
 from robot.visual.camera   import Camera, OrbitType
 from robot.visual.observer import Observer
 
 Vector3 = vector3.Vector3
+
+class SavedView(enum.Enum):
+  TOP    = glfw.KEY_1
+  BOTTOM = glfw.KEY_2
+  LEFT   = glfw.KEY_3
+  RIGHT  = glfw.KEY_4
+  FRONT  = glfw.KEY_5
+  BACK   = glfw.KEY_6
+  ISO    = glfw.KEY_7
 
 # TODO: Mouse picking on all actions
 # This is what makes most CAD cameras feel very natural (I think)
@@ -67,6 +76,10 @@ class CameraController(Observer):
     if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT, glfw.KEY_UP, glfw.KEY_DOWN]:
       self.arrows(key, action, modifiers)
 
+    if key in [glfw.KEY_1, glfw.KEY_2, glfw.KEY_3, glfw.KEY_4, glfw.KEY_5, glfw.KEY_6, glfw.KEY_7]:
+      if modifiers & glfw.MOD_CONTROL and action == glfw.PRESS:
+        self.saved_views(key)
+
   def scroll(self, direction):
     direction.normalize()
 
@@ -119,3 +132,29 @@ class CameraController(Observer):
 
   def reset(self):
     self.camera.look_at(self.start_position, self.start_target, Vector3(0, 0, 1))
+
+  def saved_views(self, key):
+    radius = 1250
+    target = Vector3(0, 0, 349)
+    up = Vector3(0, 0, 1)
+
+    if key is SavedView.TOP.value:
+      position = Vector3(0, 0, radius)
+      up = Vector3(0, 1, 0)
+    elif key is SavedView.BOTTOM.value:
+      position = Vector3(0, 0, -radius)
+      up = Vector3(0, -1, 0)
+    elif key is SavedView.LEFT.value:
+      position = Vector3(-radius, 0, 349)
+    elif key is SavedView.RIGHT.value:
+      position = Vector3(radius, 0, 349)
+    elif key is SavedView.FRONT.value:
+      position = Vector3(0, -radius, 349)
+    elif key is SavedView.BACK.value:
+      position = Vector3(0, radius, 349)
+    elif key is SavedView.ISO.value:
+      position = Vector3(750, -750, 750)
+    else:
+      return
+
+    self.camera.look_at(position, target, up)
