@@ -45,6 +45,14 @@ class CameraController(Observer):
     if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT, glfw.KEY_UP, glfw.KEY_DOWN]:
       self.arrows(key, action, modifiers)
 
+  def scroll(self, direction):
+    direction.normalize()
+
+    if direction.x:
+      self.request_orbit(0, direction.x)
+    if direction.y:
+      self.camera.dolly(self.DOLLY_SPEED * direction.y)
+
   def arrows(self, key, action, modifiers):
     # TODO: This doesn't handle both keys pressed at once
     direction = {
@@ -76,11 +84,3 @@ class CameraController(Observer):
 
   def reset(self):
     self.camera.look_at(self.start_position, self.start_target, Vector3(0, 0, 1))
-
-  def scroll(self, direction):
-    direction.normalize()
-
-    if direction.x:
-      self.request_orbit(0, direction.x)
-    if direction.y:
-      self.camera.dolly(self.DOLLY_SPEED * direction.y)
