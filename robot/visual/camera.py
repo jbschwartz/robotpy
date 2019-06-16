@@ -52,16 +52,16 @@ class Camera():
   def position(self):
     return self.camera_to_world.translation()
 
-  def orbit(self, angle_x = 0, angle_z = 0):
+  def orbit(self, pitch = 0, yaw = 0):
     # Move camera to the origin
     self.camera_to_world = Transform(translation = -self.position) * self.camera_to_world 
 
-    if angle_x != 0:
+    if pitch != 0:
       # Rotation around camera x axis (camera tilt)
-      self.camera_to_world *= Transform(axis = Vector3(1, 0, 0), angle = angle_x)
-    if angle_z != 0:
+      self.camera_to_world *= Transform(axis = Vector3(1, 0, 0), angle = pitch)
+    if yaw != 0:
       # Rotation around world z axis
-      self.camera_to_world = Transform(axis = Vector3(0, 0, 1), angle = angle_z) * self.camera_to_world
+      self.camera_to_world = Transform(axis = Vector3(0, 0, 1), angle = yaw) * self.camera_to_world
 
     # Move target to origin
     self.camera_to_world *= Transform(translation = Vector3(0, 0, self.distance_to_target))
