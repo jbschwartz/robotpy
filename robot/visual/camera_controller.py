@@ -29,14 +29,14 @@ class CameraController(Observer):
         direction = vector3.normalize(cursor_delta)
         self.request_orbit(*direction.yx)
   
-  def key(self, key, action):
+  def key(self, key, action, modifiers):
     if key == glfw.KEY_R and action == glfw.RELEASE:
       self.camera.reset()
 
     if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT, glfw.KEY_UP, glfw.KEY_DOWN]:
-      self.arrows(key, action)
+      self.arrows(key, action, modifiers)
 
-  def arrows(self, key, action):
+  def arrows(self, key, action, modifiers):
     # TODO: This doesn't handle both keys pressed at once
     direction = {
       glfw.KEY_RIGHT: 1,

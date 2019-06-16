@@ -47,7 +47,7 @@ class Window():
   def key_callback(self, window, key, scancode, action, mods):
     self.modifiers = mods
 
-    self.emit(WindowEvent.KEY, key, action)
+    self.emit(WindowEvent.KEY, key, action, self.modifiers)
 
     # This may be better suited in some sort of simulation controller class
     if key == glfw.KEY_SPACE and action == glfw.PRESS:
