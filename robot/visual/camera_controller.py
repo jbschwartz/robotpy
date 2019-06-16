@@ -1,7 +1,7 @@
 import glfw
 
 from robot.spatial         import vector3
-from robot.visual.camera   import Camera
+from robot.visual.camera   import Camera, OrbitType
 from robot.visual.observer import Observer
 
 Vector3 = vector3.Vector3
@@ -18,6 +18,7 @@ class CameraController(Observer):
 
   def __init__(self, camera : Camera):
     self.camera = camera
+    self.orbit_type = OrbitType.FREE
 
     self.start_position = camera.position
     self.start_target   = camera.target
@@ -43,6 +44,9 @@ class CameraController(Observer):
   def key(self, key, action, modifiers):
     if key == glfw.KEY_R and action == glfw.RELEASE:
       self.reset()
+
+    if key == glfw.KEY_O and action == glfw.RELEASE:
+      self.orbit_type = OrbitType.FREE if self.orbit_type is OrbitType.CONSTRAINED else OrbitType.CONSTRAINED
 
     if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT, glfw.KEY_UP, glfw.KEY_DOWN]:
       self.arrows(key, action, modifiers)
@@ -79,7 +83,7 @@ class CameraController(Observer):
     self.camera.dolly(self.DOLLY_SPEED * z)
 
   def request_orbit(self, x, z):
-    self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z)
+    self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z, self.orbit_type)
 
   def request_track(self, x, y):
     self.camera.track(self.TRACK_SPEED * x, self.TRACK_SPEED * y)

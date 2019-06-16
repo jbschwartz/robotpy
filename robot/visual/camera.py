@@ -1,8 +1,12 @@
-import math
+import enum, math
 
 from robot.spatial.matrix4   import Matrix4
 from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
+
+class OrbitType(enum.Enum):
+  FREE        = enum.auto()
+  CONSTRAINED = enum.auto()
 
 class Camera():
   '''
@@ -55,7 +59,7 @@ class Camera():
   def position(self):
     return self.camera_to_world.translation()
 
-  def orbit(self, pitch = 0, yaw = 0):
+  def orbit(self, pitch = 0, yaw = 0, orbit_type : OrbitType = OrbitType.FREE):
     '''
     Orbits the camera around the target point (with pitch and yaw)
     '''
@@ -66,8 +70,12 @@ class Camera():
       # Rotation around camera x axis (camera tilt)
       self.camera_to_world *= Transform(axis = Vector3(1, 0, 0), angle = pitch)
     if yaw != 0:
-      # Rotation around camera y axis
-      self.camera_to_world *= Transform(axis = Vector3(0, 1, 0), angle = yaw)
+      if orbit_type is OrbitType.FREE:
+        # Rotation around camera y axis
+        self.camera_to_world *= Transform(axis = Vector3(0, 1, 0), angle = yaw)
+      elif orbit_type is OrbitType.CONSTRAINED:
+        # Rotation around world z axis
+        self.camera_to_world = Transform(axis = Vector3(0, 0, 1), angle = yaw) * self.camera_to_world
 
     # Move target to origin
     self.camera_to_world *= Transform(translation = Vector3(0, 0, self.distance_to_target))
