@@ -57,8 +57,7 @@ class Window():
     self.emit(WindowEvent.SCROLL, Vector3(x_direction, y_direction))
 
   def mouse_button_callback(self, window, button, action, mods):
-    if action == glfw.PRESS:
-      self.emit(WindowEvent.CLICK, button, self.get_cursor())
+    self.emit(WindowEvent.CLICK, button, action, self.get_cursor())
 
     # Record which mouse button is being dragged
     self.dragging = button if action == glfw.PRESS else None
