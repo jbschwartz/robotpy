@@ -10,9 +10,10 @@ Vector3 = vector3.Vector3
 # This is what makes most CAD cameras feel very natural (I think)
 
 class CameraController(Observer):
-  ORBIT_SPEED = 0.05
-  TRACK_SPEED = 1
-  ZOOM_SPEED  = 100
+  ORBIT_SPEED     = 0.05
+  TRACK_SPEED     = 1
+  TRACK_SPEED_KEY = 20
+  ZOOM_SPEED      = 100
 
   def __init__(self, camera : Camera):
     self.camera = camera
@@ -46,9 +47,15 @@ class CameraController(Observer):
     }
     
     if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT] and action in [glfw.PRESS, glfw.REPEAT]:
-      self.request_orbit(0, direction[key])
+      if modifiers & glfw.MOD_CONTROL:
+        self.request_track(self.TRACK_SPEED_KEY * direction[key], 0)
+      else:
+        self.request_orbit(0, direction[key])
     if key in [glfw.KEY_UP, glfw.KEY_DOWN] and action in [glfw.PRESS, glfw.REPEAT]:
-      self.request_orbit(direction[key], 0)
+      if modifiers & glfw.MOD_CONTROL:
+        self.request_track(0, self.TRACK_SPEED_KEY * direction[key])
+      else:
+        self.request_orbit(direction[key], 0)
 
   def request_orbit(self, x, z):
     self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z)
