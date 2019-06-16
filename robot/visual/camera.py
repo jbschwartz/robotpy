@@ -15,8 +15,6 @@ class Camera():
     self.calculate_projection(60, 100, 10000, aspect)
 
     self.look_at(position, target, up)
-    
-    self.distance_to_target = (self.target - self.position).length()
 
   def look_at(self, position, target, up):
     '''
@@ -48,6 +46,8 @@ class Camera():
     align_x = Transform(axis=(rotation_direction * forward), angle=angle_x, translation=position)
 
     self.camera_to_world = align_x * align_z 
+
+    self.distance_to_target = (self.target - self.position).length()
 
   @property
   def position(self):
