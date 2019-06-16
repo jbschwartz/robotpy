@@ -81,7 +81,16 @@ class Vector3(Swizzler):
 
 def angle_between(v1, v2):
   dot = v1 * v2
-  return math.acos(dot / (v1.length() * v2.length()))
+  lengths = (v1.length() * v2.length())
+
+  try:
+    return math.acos(dot / lengths)
+  except ValueError:
+    # Happens if floating point rounding pushes us beyond acos' domain (e.g. 1.00000002)
+    if math.isclose(dot, 1):
+      return 1 / lengths
+    elif math.isclose(dot, -1):
+      return -1 / lengths
 
 def normalize(v):
   # TODO: Make sure that length is non-zero before dividing
