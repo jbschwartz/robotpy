@@ -5,6 +5,9 @@ from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
 
 class Camera():
+  '''
+  Camera model responsible for camera positioning and manipulation.
+  '''
   def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), aspect = 16/9):
     self.aspect = aspect
     self.target = target
@@ -51,6 +54,9 @@ class Camera():
     return self.camera_to_world.translation()
 
   def orbit(self, pitch = 0, yaw = 0):
+    '''
+    Orbits the camera around the target point (with pitch and yaw)
+    '''
     # Move camera to the origin
     self.camera_to_world = Transform(translation = -self.position) * self.camera_to_world 
 
