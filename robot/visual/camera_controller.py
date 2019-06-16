@@ -13,7 +13,7 @@ class CameraController(Observer):
   ORBIT_SPEED     = 0.05
   TRACK_SPEED     = 1
   TRACK_SPEED_KEY = 20
-  ZOOM_SPEED      = 100
+  DOLLY_SPEED     = 100
 
   def __init__(self, camera : Camera):
     self.camera = camera
@@ -69,4 +69,4 @@ class CameraController(Observer):
     if direction.x:
       self.request_orbit(0, direction.x)
     if direction.y:
-      self.camera.zoom(self.ZOOM_SPEED * direction.y)
+      self.camera.dolly(self.DOLLY_SPEED * direction.y)

@@ -69,12 +69,11 @@ class Camera():
     # Move target back to position
     self.camera_to_world = Transform(translation = self.target) * self.camera_to_world
 
-  def zoom(self, amount):
+  def dolly(self, displacement):
     '''
-    Move the camera in or out along its line of sight
+    Move the camera in or out along its line of sight (z axis)
     '''
-    movement = self.camera_to_world(Vector3(0, 0, amount), type="vector")
-    self.camera_to_world = Transform(translation=movement) * self.camera_to_world
+    self.camera_to_world *= Transform(translation = Vector3(0, 0, displacement))
     self.distance_to_target = (self.target - self.position).length()
 
   def track(self, x, y):
