@@ -41,8 +41,8 @@ class CameraController(Observer):
     direction = {
       glfw.KEY_RIGHT: 1,
       glfw.KEY_LEFT: -1,
-      glfw.KEY_UP: -1,
-      glfw.KEY_DOWN: 1
+      glfw.KEY_UP:    1,
+      glfw.KEY_DOWN: -1
     }
     
     if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT] and action in [glfw.PRESS, glfw.REPEAT]:
