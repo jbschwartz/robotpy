@@ -26,32 +26,53 @@ class Camera():
 
     Uses a geometrically intuitive method with quaternions.
     (instead of a more efficient computation converting from a matrix directly)
+
+    Steps:
+      1.  Start with the base coordinate frame
+      2.  We calculate our desired z axis (called forward)
+      3.  We calculate the difference between our existing z axis and desired
+      4.  We rotate around our desired x axis (called right) 
+          to align our existing z axis with our desired z axis
+      5.  In the process, we move our existing x axis out of alignment with our desired x axis into an intermediate
+      6.  We aim to rotate around our desired z axis (mostly so we don't move our desired z axis)
+          to align our intermediate x axis with the desired x axis
+      7.  We calculate the difference between our intermediate x axis and desired
+      8.  Note, sometimes the intermediate x axis is already positioned correctly. So we just stop there.
+      9.  Otherwise, we need to then calculate which direction to rotate the intermediate x to get to desired.
+      10. Rotate around our desired z axis to complete the transformation
     '''
 
     self.target = target
 
-    # FIXME: Broken up vector (e.g.):
-    #   camera = Camera(Vector3(375, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
-
-    forward = (position - target).normalize()
-    right = (up % forward).normalize()
-
-    angle_z = math.acos(up * forward)
-    align_z = Transform(axis=right, angle=angle_z)
-
-    intermediate_x = align_z(Vector3(1, 0, 0), type="vector")
-    # TODO: Look into ValueError: math domain error for following parameters:
-    #   camera = Camera(Vector3(0, -350, 350), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
-    angle_x = math.acos(right * intermediate_x)
+    forward = (position - target).normalize()       # Step 2
+    angle_z = math.acos(Vector3(0, 0, 1) * forward) # Step 3
     
-    # Check which direction we need to rotate by angle_x (dot product tells us how much, but not which way)
-    # See if the calculated normal vector is parallel or anti-parallel with the z vector
-    calculated_normal = (right % intermediate_x)
-    rotation_direction = 1 if calculated_normal * forward > 0 else -1
+    right = (up % forward).normalize()
+    align_z = Transform(axis=right, angle=angle_z)  # Step 4
 
-    align_x = Transform(axis=(rotation_direction * forward), angle=angle_x, translation=position)
+    intermediate_x = align_z(Vector3(1, 0, 0), type="vector") # Step 5
 
-    self.camera_to_world = align_x * align_z 
+    try:
+      dot = right * intermediate_x
+      angle_x = math.acos(dot) # Step 7
+    except ValueError:
+      # Happens if floating point rounding pushes us beyond acos' domain (e.g. 1.00000002)
+      if math.isclose(dot, 1):
+        angle_x = math.acos(1)
+      elif math.isclose(dot, -1):
+        angle_x = math.acos(-1)
+
+    if math.isclose(angle_x, 0):
+      # Our intermediate x axis is already where it should be. We do no further rotation.
+      align_x = Transform(translation=position) # Step 8
+    else:
+      # Check which direction we need to rotate by angle_x (dot product tells us how much, but not which way)
+      # See if the calculated normal vector is parallel or anti-parallel with the z vector
+      calculated_normal = (right % intermediate_x)
+      rotation_direction = -1 if calculated_normal * forward > 0 else 1 
+      align_x = Transform(axis=(rotation_direction * forward), angle=angle_x, translation=position) # Step 9
+
+    self.camera_to_world = align_x * align_z # Step 10
 
     self.distance_to_target = (self.target - self.position).length()
 
