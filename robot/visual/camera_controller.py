@@ -135,7 +135,8 @@ class CameraController(Observer):
 
   def saved_views(self, key):
     radius = 1250
-    target = Vector3(0, 0, 349)
+    z_height = 500
+    target = Vector3(0, 0, z_height)
     up = Vector3(0, 0, 1)
 
     if key is SavedView.TOP.value:
@@ -145,13 +146,13 @@ class CameraController(Observer):
       position = Vector3(0, 0, -radius)
       up = Vector3(0, -1, 0)
     elif key is SavedView.LEFT.value:
-      position = Vector3(-radius, 0, 349)
+      position = Vector3(-radius, 0, z_height)
     elif key is SavedView.RIGHT.value:
-      position = Vector3(radius, 0, 349)
+      position = Vector3(radius, 0, z_height)
     elif key is SavedView.FRONT.value:
-      position = Vector3(0, -radius, 349)
+      position = Vector3(0, -radius, z_height)
     elif key is SavedView.BACK.value:
-      position = Vector3(0, radius, 349)
+      position = Vector3(0, radius, z_height)
     elif key is SavedView.ISO.value:
       position = Vector3(750, -750, 750)
     else:
