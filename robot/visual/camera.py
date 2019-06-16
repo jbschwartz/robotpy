@@ -24,6 +24,8 @@ class Camera():
     (instead of a more efficient computation converting from a matrix directly)
     '''
 
+    self.target = target
+
     # FIXME: Broken up vector (e.g.):
     #   camera = Camera(Vector3(375, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
 
