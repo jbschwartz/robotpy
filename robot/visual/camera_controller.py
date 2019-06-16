@@ -17,6 +17,10 @@ class CameraController(Observer):
 
   def __init__(self, camera : Camera):
     self.camera = camera
+
+    self.start_position = camera.position
+    self.start_target   = camera.target
+
     self.last_cursor_position = None
 
   def click(self, button, cursor):
@@ -32,7 +36,7 @@ class CameraController(Observer):
   
   def key(self, key, action, modifiers):
     if key == glfw.KEY_R and action == glfw.RELEASE:
-      self.camera.reset()
+      self.reset()
 
     if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT, glfw.KEY_UP, glfw.KEY_DOWN]:
       self.arrows(key, action, modifiers)
@@ -62,6 +66,9 @@ class CameraController(Observer):
 
   def request_track(self, x, y):
     self.camera.track(self.TRACK_SPEED * x, self.TRACK_SPEED * y)
+
+  def reset(self):
+    self.camera.look_at(self.start_position, self.start_target, Vector3(0, 0, 1))
 
   def scroll(self, direction):
     direction.normalize()

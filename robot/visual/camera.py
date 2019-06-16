@@ -8,14 +8,12 @@ class Camera():
   def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), aspect = 16/9):
     self.aspect = aspect
     self.target = target
-    self.start_position = position
-    self.start_target = target
 
     self.calculate_projection(60, 100, 10000, aspect)
 
-    self.distance_to_target = (self.target - self.start_position).length()
-
     self.look_at(position, target, up)
+    
+    self.distance_to_target = (self.target - self.position).length()
 
   def look_at(self, position, target, up):
     '''
@@ -77,16 +75,14 @@ class Camera():
     self.distance_to_target = (self.target - self.position).length()
 
   def track(self, x, y):
+    '''
+    Move the camera vertically and horizontally (with respect to camera coordinate frame)
+    '''
     camera_displacement_in_world = self.camera_to_world(Vector3(x, y), type="vector")
 
     self.target += camera_displacement_in_world
 
     self.camera_to_world = Transform(translation = camera_displacement_in_world) * self.camera_to_world
-
-  def reset(self):
-    # TODO: Move this out to the CameraController
-    self.target = self.start_target
-    self.look_at(self.start_position, self.target, Vector3(0,0,1))
 
   def calculate_projection(self, fov, z_near, z_far, aspect):
     fov = math.radians(fov)
