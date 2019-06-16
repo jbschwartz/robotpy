@@ -34,6 +34,8 @@ class CameraController(Observer):
       elif modifiers & glfw.MOD_ALT:
         # TODO: Fix this so that direction doesn't reverse at the centerline of the screen
         self.request_roll(-cursor_delta.y + cursor_delta.x)
+      elif modifiers & glfw.MOD_SHIFT:
+        self.request_dolly(3 * cursor_delta.y / self.DOLLY_SPEED)
       else:
         direction = vector3.normalize(cursor_delta)
         self.request_orbit(*direction.yx)
@@ -51,7 +53,7 @@ class CameraController(Observer):
     if direction.x:
       self.request_orbit(0, direction.x)
     if direction.y:
-      self.camera.dolly(self.DOLLY_SPEED * direction.y)
+      self.request_dolly(direction.y)
 
   def arrows(self, key, action, modifiers):
     # TODO: This doesn't handle both keys pressed at once
@@ -72,6 +74,9 @@ class CameraController(Observer):
         self.request_track(0, self.TRACK_SPEED_KEY * direction[key])
       else:
         self.request_orbit(direction[key], 0)
+
+  def request_dolly(self, z):
+    self.camera.dolly(self.DOLLY_SPEED * z)
 
   def request_orbit(self, x, z):
     self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z)
