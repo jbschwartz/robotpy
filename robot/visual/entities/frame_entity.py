@@ -13,12 +13,12 @@ from robot.visual.entities.entity import Entity
 from robot.visual.shader_program  import ShaderProgram
 
 class FrameEntity(Entity):
-  def __init__(self, frame = Frame(), shader_program : ShaderProgram = None, color = (0.5, 0, 0)):
+  def __init__(self, frame = Frame(), shader_program : ShaderProgram = None):
     self.buffer = []
     self.frame = frame
     self.scale = 15
 
-    Entity.__init__(self, shader_program, color)
+    Entity.__init__(self, shader_program)
 
   def build_buffer(self):
     data_list = [
