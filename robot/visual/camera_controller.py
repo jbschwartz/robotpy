@@ -61,8 +61,7 @@ class CameraController(Observer):
       if modifiers & glfw.MOD_CONTROL:
         self.request_track(cursor_delta.x, -cursor_delta.y)
       elif modifiers & glfw.MOD_ALT:
-        # TODO: Fix this so that direction doesn't reverse at the centerline of the screen
-        self.request_roll(-cursor_delta.y + cursor_delta.x)
+        self.request_roll(cursor, cursor_delta)
       elif modifiers & glfw.MOD_SHIFT:
         self.request_dolly(3 * cursor_delta.y / self.DOLLY_SPEED)
       else:
@@ -134,8 +133,19 @@ class CameraController(Observer):
   def request_track(self, x, y):
     self.camera.track(self.TRACK_SPEED * x, self.TRACK_SPEED * y)
 
-  def request_roll(self, angle):
-    self.camera.roll(self.ROLL_SPEED * angle)
+  def request_roll(self, cursor, cursor_delta):
+    # Calculate the initial cursor position
+    cursor_start_point = cursor - cursor_delta
+    # Calculate the radius vector from center screen to initial cursor position
+    r = Vector3(cursor_start_point.x - self.window_width / 2, cursor_start_point.y - self.window_height / 2)
+
+    if math.isclose(r.length(), 0):
+      return 
+
+    # Calculate the unit tangent vector to the circle at cursor_start_point
+    t = Vector3(r.y, -r.x).normalize()
+    # The contribution to the roll is the projection of the cursor_delta vector onto the tangent vector
+    self.camera.roll(self.ROLL_SPEED * cursor_delta * t)
 
   def reset(self):
     self.camera.look_at(self.start_position, self.start_target, Vector3(0, 0, 1))
