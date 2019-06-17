@@ -56,7 +56,7 @@ class CameraController(Observer):
       else:
         self.orbit_type = OrbitType.CONSTRAINED
   
-  def drag(self, button, cursor_delta, modifiers):
+  def drag(self, button, cursor, cursor_delta, modifiers):
     if button == glfw.MOUSE_BUTTON_MIDDLE:
       if modifiers & glfw.MOD_CONTROL:
         self.request_track(cursor_delta.x, -cursor_delta.y)

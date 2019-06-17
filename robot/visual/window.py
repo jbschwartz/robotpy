@@ -71,7 +71,7 @@ class Window():
     self.last_cursor_position = cursor
 
     event = WindowEvent.DRAG if self.dragging is not None else WindowEvent.CURSOR
-    self.emit(event, self.dragging, cursor_delta, self.modifiers)
+    self.emit(event, self.dragging, cursor, cursor_delta, self.modifiers)
 
   def window_callback(self, window, width, height):
     self.emit(WindowEvent.WINDOW_RESIZE, width, height)
