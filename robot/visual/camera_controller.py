@@ -34,6 +34,9 @@ class CameraController(Observer):
 
     self.last_cursor_position = None
 
+    self.window_width  = None
+    self.window_height = None
+
   def click(self, button, action, cursor):
     # EXPERIMENTAL
     #   When we're done orbiting, switch back to constrained mode
@@ -87,6 +90,10 @@ class CameraController(Observer):
       self.request_orbit(0, direction.x)
     if direction.y:
       self.request_dolly(direction.y)
+
+  def window_resize(self, width, height):
+    self.window_width = width
+    self.window_height = height
 
   def arrows(self, key, action, modifiers):
     # TODO: This doesn't handle both keys pressed at once

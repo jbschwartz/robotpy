@@ -38,7 +38,7 @@ class Window():
     glfw.window_hint(glfw.SAMPLES, 4)
 
   def set_callbacks(self):
-    glfw.set_window_size_callback(self.window, lambda *args: self.emit(WindowEvent.WINDOW_RESIZE, *args))
+    glfw.set_window_size_callback(self.window, self.window_callback)
     glfw.set_key_callback(self.window, self.key_callback)
     glfw.set_scroll_callback(self.window, self.scroll_callback)
     glfw.set_mouse_button_callback(self.window, self.mouse_button_callback)
@@ -73,6 +73,9 @@ class Window():
     event = WindowEvent.DRAG if self.dragging is not None else WindowEvent.CURSOR
     self.emit(event, self.dragging, cursor_delta, self.modifiers)
 
+  def window_callback(self, window, width, height):
+    self.emit(WindowEvent.WINDOW_RESIZE, width, height)
+
   def get_cursor(self):
     return Vector3(*glfw.get_cursor_pos(self.window), 0)
 
@@ -86,6 +89,9 @@ class Window():
         observer.notify(event_type, *args, **kwargs)
 
   def run(self, fps_limit = None):
+    # Send a window resize event so observers are provided the initial window size 
+    self.window_callback(self.window, *glfw.get_window_size(self.window))
+
     with Timer('START_RENDERER') as t:
       self.emit(WindowEvent.START_RENDERER)
 

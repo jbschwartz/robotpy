@@ -53,7 +53,8 @@ if __name__ == "__main__":
     WindowEvent.DRAG,
     WindowEvent.KEY,
     WindowEvent.RESET,
-    WindowEvent.SCROLL
+    WindowEvent.SCROLL,
+    WindowEvent.WINDOW_RESIZE
   ])
 
   world_frame = FrameEntity(Frame(), flat_program)
