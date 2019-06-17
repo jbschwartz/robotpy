@@ -5,12 +5,9 @@ class Mesh:
     self.name = name
     self.facets = []
 
-  def set_color(self, r, g, b):
-    pass
-
   def vertices(self):
     '''
-    Iterable list of vertex data returned in the format of the buffer (vx, vy, vz, nx, ny, nz)
+    Iterable list of vertex data returned in the format (vx, vy, vz)
     '''
     for facet in self.facets:
       yield facet.vertices[0]
