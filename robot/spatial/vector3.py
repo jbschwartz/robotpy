@@ -1,5 +1,6 @@
 import math
 
+from robot                  import utils
 from robot.spatial.swizzler import Swizzler
 
 class Vector3(Swizzler):
@@ -83,14 +84,7 @@ def angle_between(v1, v2):
   dot = v1 * v2
   lengths = (v1.length() * v2.length())
 
-  try:
-    return math.acos(dot / lengths)
-  except ValueError:
-    # Happens if floating point rounding pushes us beyond acos' domain (e.g. 1.00000002)
-    if math.isclose(dot, 1):
-      return 1 / lengths
-    elif math.isclose(dot, -1):
-      return -1 / lengths
+  return utils.safe_acos(dot / lengths)
 
 def normalize(v):
   # TODO: Make sure that length is non-zero before dividing

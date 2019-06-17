@@ -1,5 +1,6 @@
 import enum, math
 
+from robot                   import utils
 from robot.spatial.matrix4   import Matrix4
 from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
@@ -52,16 +53,9 @@ class Camera():
 
     intermediate_x = align_z(Vector3(1, 0, 0), type="vector") # Step 5
 
-    try:
-      dot = right * intermediate_x
-      angle_x = math.acos(dot) # Step 7
-    except ValueError:
-      # Happens if floating point rounding pushes us beyond acos' domain (e.g. 1.00000002)
-      if math.isclose(dot, 1):
-        angle_x = math.acos(1)
-      elif math.isclose(dot, -1):
-        angle_x = math.acos(-1)
-
+    dot = right * intermediate_x
+    angle_x = utils.safe_acos(dot)
+    
     if math.isclose(angle_x, 0):
       # Our intermediate x axis is already where it should be. We do no further rotation.
       align_x = Transform(translation=position) # Step 8
