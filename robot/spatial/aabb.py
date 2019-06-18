@@ -7,7 +7,15 @@ class AABB:
     self.min = Vector3(math.inf, math.inf, math.inf)
     self.max = Vector3(-math.inf, -math.inf, -math.inf)
 
-  def extend(self, v : Vector3):
+  def extend(self, *args):
+    for other in args:
+      if isinstance(other, Vector3):
+        self._extend_vector(other)
+      elif isinstance(other, AABB):
+        self._extend_vector(other.min)
+        self._extend_vector(other.max)
+
+  def _extend_vector(self, v : Vector3):
     for index, value in enumerate(v):
       if value < self.min[index]:
         self.min[index] = value
