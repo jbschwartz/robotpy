@@ -13,3 +13,11 @@ class AABB:
         self.min[index] = value
       if value > self.max[index]:
         self.max[index] = value
+
+  @property
+  def center(self):
+    return self.size / 2
+
+  @property
+  def size(self):
+    return self.max - self.min
