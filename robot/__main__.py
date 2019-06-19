@@ -12,6 +12,7 @@ from robot.visual.camera_controller          import CameraController
 from robot.visual.entities                   import robot_entity
 from robot.visual.entities.triangle_entity   import TriangleEntity
 from robot.visual.entities.frame_entity      import FrameEntity
+from robot.visual.entities.bounding_entity   import BoundingEntity
 from robot.visual.scene                      import Scene
 from robot.visual.shader_program             import ShaderProgram
 from robot.visual.window                     import Window
@@ -28,11 +29,13 @@ if __name__ == "__main__":
     flat_program = ShaderProgram('./robot/visual/glsl/vertex-flat.glsl', './robot/visual/glsl/fragment-flat.glsl')
     
   ee_frame = FrameEntity(Frame(), flat_program)
+  bb = BoundingEntity(flat_program)
 
   with Timer('Initialize Robot') as t:
     robot = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
     robot.shader_program = program
     robot.frame_entity = ee_frame
+    robot.bounding_entity = bb
     robot.serial.position(Vector3(-500, 0, 0))
     robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 6)
 
