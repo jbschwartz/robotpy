@@ -44,6 +44,7 @@ def load(filename):
       meshes = p.parse(f'robot/mech/robots/meshes/{data["mesh_file"]}')
     except ParserError as error:
       print('\033[91m' + f'Parsing error on line {error.line}: {error}' + '\033[0m')
+      # TODO: It's probably no longer appropriate for this to be a quit() here
       quit()
 
   return RobotEntity(Serial(joints, links), meshes)
