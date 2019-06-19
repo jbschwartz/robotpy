@@ -6,25 +6,13 @@ from robot.spatial.vector3 import Vector3
 class TestAABB(unittest.TestCase):
   def setUp(self):
     self.aabb = AABB()
+    self.v1 = Vector3(1, 2, 3)
+    self.v2 = Vector3(-1, -2, -3)
+    self.v3 = Vector3(0, 1, 2)
+    self.v4 = Vector3(4, 4, 4)
 
   def test_extend(self):
-    v1 = Vector3(1, 2, 3)
-    v2 = Vector3(-1, -2, -3)
-    v3 = Vector3(0, 1, 2)
-    
-    self.aabb.extend(v1)
+    self.aabb.extend(self.v1, self.v2, self.v3)
 
-    # print(self.aabb.min, self.aabb.max)
-
-    self.assertAlmostEqual(v1, self.aabb.min)
-    self.assertAlmostEqual(v1, self.aabb.max)
-
-    self.aabb.extend(v2)
-
-    self.assertAlmostEqual(v2, self.aabb.min)
-    self.assertAlmostEqual(v1, self.aabb.max)
-
-    self.aabb.extend(v3)
-
-    self.assertAlmostEqual(v2, self.aabb.min)
-    self.assertAlmostEqual(v1, self.aabb.max)
+    self.assertAlmostEqual(self.v2, self.aabb.min)
+    self.assertAlmostEqual(self.v1, self.aabb.max)
