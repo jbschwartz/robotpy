@@ -174,7 +174,7 @@ class FrameEntity(Entity):
       -0.25,  0.25, -0.25
     ]
     
-    self.buffer = np.array([self.scale * component for component in data_list], dtype=np.float32)
+    self.buffer = np.array(data_list, dtype=np.float32)
 
   def load(self):
     self.build_buffer()
@@ -207,6 +207,13 @@ class FrameEntity(Entity):
     self.shader_program.light_intensity = light.intensity
     
     self.shader_program.model_matrix = transform
+    self.shader_program.scale_matrix = Matrix4([
+      self.scale, 0, 0, 0,
+      0, self.scale, 0, 0, 
+      0, 0, self.scale, 0, 
+      0, 0, 0, 1
+    ])
+    self.shader_program.in_opacity = 1
 
     glBindVertexArray(self.vao)
 

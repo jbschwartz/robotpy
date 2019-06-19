@@ -16,12 +16,7 @@ class TriangleEntity():
     self.buffer = []
     self.color = color
     self.shader_program = shader_program
-    self.transform = Matrix4([
-      50, 0, 0, 0,
-      0, 50, 0, 0,
-      0, 0, 50, 0,
-      0, 0, 350, 1
-    ])
+    self.scale = 50
 
   def use_shader(self, shader_program):
     self.shader_program = shader_program
@@ -56,9 +51,9 @@ class TriangleEntity():
     target = camera.target
 
     self.transform = Matrix4([
-      50, 0, 0, 0,
-      0, 50, 0, 0,
-      0, 0, 50, 0,
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, 0,
       target.x, target.y, target.z, 1
     ])
 
@@ -72,7 +67,14 @@ class TriangleEntity():
     self.shader_program.light_intensity = light.intensity
 
     self.shader_program.model_matrix  = self.transform
+    self.shader_program.scale_matrix = Matrix4([
+      self.scale, 0, 0, 0,
+      0, self.scale, 0, 0, 
+      0, 0, self.scale, 0, 
+      0, 0, 0, 1
+    ])
     self.shader_program.color_in     = self.color
+    self.shader_program.in_opacity = 0.5
 
     glBindVertexArray(self.vao)
 
