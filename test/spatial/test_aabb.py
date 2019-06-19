@@ -25,3 +25,13 @@ class TestAABB(unittest.TestCase):
     
     self.assertAlmostEqual(self.v2, self.aabb.min)
     self.assertAlmostEqual(self.v4, self.aabb.max)
+
+  def test_size(self):
+    expected = self.v1 - self.v2
+
+    self.assertAlmostEqual(self.aabb.size, expected)
+
+  def test_center(self):
+    expected = (self.v1 - self.v2) / 2
+
+    self.assertAlmostEqual(self.aabb.center, expected)
