@@ -127,7 +127,7 @@ class STLParser:
         self.meshes.append(current_mesh)
         current_mesh = Mesh(mesh_id)
 
-      current_mesh.facets.append(Facet(vertices, normal))
+      current_mesh.append(Facet(vertices, normal))
 
     self.meshes.append(current_mesh)
 
@@ -239,7 +239,7 @@ class STLParser:
       if self.show_warnings:
         self.add_warning(WarningType.DEGENERATE_TRIANGLE)
 
-    self.current['mesh'].facets.append(current_facet)
+    self.current['mesh'].append(current_facet)
     self.current['state'] = ParserState.PARSE_FACET
 
   @check_state(ParserState.PARSE_FACET)
