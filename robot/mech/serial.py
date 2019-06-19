@@ -42,7 +42,8 @@ class Serial:
 
   def position(self, v):
     transform = Transform(translation = v)
-    self.links[0].frame = transform * self.links[0].frame 
+    self.links[0].frame = transform * self.links[0].frame
+    self.update_links()
 
   def update_links(self):
     last_frame = self.links[0].frame
