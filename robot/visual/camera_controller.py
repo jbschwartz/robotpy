@@ -7,12 +7,12 @@ from robot.visual.observer import Observer
 Vector3 = vector3.Vector3
 
 class SavedView(enum.Enum):
-  TOP    = glfw.KEY_1
-  BOTTOM = glfw.KEY_2
-  LEFT   = glfw.KEY_3
-  RIGHT  = glfw.KEY_4
-  FRONT  = glfw.KEY_5
-  BACK   = glfw.KEY_6
+  FRONT  = glfw.KEY_1
+  BACK   = glfw.KEY_2
+  RIGHT  = glfw.KEY_3
+  LEFT   = glfw.KEY_4
+  TOP    = glfw.KEY_5
+  BOTTOM = glfw.KEY_6
   ISO    = glfw.KEY_7
 
 # TODO: Mouse picking on all actions
