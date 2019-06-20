@@ -24,7 +24,7 @@ class AABB:
 
   @property
   def center(self):
-    return self.size / 2
+    return self.min + (self.size / 2)
 
   @property
   def size(self):

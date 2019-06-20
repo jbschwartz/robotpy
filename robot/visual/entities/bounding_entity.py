@@ -90,7 +90,7 @@ class BoundingEntity(Entity):
     pass
 
   def draw(self, camera, light, transform = Transform()):
-    transform *= Transform(translation = self.aabb.center + self.aabb.min)
+    transform *= Transform(translation = self.aabb.center)
 
     glUseProgram(self.shader_program.program_id)
 
