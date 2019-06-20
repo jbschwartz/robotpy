@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 
+from robot.spatial.aabb         import AABB
 from robot.visual.camera        import Camera
 from robot.visual.observer      import Observer
 
@@ -8,6 +9,17 @@ class Scene(Observer):
     self.camera = camera
     self.entities = []
     self.light = light
+
+  @property
+  def aabb(self):
+    aabb = AABB()
+    for entity in self.entities:
+      try:
+        # TODO: Maybe there's a better way to do this. Or at least I need to put an AABB on all entities (in the entity base class?)
+        aabb.extend(entity.aabb)
+      except AttributeError:
+        pass
+    return aabb
 
   def window_resize(self, width, height):
     if width and height:
