@@ -63,6 +63,10 @@ class RobotEntity(Entity):
   def meshes(self):
     return [link.mesh for link in self.serial.links]
 
+  @property
+  def aabb(self):
+    return self.serial.aabb
+
   def build_buffer(self):
     data_list = []
     for index, mesh in enumerate(self.meshes):
