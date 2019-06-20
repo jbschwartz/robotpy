@@ -70,7 +70,8 @@ class Transform:
 
   def transform_aabb(self, aabb):
     new_aabb = AABB()
-    new_aabb.extend(self.transform_point(aabb.min), self.transform_point(aabb.max))
+    for corner in aabb.corners:
+      new_aabb.extend(self.transform_point(corner))
 
     return new_aabb
 
