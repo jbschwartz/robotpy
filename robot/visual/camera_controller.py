@@ -39,23 +39,7 @@ class CameraController(Observer):
     self.window_height = None
 
   def click(self, button, action, cursor):
-    # EXPERIMENTAL
-    #   When we're done orbiting, switch back to constrained mode
-    #   But only do so if the camera isn't overly rolled
-    if action == glfw.RELEASE:
-      # Get projection of the camera's x axis in the world's xy plane
-      # Then get the angle (of roll) between the camera's x axis and the projection
-      camera_direction_x = self.camera.camera_to_world(Vector3(1, 0, 0), type="vector")
-      mutual_perpendicular = vector3.cross(camera_direction_x, Vector3(0, 0, 1))
-      vector_in_plane = vector3.cross(Vector3(0, 0, 1), mutual_perpendicular)
-
-      roll_angle = vector3.angle_between(camera_direction_x, vector_in_plane)
-
-      # These thresholds are set empirically
-      if roll_angle >= math.radians(15) and roll_angle <= math.radians(165):
-        self.orbit_type = OrbitType.FREE
-      else:
-        self.orbit_type = OrbitType.CONSTRAINED
+    pass
   
   def drag(self, button, cursor, cursor_delta, modifiers):
     if button == glfw.MOUSE_BUTTON_MIDDLE:
@@ -119,16 +103,6 @@ class CameraController(Observer):
     self.camera.dolly(self.DOLLY_SPEED * z)
 
   def request_orbit(self, x, z):
-    # EXPERIMENTAL
-    #   Check to see if the camera is approaching the "poles"
-    #   If it is, turn off constrained orbiting
-    camera_direction_z = self.camera.camera_to_world(Vector3(0, 0, -1), type="vector") # In world space
-    angle_between_z = vector3.angle_between(camera_direction_z, Vector3(0, 0, 1))
-
-    # These thresholds are set empirically
-    if angle_between_z <= math.radians(20) or angle_between_z >= math.radians(160):
-      self.orbit_type = OrbitType.FREE
-
     self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z, self.orbit_type)
 
   def request_track(self, x, y):
