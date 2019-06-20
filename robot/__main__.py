@@ -49,8 +49,13 @@ if __name__ == "__main__":
 
   camera = Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
 
-  camera_controller = CameraController(camera)
+  world_frame = FrameEntity(Frame(), flat_program)
+  light = AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
 
+  scene = Scene(camera, light)
+
+  camera_controller = CameraController(camera, scene)
+  
   window.register_observer(camera_controller, [ 
     WindowEvent.CLICK,
     WindowEvent.DRAG,
@@ -60,10 +65,6 @@ if __name__ == "__main__":
     WindowEvent.WINDOW_RESIZE
   ])
 
-  world_frame = FrameEntity(Frame(), flat_program)
-  light = AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
-
-  scene = Scene(camera, light)
   scene.entities.append(world_frame)
   scene.entities.append(robot)
   scene.entities.append(robot2)

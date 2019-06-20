@@ -25,8 +25,9 @@ class CameraController(Observer):
   DOLLY_SPEED     = 100
   ROLL_SPEED      = 0.005
 
-  def __init__(self, camera : Camera):
+  def __init__(self, camera : Camera, scene):
     self.camera = camera
+    self.scene = scene
     self.orbit_type = OrbitType.CONSTRAINED
 
     self.start_position = camera.position
