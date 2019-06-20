@@ -131,13 +131,13 @@ class Camera():
     
     Leaves a given amount of margin around the scene (on a percentage basis)
     '''
-    # Convert the bounding box to screen space
-    screen_aabb = self.world_to_camera(world_aabb)
+    # Convert the bounding box to eye space
+    eye_aabb = self.world_to_camera(world_aabb)
 
-    width = screen_aabb.size.x
+    width = eye_aabb.size.x
     horizontal_fov_width = -(width * margin) / 2 * math.tan(self.fov)
     
-    height = screen_aabb.size.y
+    height = eye_aabb.size.y
     vertical_fov_height = -(height * margin) / 2 * math.tan(self.fov * self.aspect)
 
     # Distance from bounding box necessary to capture it on the screen (if bounding box is centered)
@@ -145,12 +145,12 @@ class Camera():
     required_distance = min(horizontal_fov_width, vertical_fov_height)
 
     # Current camera distance to the bounding box
-    current_distance = screen_aabb.max.z
+    current_distance = eye_aabb.max.z
 
     delta_z = current_distance - required_distance
 
     # Move the camera, remembering to adjust for the box being shifted off center
-    self.camera_to_world *= Transform(translation = Vector3(screen_aabb.center.x, screen_aabb.center.y, delta_z))
+    self.camera_to_world *= Transform(translation = Vector3(eye_aabb.center.x, eye_aabb.center.y, delta_z))
     # Set the camera target to the center of the scene
     self.target = world_aabb.center
 
