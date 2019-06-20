@@ -177,3 +177,4 @@ class CameraController(Observer):
       return
 
     self.camera.look_at(position, target, up)
+    self.camera.fit(self.scene.aabb, 1.1)
