@@ -29,3 +29,20 @@ class AABB:
   @property
   def size(self):
     return self.max - self.min
+
+  @property
+  def corners(self):
+    size = self.size
+    x = Vector3(x = size.x)
+    y = Vector3(y = size.y)
+    
+    return [
+      self.max,
+      self.max - x,
+      self.max - y,
+      self.max - x - y,
+      self.min,
+      self.min + x,
+      self.min + y,
+      self.min + x + y,
+    ]
