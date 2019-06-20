@@ -8,6 +8,7 @@ from ctypes import c_void_p
 from robot.mech.joint                      import Joint
 from robot.mech.link                       import Link
 from robot.mech.serial                     import Serial
+from robot.spatial.aabb                    import AABB
 from robot.spatial.frame                   import Frame
 from robot.spatial.matrix4                 import Matrix4
 from robot.spatial.vector3                 import Vector3
@@ -57,6 +58,16 @@ class RobotEntity(Entity):
     self.bounding_entity = None
 
     Entity.__init__(self, shader_program, color)
+  
+  @property
+  def aabb(self) -> AABB:
+    aabb = AABB()
+    for mesh, link in zip(self.meshes, self.serial.links):
+      # REVIEW: Is this optimal? Do I need to check all 8 corners to find the AABB of a transformed (and no longer AA) AABB?
+      for corner in mesh.aabb.corners:
+        aabb.extend(link.frame.transform(corner))
+   
+    return aabb
 
   def build_buffer(self):
     data_list = []
@@ -136,3 +147,6 @@ class RobotEntity(Entity):
       for mesh, link in zip(self.meshes, self.serial.links):
         self.bounding_entity.aabb = mesh.aabb
         self.bounding_entity.draw(camera, light, link.frame.transform)
+
+      self.bounding_entity.aabb = self.aabb
+      self.bounding_entity.draw(camera, light)

@@ -2,6 +2,7 @@ import math
 
 import robot.spatial.dual       as     dual
 import robot.spatial.quaternion as     quaternion
+from robot.spatial.aabb         import AABB
 from robot.spatial.vector3      import Vector3
 from robot.visual.facet         import Facet
 from robot.visual.mesh          import Mesh
@@ -48,6 +49,8 @@ class Transform:
         return self.transform_point(other)
     elif isinstance(other, Mesh):
       return self.transform_mesh(other)
+    elif isinstance(other, AABB):
+      return self.transform_aabb(other)
         
   def transform_vector(self, vector):
     d = Dual(Quaternion(0, *vector.xyz), Quaternion(0, 0, 0, 0))
@@ -64,6 +67,12 @@ class Transform:
     new_mesh.facets = list(map(self.transform_facet, mesh.facets))
 
     return new_mesh
+
+  def transform_aabb(self, aabb):
+    new_aabb = AABB()
+    new_aabb.extend(self.transform_point(aabb.min), self.transform_point(aabb.max))
+
+    return new_aabb
 
   def transform_facet(self, facet):
     new_normal = self.transform_vector(facet.normal)
