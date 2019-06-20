@@ -25,6 +25,15 @@ def load(filename):
   with open(filename) as json_file:  
     data = json.load(json_file)
 
+    p = STLParser()
+
+    try:
+      meshes = p.parse(f'robot/mech/robots/meshes/{data["mesh_file"]}')
+    except ParserError as error:
+      print('\033[91m' + f'Parsing error on line {error.line}: {error}' + '\033[0m')
+      # TODO: It's probably no longer appropriate for this to be a quit() here
+      quit()
+
     for joint_params in data['joints']:
       for param, value in joint_params.items():
         if param == 'limits':
@@ -35,39 +44,24 @@ def load(filename):
 
       joints.append(Joint(**joint_params))
 
-    for link_parameters in data['links']:
+    for link_parameters, mesh in zip(data['links'], meshes):
       link_parameters['mesh_file'] = data['mesh_file']
-      links.append(Link(**link_parameters))
+      link = Link(link_parameters['name'], mesh, link_parameters['color'])
+      links.append(link)
 
-    p = STLParser()
-
-    try:
-      meshes = p.parse(f'robot/mech/robots/meshes/{data["mesh_file"]}')
-    except ParserError as error:
-      print('\033[91m' + f'Parsing error on line {error.line}: {error}' + '\033[0m')
-      # TODO: It's probably no longer appropriate for this to be a quit() here
-      quit()
-
-  return RobotEntity(Serial(joints, links), meshes)
+  return RobotEntity(Serial(joints, links))
 
 class RobotEntity(Entity):
-  def __init__(self, serial : Serial, meshes, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):
+  def __init__(self, serial : Serial, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):
     self.serial = serial
-    self.meshes = meshes
     self.frame_entity = None
     self.bounding_entity = None
 
     Entity.__init__(self, shader_program, color)
-  
+
   @property
-  def aabb(self) -> AABB:
-    aabb = AABB()
-    for mesh, link in zip(self.meshes, self.serial.links):
-      # REVIEW: Is this optimal? Do I need to check all 8 corners to find the AABB of a transformed (and no longer AA) AABB?
-      for corner in mesh.aabb.corners:
-        aabb.extend(link.frame.transform(corner))
-   
-    return aabb
+  def meshes(self):
+    return [link.mesh for link in self.serial.links]
 
   def build_buffer(self):
     data_list = []
@@ -148,5 +142,5 @@ class RobotEntity(Entity):
         self.bounding_entity.aabb = mesh.aabb
         self.bounding_entity.draw(camera, light, link.frame.transform)
 
-      self.bounding_entity.aabb = self.aabb
+      self.bounding_entity.aabb = self.serial.aabb
       self.bounding_entity.draw(camera, light)

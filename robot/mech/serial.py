@@ -3,6 +3,7 @@ import copy, itertools, math
 from robot                   import constant
 from robot.mech.joint        import Joint
 from robot.mech.link         import Link
+from robot.spatial.aabb      import AABB
 from robot.spatial.frame     import Frame
 from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
@@ -39,6 +40,14 @@ class Serial:
       joint.angle = angle
 
     self.update_links()
+
+  @property
+  def aabb(self) -> AABB:
+    aabb = AABB()
+    for link in self.links:
+      aabb.extend(link.aabb)
+
+    return aabb
 
   def position(self, v):
     transform = Transform(translation = v)
