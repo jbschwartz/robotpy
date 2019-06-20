@@ -7,7 +7,10 @@ from robot.spatial.vector3      import Vector3
 from robot.visual.window_event  import WindowEvent
 
 class Window():
-  def __init__(self, x, y, title):
+  def __init__(self, width, height, title):
+    self.width = width
+    self.height = height
+
     self.observers = []
     self.pause = False
     self.dragging = None
@@ -19,7 +22,7 @@ class Window():
     self.window_hints()
 
     with Timer('Create Window') as t:
-      self.window = glfw.create_window(x, y, title, None, None)
+      self.window = glfw.create_window(self.width, self.height, title, None, None)
     
     if not self.window:
       glfw.terminate()
@@ -74,6 +77,8 @@ class Window():
     self.emit(event, self.dragging, cursor, cursor_delta, self.modifiers)
 
   def window_callback(self, window, width, height):
+    self.width = width
+    self.height = height
     self.emit(WindowEvent.WINDOW_RESIZE, width, height)
 
   def get_cursor(self):
