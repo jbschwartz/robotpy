@@ -70,16 +70,21 @@ class Camera():
 
     self.camera_to_world = align_x * align_z # Step 10
 
-    self.distance_to_target = (self.target - self.position).length()
-
   @property
   def position(self):
     return self.camera_to_world.translation()
+
+  @property
+  def distance_to_target(self):
+    return (self.target - self.position).length()
 
   def orbit(self, pitch = 0, yaw = 0, orbit_type : OrbitType = OrbitType.FREE):
     '''
     Orbits the camera around the target point (with pitch and yaw)
     '''
+    # Save the distance to the target; we'll use it later.
+    distance_to_target = self.distance_to_target
+
     # Move camera to the origin
     self.camera_to_world = Transform(translation = -self.position) * self.camera_to_world 
 
@@ -95,7 +100,7 @@ class Camera():
         self.camera_to_world = Transform(axis = Vector3(0, 0, 1), angle = yaw) * self.camera_to_world
 
     # Move target to origin
-    self.camera_to_world *= Transform(translation = Vector3(0, 0, self.distance_to_target))
+    self.camera_to_world *= Transform(translation = Vector3(0, 0, distance_to_target))
 
     # Move target back to position
     self.camera_to_world = Transform(translation = self.target) * self.camera_to_world
@@ -105,7 +110,6 @@ class Camera():
     Move the camera in or out along its line of sight (z axis)
     '''
     self.camera_to_world *= Transform(translation = Vector3(0, 0, displacement))
-    self.distance_to_target = (self.target - self.position).length()
 
   def track(self, x, y):
     '''
@@ -149,7 +153,6 @@ class Camera():
     self.camera_to_world *= Transform(translation = Vector3(screen_aabb.center.x, screen_aabb.center.y, delta_z))
     # Set the camera target to the center of the scene
     self.target = world_aabb.center
-    self.distance_to_target = (self.target - self.position).length()
 
   def calculate_projection(self, fov, z_near, z_far, aspect):
     f = 1.0 / math.tan(fov / 2.0)
