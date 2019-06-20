@@ -17,7 +17,9 @@ class Camera():
     self.aspect = aspect
     self.target = target
 
-    self.calculate_projection(60, 100, 10000, aspect)
+    self.aspect = aspect
+    self.fov = math.radians(60)
+    self.calculate_projection(self.fov, 100, 10000, self.aspect)
 
     self.look_at(position, target, up)
 
@@ -119,7 +121,6 @@ class Camera():
     self.camera_to_world *= Transform(axis = Vector3(0, 0, 1), angle = angle)
 
   def calculate_projection(self, fov, z_near, z_far, aspect):
-    fov = math.radians(fov)
     f = 1.0 / math.tan(fov / 2.0)
     z_width = z_far - z_near
 
