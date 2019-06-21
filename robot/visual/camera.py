@@ -154,6 +154,20 @@ class Camera():
     # Set the camera target to the center of the scene
     self.target = world_aabb.center
 
+  def cast(self, ndc):
+    '''
+    Cast a ray from the camera through the provided ndc coordinates and return in world coordinates
+    '''
+    # Manually unproject the ray and normalize
+    # Choose the -z direction (so the ray comes out of the camera)
+    m11 = self.inverse_projection.elements[0]
+    m22 = self.inverse_projection.elements[5]
+    ray_eye = Vector3(m11 * ndc.x, m22 * ndc.y, -1).normalize()
+    
+    ray_world = self.camera_to_world(ray_eye, type="vector")
+    
+    return ray_world
+
   def calculate_projection(self, fov, z_near, z_far, aspect):
     f = 1.0 / math.tan(fov / 2.0)
     z_width = z_far - z_near
