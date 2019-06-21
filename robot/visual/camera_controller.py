@@ -79,6 +79,8 @@ class CameraController(Observer):
     self.window_width = width
     self.window_height = height
 
+    # TODO: Need to update the camera's aspect ratio here
+
   def arrows(self, key, action, modifiers):
     # TODO: This doesn't handle both keys pressed at once
     direction = {
