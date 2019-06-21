@@ -17,7 +17,6 @@ class Camera():
     self.aspect = aspect
     self.target = target
 
-    self.aspect = aspect
     self.fov = math.radians(60)
     self.calculate_projection(self.fov, 100, 10000, self.aspect)
 
