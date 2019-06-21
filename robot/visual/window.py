@@ -84,6 +84,9 @@ class Window():
   def get_cursor(self):
     return Vector3(*glfw.get_cursor_pos(self.window), 0)
 
+  def ndc(self, cursor):
+    return Vector3(2 * cursor.x / self.width - 1, 1 - 2 * cursor.y / self.height)
+
   def register_observer(self, observer, events = []):
     # If valid_events is empty, subscribe the observer to all events
     self.observers.append((observer, events))
