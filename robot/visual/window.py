@@ -1,4 +1,4 @@
-import glfw, sys
+import numpy, glfw, sys
 
 from OpenGL.GL import GL_FALSE
 
@@ -57,7 +57,7 @@ class Window():
       self.pause = not self.pause
 
   def scroll_callback(self, window, x_direction, y_direction):
-    self.emit(WindowEvent.SCROLL, Vector3(x_direction, y_direction))
+    self.emit(WindowEvent.SCROLL, numpy.sign(x_direction), numpy.sign(y_direction))
 
   def mouse_button_callback(self, window, button, action, mods):
     self.emit(WindowEvent.CLICK, button, action, self.get_cursor())
@@ -81,6 +81,7 @@ class Window():
     self.height = height
     self.emit(WindowEvent.WINDOW_RESIZE, width, height)
 
+  # TODO: Remove this function (in favor of a property?). It's probably not necessary since the cursor_pos callback is constantly updating last_cursor_position
   def get_cursor(self):
     return Vector3(*glfw.get_cursor_pos(self.window), 0)
 
