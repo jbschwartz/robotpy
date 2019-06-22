@@ -25,18 +25,16 @@ class CameraController(Observer):
   DOLLY_SPEED     = 100
   ROLL_SPEED      = 0.005
 
-  def __init__(self, camera : Camera, scene):
+  def __init__(self, camera : Camera, scene, window):
     self.camera = camera
     self.scene = scene
+    self.window = window
     self.orbit_type = OrbitType.CONSTRAINED
 
     self.start_position = camera.position
     self.start_target   = camera.target
 
     self.last_cursor_position = None
-
-    self.window_width  = None
-    self.window_height = None
 
   def click(self, button, action, cursor):
     pass
@@ -76,10 +74,7 @@ class CameraController(Observer):
       self.request_dolly(direction.y)
 
   def window_resize(self, width, height):
-    self.window_width = width
-    self.window_height = height
-
-    # TODO: Need to update the camera's aspect ratio here
+    self.camera.aspect = self.window.width / self.window.height
 
   def arrows(self, key, action, modifiers):
     # TODO: This doesn't handle both keys pressed at once
@@ -114,7 +109,7 @@ class CameraController(Observer):
     # Calculate the initial cursor position
     cursor_start_point = cursor - cursor_delta
     # Calculate the radius vector from center screen to initial cursor position
-    r = Vector3(cursor_start_point.x - self.window_width / 2, cursor_start_point.y - self.window_height / 2)
+    r = Vector3(cursor_start_point.x - self.window.width / 2, cursor_start_point.y - self.window.height / 2)
 
     if math.isclose(r.length(), 0):
       return 

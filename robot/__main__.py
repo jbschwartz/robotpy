@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
   scene = Scene(camera, light)
 
-  camera_controller = CameraController(camera, scene)
+  camera_controller = CameraController(camera, scene, window)
   
   window.register_observer(camera_controller, [ 
     WindowEvent.CLICK,
