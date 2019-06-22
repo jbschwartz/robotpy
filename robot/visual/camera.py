@@ -177,7 +177,7 @@ class Camera():
     # Set the camera target to the center of the scene
     self.target = world_aabb.center
 
-  def cast(self, ndc):
+  def cast_ray_to(self, ndc):
     '''
     Cast a ray from the camera through the provided ndc coordinates and return in eye coordinates
     '''
