@@ -26,6 +26,9 @@ class Camera():
 
   @property
   def fov(self):
+    '''
+    Get the vertical field of view of the camera
+    '''
     return self._fov
   
   @fov.setter
