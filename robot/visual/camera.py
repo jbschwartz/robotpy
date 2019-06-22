@@ -161,20 +161,21 @@ class Camera():
     # Convert the bounding box to eye space
     eye_aabb = self.world_to_camera(world_aabb)
 
-    width = eye_aabb.size.x
-    horizontal_fov_width = -(width * margin) / 2 * math.tan(self.fov)
-    
-    height = eye_aabb.size.y
-    vertical_fov_height = -(height * margin) / 2 * math.tan(self.fov * self.aspect)
+    # Scale the box by the margin and divide in two for the trig below
+    scaled_box = margin * eye_aabb.size / 2
 
-    # Distance from bounding box necessary to capture it on the screen (if bounding box is centered)
-    # See whether camera x or y is the limiting side
-    required_distance = min(horizontal_fov_width, vertical_fov_height)
+    # Calculate camera distance from bounding box necessary to fit it on the screen (if bounding box is centered)
+    distance_to_fit_horizontal = scaled_box.x / math.tan(self.fov_horizontal / 2)
+    distance_to_fit_vertical   = scaled_box.y / math.tan(self.fov / 2)
+
+    # Take the bigger of the two distances to guarantee that both directions fit
+    required_distance = max(distance_to_fit_horizontal, distance_to_fit_vertical)
 
     # Current camera distance to the bounding box
     current_distance = eye_aabb.max.z
 
-    delta_z = current_distance - required_distance
+    # Calculate how much to move the camera
+    delta_z = current_distance + required_distance
 
     # Move the camera, remembering to adjust for the box being shifted off center
     self.camera_to_world *= Transform(translation = Vector3(eye_aabb.center.x, eye_aabb.center.y, delta_z))
