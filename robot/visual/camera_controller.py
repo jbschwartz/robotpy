@@ -24,6 +24,7 @@ class CameraController(Observer):
   TRACK_SPEED_KEY = 20
   DOLLY_SPEED     = 100
   ROLL_SPEED      = 0.005
+  DOLLY_IN        = 1
 
   def __init__(self, camera : Camera, scene, window):
     self.camera = camera
@@ -65,13 +66,16 @@ class CameraController(Observer):
       if modifiers & glfw.MOD_CONTROL and action == glfw.PRESS:
         self.saved_views(key)
 
-  def scroll(self, direction):
-    direction.normalize()
-
-    if direction.x:
-      self.request_orbit(0, direction.x)
-    if direction.y:
-      self.request_dolly(direction.y)
+  def scroll(self, horizontal, vertical):
+    if horizontal:
+      self.request_orbit(0, horizontal)
+    if vertical:
+      if vertical == self.DOLLY_IN:
+        # Dolly in toward the mouse
+        self.dolly(self.ray_to_cursor())
+      else:
+        # And out in the camera's z axis
+        self.dolly(Vector3(0, 0, 1))
 
   def window_resize(self, width, height):
     self.camera.aspect = self.window.width / self.window.height
@@ -96,8 +100,22 @@ class CameraController(Observer):
       else:
         self.request_orbit(direction[key], 0)
 
-  def request_dolly(self, z):
-    self.camera.dolly(Vector3(0, 0, self.DOLLY_SPEED * z))
+  def ray_to_cursor(self):
+    return self.camera.cast_ray_to(self.window.ndc(self.window.get_cursor()))
+
+  def dolly(self, direction):
+    '''
+    Move the camera along the provided direction
+    '''
+    displacement = self.DOLLY_SPEED * direction
+    self.camera.dolly(displacement)
+
+    # Translate target laterally with camera
+    if displacement.x != 0 or displacement.y != 0:
+      # Remove the z component so the target doesn't move in and out of the scene with the camera
+      displacement.z = 0
+
+      self.camera.target += self.camera.camera_to_world(displacement, type="vector")
 
   def request_orbit(self, x, z):
     self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z, self.orbit_type)
