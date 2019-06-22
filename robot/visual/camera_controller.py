@@ -97,7 +97,7 @@ class CameraController(Observer):
         self.request_orbit(direction[key], 0)
 
   def request_dolly(self, z):
-    self.camera.dolly(self.DOLLY_SPEED * z)
+    self.camera.dolly(Vector3(0, 0, self.DOLLY_SPEED * z))
 
   def request_orbit(self, x, z):
     self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z, self.orbit_type)
