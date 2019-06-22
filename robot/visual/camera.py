@@ -30,7 +30,7 @@ class Camera():
     Get the vertical field of view of the camera
     '''
     return self._fov
-  
+
   @fov.setter
   def fov(self, fov):
     self._fov = fov
@@ -48,7 +48,6 @@ class Camera():
   def aspect(self, aspect):
     self._aspect = aspect
     self.calculate_projection()
-
 
   def look_at(self, position, target, up):
     '''
