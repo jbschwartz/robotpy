@@ -179,17 +179,16 @@ class Camera():
 
   def cast(self, ndc):
     '''
-    Cast a ray from the camera through the provided ndc coordinates and return in world coordinates
+    Cast a ray from the camera through the provided ndc coordinates and return in eye coordinates
     '''
+    # TODO: Verify that this is working correctly (with a test?).
+
     # Manually unproject the ray and normalize
     # Choose the -z direction (so the ray comes out of the camera)
     m11 = self.inverse_projection.elements[0]
     m22 = self.inverse_projection.elements[5]
-    ray_eye = Vector3(m11 * ndc.x, m22 * ndc.y, -1).normalize()
-    
-    ray_world = self.camera_to_world(ray_eye, type="vector")
-    
-    return ray_world
+
+    return Vector3(m11 * ndc.x, m22 * ndc.y, -1).normalize()
 
   def calculate_projection(self):
     f = 1.0 / math.tan(self.fov / 2.0)
