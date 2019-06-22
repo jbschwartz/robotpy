@@ -102,25 +102,23 @@ class Camera():
     '''
     Orbits the camera around the target point (with pitch and yaw)
     '''
-    # Save the distance to the target; we'll use it later.
-    distance_to_target = self.distance_to_target
 
-    # Move camera to the origin
-    self.camera_to_world = Transform(translation = -self.position) * self.camera_to_world 
+    # Move target to the origin
+    self.camera_to_world = Transform(translation = -self.target) * self.camera_to_world
 
     if pitch != 0:
-      # Rotation around camera x axis (camera tilt)
-      self.camera_to_world *= Transform(axis = Vector3(1, 0, 0), angle = pitch)
+      # Rotation around camera x axis in world coordinates
+      pitch_axis = self.camera_to_world(Vector3(1, 0, 0), type="vector")
+      self.camera_to_world = Transform(axis = pitch_axis, angle = pitch) * self.camera_to_world
     if yaw != 0:
       if orbit_type is OrbitType.FREE:
-        # Rotation around camera y axis
-        self.camera_to_world *= Transform(axis = Vector3(0, 1, 0), angle = yaw)
+        # Rotation around camera y axis in world coordinates
+        yaw_axis = self.camera_to_world(Vector3(0, 1, 0), type="vector")
       elif orbit_type is OrbitType.CONSTRAINED:
         # Rotation around world z axis
-        self.camera_to_world = Transform(axis = Vector3(0, 0, 1), angle = yaw) * self.camera_to_world
+        yaw_axis = Vector3(0, 0, 1)
 
-    # Move target to origin
-    self.camera_to_world *= Transform(translation = Vector3(0, 0, distance_to_target))
+      self.camera_to_world = Transform(axis = yaw_axis, angle = yaw) * self.camera_to_world
 
     # Move target back to position
     self.camera_to_world = Transform(translation = self.target) * self.camera_to_world
