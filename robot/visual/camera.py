@@ -14,13 +14,34 @@ class Camera():
   Camera model responsible for camera positioning and manipulation.
   '''
   def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), aspect = 16/9):
-    self.aspect = aspect
+    self._fov = math.radians(60)
+    self._aspect = aspect
+    self.near_clip = 100
+    self.far_clip = 10000
     self.target = target
 
-    self.fov = math.radians(60)
-    self.calculate_projection(self.fov, 100, 10000, self.aspect)
+    self.calculate_projection()
 
     self.look_at(position, target, up)
+
+  @property
+  def fov(self):
+    return self._fov
+  
+  @fov.setter
+  def fov(self, fov):
+    self._fov = fov
+    self.calculate_projection()
+
+  @property
+  def aspect(self):
+    return self._aspect
+  
+  @aspect.setter
+  def aspect(self, aspect):
+    self._aspect = aspect
+    self.calculate_projection()
+
 
   def look_at(self, position, target, up):
     '''
@@ -167,14 +188,14 @@ class Camera():
     
     return ray_world
 
-  def calculate_projection(self, fov, z_near, z_far, aspect):
-    f = 1.0 / math.tan(fov / 2.0)
-    z_width = z_far - z_near
+  def calculate_projection(self):
+    f = 1.0 / math.tan(self.fov / 2.0)
+    z_width = self.far_clip - self.near_clip
 
-    m11 = f / aspect
+    m11 = f / self.aspect
     m22 = f
-    m33 = (z_far + z_near) / (-z_width)
-    m34 = 2 * z_far * z_near / (-z_width)
+    m33 = (self.far_clip + self.near_clip) / (-z_width)
+    m34 = 2 * self.far_clip * self.near_clip / (-z_width)
 
     # Remember: the elements of the matrix look transposed 
     self.projection = Matrix4([m11,  0.0,  0.0,  0.0, 
