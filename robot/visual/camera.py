@@ -155,59 +155,6 @@ class Camera():
   def roll(self, angle):
     self.camera_to_world *= Transform(axis = Vector3(0, 0, 1), angle = angle)
 
-  def debug(self, aabb):
-    corners = aabb.corners
-    cam_points = [self.world_to_camera(corner) for corner in corners]
-    clip_points = [self.project(corner) for corner in cam_points]
-
-    print(' ')
-    print('--WORLD SPACE--')
-    print('Top Rear Right: ',     corners[0])
-    print('Top Rear Left: ',      corners[1])
-    print('Top Front Left: ',     corners[2])
-    print('Top Front Right: ',    corners[3])
-    print('Bottom Front Left: ',  corners[4])
-    print('Bottom Front Right: ', corners[5])
-    print('Bottom Rear Right: ',  corners[6])
-    print('Bottom Rear Left: ',   corners[7])
-    print(' ')
-
-    print(' ')
-    print('--CAMERA SPACE--')
-    print('Top Rear Right: ',     cam_points[0])
-    print('Top Rear Left: ',      cam_points[1])
-    print('Top Front Left: ',     cam_points[2])
-    print('Top Front Right: ',    cam_points[3])
-    print('Bottom Front Left: ',  cam_points[4])
-    print('Bottom Front Right: ', cam_points[5])
-    print('Bottom Rear Right: ',  cam_points[6])
-    print('Bottom Rear Left: ',   cam_points[7])
-    print(' ')
-
-    print(' ')
-    print('--HOMOG CLIP SPACE--')
-    print('Top Rear Right: ',     clip_points[0])
-    print('Top Rear Left: ',      clip_points[1])
-    print('Top Front Left: ',     clip_points[2])
-    print('Top Front Right: ',    clip_points[3])
-    print('Bottom Front Left: ',  clip_points[4])
-    print('Bottom Front Right: ', clip_points[5])
-    print('Bottom Rear Right: ',  clip_points[6])
-    print('Bottom Rear Left: ',   clip_points[7])
-    print(' ')
-
-    print(' ')
-    print('--NDC--')
-    print('Top Rear Right: ',     clip_points[0] / -cam_points[0].z)
-    print('Top Rear Left: ',      clip_points[1] / -cam_points[1].z)
-    print('Top Front Left: ',     clip_points[2] / -cam_points[2].z)
-    print('Top Front Right: ',    clip_points[3] / -cam_points[3].z)
-    print('Bottom Front Left: ',  clip_points[4] / -cam_points[4].z)
-    print('Bottom Front Right: ', clip_points[5] / -cam_points[5].z)
-    print('Bottom Rear Right: ',  clip_points[6] / -cam_points[6].z)
-    print('Bottom Rear Left: ',   clip_points[7] / -cam_points[7].z)
-    print(' ')
-
   def fit(self, world_aabb, scale = 1):
     '''
     Dolly and track the camera to fit the provided bounding box in world space. 
