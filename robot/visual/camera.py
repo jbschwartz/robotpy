@@ -130,12 +130,14 @@ class Camera():
     self.camera_to_world = Transform(translation = self.target) * self.camera_to_world
 
   def dolly(self, displacement):
+    # TODO: Update this comment
     '''
     Move the camera in or out along its line of sight (z axis) while tracking as necessary
 
     For example, the controller may request the camera track toward the mouse location in world space.
     We tend to put the mouse where we're interested in dollying so this is useful.
     '''
+    # TODO: Restrict the amount of dollying so that the camera cannot pass through the target
     self.camera_to_world *= Transform(translation = displacement)
 
   def track(self, x, y):
@@ -227,6 +229,10 @@ class Camera():
 
     # Manually unproject the ray and normalize
     # Choose the -z direction (so the ray comes out of the camera)
+
+    # TODO: Maybe factor the projection out into a Projection class as this (as well as other things) will be different with orthographic projection.
+    #    For example, camera dollying is worthless in orthographic projection. There is no concept of distance as objects are the same size at all distances
+
     m11 = self.inverse_projection.elements[0]
     m22 = self.inverse_projection.elements[5]
 
