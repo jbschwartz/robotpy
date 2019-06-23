@@ -56,6 +56,9 @@ class CameraController(Observer):
     if key == glfw.KEY_R and action == glfw.RELEASE:
       self.reset()
 
+    if key == glfw.KEY_F and action == glfw.RELEASE:
+      self.camera.fit(self.scene.aabb)
+
     if key == glfw.KEY_O and action == glfw.RELEASE:
       self.orbit_type = OrbitType.FREE if self.orbit_type is OrbitType.CONSTRAINED else OrbitType.CONSTRAINED
 
