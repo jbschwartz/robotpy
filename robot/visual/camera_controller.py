@@ -19,6 +19,7 @@ class SavedView(enum.Enum):
 # This is what makes most CAD cameras feel very natural (I think)
 
 class CameraController(Observer):
+  # TODO: Make a camera control settings class that can be persisted to disk
   ORBIT_SPEED     = 0.05
   TRACK_SPEED     = 1
   TRACK_SPEED_KEY = 20
@@ -49,6 +50,9 @@ class CameraController(Observer):
       elif modifiers & glfw.MOD_SHIFT:
         self.dolly(Vector3(0, 0, 3 * cursor_delta.y / self.DOLLY_SPEED))
       else:
+        # TODO: Maybe do something with speed scaling. 
+        # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
+        # The steps are too large and it looks choppy.
         direction = vector3.normalize(cursor_delta)
         self.request_orbit(*direction.yx)
   
@@ -113,6 +117,9 @@ class CameraController(Observer):
     displacement = self.DOLLY_SPEED * direction
     self.camera.dolly(displacement)
 
+    # TODO: Improvement: track the target toward the mouse pick point so that the target approaches
+    #   the correct "camera z" value as we zoom in. This requires scene intersection to work properly
+
     # Translate target laterally with camera
     if displacement.x != 0 or displacement.y != 0:
       # Remove the z component so the target doesn't move in and out of the scene with the camera
@@ -164,6 +171,7 @@ class CameraController(Observer):
     elif key is SavedView.BACK.value:
       position = Vector3(0, radius, z_height)
     elif key is SavedView.ISO.value:
+      # TODO: Make this proper ISO view. The angles aren't currently correct.
       position = Vector3(750, -750, 750)
     else:
       return
