@@ -25,6 +25,7 @@ class CameraController(Observer):
   TRACK_SPEED_KEY = 20
   DOLLY_SPEED     = 100
   ROLL_SPEED      = 0.005
+  ROLL_SPEED_KEY  = 15
   DOLLY_IN        = 1
 
   def __init__(self, camera : Camera, scene, window):
@@ -46,7 +47,8 @@ class CameraController(Observer):
       if modifiers & glfw.MOD_CONTROL:
         self.request_track(cursor_delta.x, -cursor_delta.y)
       elif modifiers & glfw.MOD_ALT:
-        self.request_roll(cursor, cursor_delta)
+        angle = self.calculate_roll_angle(cursor, cursor_delta)
+        self.roll(angle)
       elif modifiers & glfw.MOD_SHIFT:
         self.dolly(Vector3(0, 0, 3 * cursor_delta.y / self.DOLLY_SPEED))
       else:
@@ -99,6 +101,9 @@ class CameraController(Observer):
     if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT] and action in [glfw.PRESS, glfw.REPEAT]:
       if modifiers & glfw.MOD_CONTROL:
         self.request_track(self.TRACK_SPEED_KEY * direction[key], 0)
+      elif modifiers & glfw.MOD_ALT:
+        direction = 1 if key == glfw.KEY_LEFT else -1
+        self.roll(self.ROLL_SPEED_KEY * direction)
       else:
         self.request_orbit(0, direction[key])
     if key in [glfw.KEY_UP, glfw.KEY_DOWN] and action in [glfw.PRESS, glfw.REPEAT]:
@@ -142,7 +147,7 @@ class CameraController(Observer):
   def request_track(self, x, y):
     self.camera.track(self.TRACK_SPEED * x, self.TRACK_SPEED * y)
 
-  def request_roll(self, cursor, cursor_delta):
+  def calculate_roll_angle(self, cursor, cursor_delta):
     # Calculate the initial cursor position
     cursor_start_point = cursor - cursor_delta
     # Calculate the radius vector from center screen to initial cursor position
@@ -154,7 +159,10 @@ class CameraController(Observer):
     # Calculate the unit tangent vector to the circle at cursor_start_point
     t = Vector3(r.y, -r.x).normalize()
     # The contribution to the roll is the projection of the cursor_delta vector onto the tangent vector
-    self.camera.roll(self.ROLL_SPEED * cursor_delta * t)
+    return cursor_delta * t
+
+  def roll(self, amount):
+    self.camera.roll(self.ROLL_SPEED * amount)
 
   def reset(self):
     self.camera.look_at(self.start_position, self.start_target, Vector3(0, 0, 1))
