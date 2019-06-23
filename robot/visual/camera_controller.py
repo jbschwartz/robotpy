@@ -115,6 +115,15 @@ class CameraController(Observer):
     Move the camera along the provided direction
     '''
     displacement = self.DOLLY_SPEED * direction
+
+    # Get the z value of the back of the scene in camera coordinates
+    camera_box = [self.camera.world_to_camera(corner) for corner in self.scene.aabb.corners]
+    back_of_scene = min(camera_box, key = lambda point: point.z)
+
+    # If we're zooming out, don't allow the camera to exceed the clipping plane
+    if displacement.z > 0 and (displacement.z - back_of_scene.z) > self.camera.far_clip:
+      return
+
     self.camera.dolly(displacement)
 
     # TODO: Improvement: track the target toward the mouse pick point so that the target approaches
