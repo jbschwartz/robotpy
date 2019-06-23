@@ -39,10 +39,6 @@ class Camera():
     self.calculate_projection()
 
   @property
-  def fov_horizontal(self):
-    return 2 * math.atan(math.tan(self.fov / 2) * self.aspect)
-
-  @property
   def aspect(self):
     return self._aspect
   
