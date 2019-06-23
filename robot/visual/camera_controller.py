@@ -47,7 +47,7 @@ class CameraController(Observer):
       elif modifiers & glfw.MOD_ALT:
         self.request_roll(cursor, cursor_delta)
       elif modifiers & glfw.MOD_SHIFT:
-        self.request_dolly(3 * cursor_delta.y / self.DOLLY_SPEED)
+        self.dolly(Vector3(0, 0, 3 * cursor_delta.y / self.DOLLY_SPEED))
       else:
         direction = vector3.normalize(cursor_delta)
         self.request_orbit(*direction.yx)
