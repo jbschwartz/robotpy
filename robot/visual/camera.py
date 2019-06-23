@@ -191,27 +191,24 @@ class Camera():
     # 
     # Note the coordinates (y and z) are given in camera space
     
+    x1 = sorted_x[0]
+    x2 = sorted_x[-1]
+    y1 = sorted_y[0]
+    y2 = sorted_y[-1]
+
     if height > width:
       # Height is the constraint
-      p1 = sorted_y[0]
-      p2 = sorted_y[-1]
-      x1 = sorted_x[0]
-      x2 = sorted_x[-1]
       m22 = self.projection.elements[5] / scale
-      delta_y = (-m22 * p1.y - p1.z - m22 * p2.y + p2.z) / (2 * m22)
-      delta_z = m22 * delta_y + m22 * p2.y - p2.z
+      delta_y = (-m22 * y1.y - y1.z - m22 * y2.y + y2.z) / (2 * m22)
+      delta_z = m22 * delta_y + m22 * y2.y - y2.z
 
       width = (x1.x - x2.x) / 2
       delta_x = width - x1.x
     else:
       # Width is the constraint
-      p1 = sorted_x[0]
-      p2 = sorted_x[-1]
-      y1 = sorted_y[0]
-      y2 = sorted_y[-1]
       m11 = self.projection.elements[0] / scale
-      delta_x = (-m11 * p1.x - p1.z - m11 * p2.x + p2.z) / (2 * m11)
-      delta_z = m11 * delta_x + m11 * p2.x - p2.z
+      delta_x = (-m11 * x1.x - x1.z - m11 * x2.x + x2.z) / (2 * m11)
+      delta_z = m11 * delta_x + m11 * x2.x - x2.z
 
       width = (y1.y - y2.y) / 2
       delta_y = width - y1.y
