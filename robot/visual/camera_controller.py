@@ -27,6 +27,7 @@ class CameraController(Observer):
   ROLL_SPEED      = 0.005
   ROLL_SPEED_KEY  = 15
   DOLLY_IN        = 1
+  FIT_SCALE       = 0.75
 
   def __init__(self, camera : Camera, scene, window):
     self.camera = camera
@@ -63,7 +64,7 @@ class CameraController(Observer):
       self.reset()
 
     if key == glfw.KEY_F and action == glfw.RELEASE:
-      self.camera.fit(self.scene.aabb)
+      self.camera.fit(self.scene.aabb, self.FIT_SCALE)
 
     if key == glfw.KEY_O and action == glfw.RELEASE:
       self.orbit_type = OrbitType.FREE if self.orbit_type is OrbitType.CONSTRAINED else OrbitType.CONSTRAINED
@@ -194,4 +195,4 @@ class CameraController(Observer):
       return
 
     self.camera.look_at(position, target, up)
-    self.camera.fit(self.scene.aabb)
+    self.camera.fit(self.scene.aabb, self.FIT_SCALE)

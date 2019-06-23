@@ -153,14 +153,14 @@ class Camera():
   def roll(self, angle):
     self.camera_to_world *= Transform(axis = Vector3(0, 0, 1), angle = angle)
 
-  def fit(self, world_aabb, margin = 1):
+  def fit(self, world_aabb, scale = 1):
     '''
     Dolly and track the camera to fit the provided bounding box in world space. 
     Update the target to the center of the bounding box.
     
-    Leaves a given amount of margin around the scene (on a percentage basis)
+    Scale [0, 1] represents the percentage of the frame used (with 1 being full frame)
     '''
-    # TODO: This is a work in progress. Some edge cases remain. Margin needs to be implemented
+    # TODO: This is a work in progress. Some edge cases remain.
 
     # Convert world bounding box corners to camera space
     camera_box_points = [self.world_to_camera(corner) for corner in world_aabb.corners]
@@ -197,7 +197,7 @@ class Camera():
       p2 = sorted_y[-1]
       x1 = sorted_x[0]
       x2 = sorted_x[-1]
-      m22 = self.projection.elements[5]
+      m22 = self.projection.elements[5] / scale
       delta_y = (-m22 * p1.y - p1.z - m22 * p2.y + p2.z) / (2 * m22)
       delta_z = m22 * delta_y + m22 * p2.y - p2.z
 
@@ -209,7 +209,7 @@ class Camera():
       p2 = sorted_x[-1]
       y1 = sorted_y[0]
       y2 = sorted_y[-1]
-      m11 = self.projection.elements[0]
+      m11 = self.projection.elements[0] / scale
       delta_x = (-m11 * p1.x - p1.z - m11 * p2.x + p2.z) / (2 * m11)
       delta_z = m11 * delta_x + m11 * p2.x - p2.z
 
