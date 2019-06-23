@@ -39,10 +39,10 @@ class AABB:
     return [
       self.max,
       self.max - x,
-      self.max - y,
       self.max - x - y,
+      self.max - y,
       self.min,
       self.min + x,
-      self.min + y,
       self.min + x + y,
+      self.min + y,
     ]
