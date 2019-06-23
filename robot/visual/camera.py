@@ -158,29 +158,66 @@ class Camera():
     
     Leaves a given amount of margin around the scene (on a percentage basis)
     '''
-    # Convert the bounding box to eye space
-    eye_aabb = self.world_to_camera(world_aabb)
+    # TODO: This is a work in progress. Some edge cases remain. Margin needs to be implemented
 
-    # Scale the box by the margin and divide in two for the trig below
-    scaled_box = margin * eye_aabb.size / 2
+    # Convert world bounding box corners to camera space
+    camera_box_points = [self.world_to_camera(corner) for corner in world_aabb.corners]
 
-    # Calculate camera distance from bounding box necessary to fit it on the screen (if bounding box is centered)
-    distance_to_fit_horizontal = scaled_box.x / math.tan(self.fov_horizontal / 2)
-    distance_to_fit_vertical   = scaled_box.y / math.tan(self.fov / 2)
+    # Generate NDCs for a point in coordinate (z = 0, y = 1, z = 2)
+    def ndc_coordinate(point, coordinate):
+      clip = self.project(point)
+      return clip[coordinate] / -point.z 
 
-    # Take the bigger of the two distances to guarantee that both directions fit
-    required_distance = max(distance_to_fit_horizontal, distance_to_fit_vertical)
+    # Find the points that create the largest width and height in NDC space
+    sorted_x = sorted(camera_box_points, key = lambda point: -ndc_coordinate(point, 0))
+    sorted_y = sorted(camera_box_points, key = lambda point: -ndc_coordinate(point, 1))
 
-    # Current camera distance to the bounding box
-    current_distance = eye_aabb.max.z
+    # Calculate the distance between the two extreme points vertically and horizontally
+    width  = ndc_coordinate(sorted_x[0], 0) - ndc_coordinate(sorted_x[-1], 0)
+    height = ndc_coordinate(sorted_y[0], 1) - ndc_coordinate(sorted_y[-1], 1)
 
-    # Calculate how much to move the camera
-    delta_z = current_distance + required_distance
+    # We now want to make the NDC coordinates of the two extreme point (in x or y) equal to 1 and -1 
+    # This will mean the bounding box is as big as we can make it on screen without clipping it
+    #
+    # To do this, both points are shifted equally to center them on the screen. Then both points are made to 1 and -1 by adjusting z 
+    # (since NDC.x = x / z and NDC.y = y / z).
+    #
+    # For the case of y being the limiting direction (but it is analogous for x) we use a system of equations:
+    # Two equations and two unknowns (delta_y, delta_z), taken from the projection matrix:
+    #   aspect * (y_1 + delta_y) / (z_1 + delta_z) = -1
+    #   aspect * (y_2 + delta_y) / (z_2 + delta_z) =  1
+    # 
+    # Note the coordinates (y and z) are given in camera space
+    
+    if height > width:
+      # Height is the constraint
+      p1 = sorted_y[0]
+      p2 = sorted_y[-1]
+      x1 = sorted_x[0]
+      x2 = sorted_x[-1]
+      m22 = self.projection.elements[5]
+      delta_y = (-m22 * p1.y - p1.z - m22 * p2.y + p2.z) / (2 * m22)
+      delta_z = m22 * delta_y + m22 * p2.y - p2.z
+
+      width = (x1.x - x2.x) / 2
+      delta_x = width - x1.x
+    else:
+      # Width is the constraint
+      p1 = sorted_x[0]
+      p2 = sorted_x[-1]
+      y1 = sorted_y[0]
+      y2 = sorted_y[-1]
+      m11 = self.projection.elements[0]
+      delta_x = (-m11 * p1.x - p1.z - m11 * p2.x + p2.z) / (2 * m11)
+      delta_z = m11 * delta_x + m11 * p2.x - p2.z
+
+      width = (y1.y - y2.y) / 2
+      delta_y = width - y1.y
 
     # Move the camera, remembering to adjust for the box being shifted off center
-    self.camera_to_world *= Transform(translation = Vector3(eye_aabb.center.x, eye_aabb.center.y, delta_z))
-    # Set the camera target to the center of the scene
-    self.target = world_aabb.center
+    self.camera_to_world *= Transform(translation = Vector3(-delta_x, -delta_y, -delta_z))
+    # Set the camera target to the center of the scene without changing it's direction
+    self.target = self.camera_to_world(Vector3(0, 0, self.world_to_camera(world_aabb.center).z))
 
   def cast_ray_to(self, ndc):
     '''
@@ -211,6 +248,14 @@ class Camera():
                                0.0,  0.0,  m34,  0.0])
 
     self.calculate_inverse_projection()
+
+  def project(self, v):
+    m11 = self.projection.elements[0]
+    m22 = self.projection.elements[5]
+    m33 = self.projection.elements[10]
+    m34 = self.projection.elements[14]
+
+    return Vector3(m11 * v.x, m22 * v.y, m33 * v.z + m34)
 
   def calculate_inverse_projection(self):
     p11 = self.projection.elements[0]
