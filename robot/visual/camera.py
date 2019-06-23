@@ -3,7 +3,9 @@ import enum, math
 from robot                   import utils
 from robot.spatial.matrix4   import Matrix4
 from robot.spatial.transform import Transform
-from robot.spatial.vector3   import Vector3
+from robot.spatial           import vector3
+
+Vector3 = vector3.Vector3
 
 class OrbitType(enum.Enum):
   FREE        = enum.auto()
@@ -170,13 +172,13 @@ class Camera():
       clip = self.project(point)
       return clip[coordinate] / -point.z 
 
-    # Find the points that create the largest width and height in NDC space
-    sorted_x = sorted(camera_box_points, key = lambda point: -ndc_coordinate(point, 0))
-    sorted_y = sorted(camera_box_points, key = lambda point: -ndc_coordinate(point, 1))
-
-    # Calculate the distance between the two extreme points vertically and horizontally
-    width  = ndc_coordinate(sorted_x[0], 0) - ndc_coordinate(sorted_x[-1], 0)
-    height = ndc_coordinate(sorted_y[0], 1) - ndc_coordinate(sorted_y[-1], 1)
+    sorted_points = {}
+    sizes = {}
+    for coord in [vector3.VECTOR_X, vector3.VECTOR_Y]:
+      # Find the points that create the largest width or height in NDC space
+      sorted_points[coord] = sorted(camera_box_points, key = lambda point: -ndc_coordinate(point, coord))
+      # Calculate the distance between the two extreme points vertically and horizontally
+      sizes[coord] = ndc_coordinate(sorted_points[coord][0], coord) - ndc_coordinate(sorted_points[coord][-1], coord)
 
     # We now want to make the NDC coordinates of the two extreme point (in x or y) equal to 1 and -1 
     # This will mean the bounding box is as big as we can make it on screen without clipping it
@@ -190,28 +192,38 @@ class Camera():
     #   aspect * (y_2 + delta_y) / (z_2 + delta_z) =  1
     # 
     # Note the coordinates (y and z) are given in camera space
-    
-    x1 = sorted_x[0]
-    x2 = sorted_x[-1]
-    y1 = sorted_y[0]
-    y2 = sorted_y[-1]
+    def solve_deltas(major, v1, v2, v3, v4, fov_factor):
+      '''
+      Solve the deltas for all three axis.
 
-    if height > width:
-      # Height is the constraint
-      m22 = self.projection.elements[5] / scale
-      delta_y = (-m22 * y1.y - y1.z - m22 * y2.y + y2.z) / (2 * m22)
-      delta_z = m22 * delta_y + m22 * y2.y - y2.z
+      If `major` is vector3.VECTOR_X, the fit occurs on the width of the bounding box.
+      If `major` is vector3.VECTOR_Y, the fit occurs on the height of the bounding box.
+      `v1` and `v2` are the points along the major axis.
+      `v3` and `v4` are the points along hte minor axis.
+      '''
+      delta_major   = (-fov_factor * v1[major] - v1.z - fov_factor * v2[major] + v2.z) / (2 * fov_factor)
+      delta_distance = fov_factor * delta_major + fov_factor * v2[major] - v2.z
 
-      width = (x1.x - x2.x) / 2
-      delta_x = width - x1.x
+      minor = vector3.VECTOR_X if major == vector3.VECTOR_Y else vector3.VECTOR_Y
+
+      minor_width = (v3[minor] - v4[minor]) / 2
+      delta_minor = minor_width - v3[minor]
+
+      return (delta_major, delta_minor, delta_distance)
+
+    x_min = sorted_points[vector3.VECTOR_X][-1]
+    x_max = sorted_points[vector3.VECTOR_X][0]
+    y_min = sorted_points[vector3.VECTOR_Y][-1]
+    y_max = sorted_points[vector3.VECTOR_Y][0]
+
+    if sizes[vector3.VECTOR_Y] > sizes[vector3.VECTOR_X]:
+      # Height is the constraint: Y is the major axis
+      fov_factor = self.projection.elements[5] / scale
+      delta_y, delta_x, delta_z = solve_deltas(vector3.VECTOR_Y, y_max, y_min, x_max, x_min, fov_factor)
     else:
-      # Width is the constraint
-      m11 = self.projection.elements[0] / scale
-      delta_x = (-m11 * x1.x - x1.z - m11 * x2.x + x2.z) / (2 * m11)
-      delta_z = m11 * delta_x + m11 * x2.x - x2.z
-
-      width = (y1.y - y2.y) / 2
-      delta_y = width - y1.y
+      # Width is the constraint: X is the major axis
+      fov_factor = self.projection.elements[0] / scale
+      delta_x, delta_y, delta_z = solve_deltas(vector3.VECTOR_X, x_max, x_min, y_max, y_min, fov_factor)
 
     # Move the camera, remembering to adjust for the box being shifted off center
     self.camera_to_world *= Transform(translation = Vector3(-delta_x, -delta_y, -delta_z))

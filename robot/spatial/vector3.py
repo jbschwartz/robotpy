@@ -3,6 +3,10 @@ import math
 from robot                  import utils
 from robot.spatial.swizzler import Swizzler
 
+VECTOR_X = 0
+VECTOR_Y = 1
+VECTOR_Z = 2
+
 class Vector3(Swizzler):
   def __init__(self, x = 0, y = 0, z = 0):
     self.x = x
