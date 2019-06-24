@@ -202,8 +202,7 @@ class Camera():
 
       minor = vector3.VECTOR_X if major == vector3.VECTOR_Y else vector3.VECTOR_Y
 
-      minor_width = (v3[minor] - v4[minor]) / 2
-      delta_minor = minor_width - v3[minor]
+      delta_minor = (-v4.z * v3[minor] - v3.z * v4[minor]) / (v3.z + v4.z)
 
       return (delta_major, delta_minor, delta_distance)
 
