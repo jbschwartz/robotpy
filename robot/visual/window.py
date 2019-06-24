@@ -1,6 +1,6 @@
 import numpy, glfw, sys
 
-from OpenGL.GL import GL_FALSE
+from OpenGL.GL import GL_TRUE
 
 from robot.common.timer         import Timer
 from robot.spatial.vector3      import Vector3
@@ -37,7 +37,7 @@ class Window():
   def window_hints(self):
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 6)
-    glfw.window_hint(glfw.RESIZABLE, GL_FALSE)
+    glfw.window_hint(glfw.RESIZABLE, GL_TRUE)
     glfw.window_hint(glfw.SAMPLES, 4)
 
   def set_callbacks(self):

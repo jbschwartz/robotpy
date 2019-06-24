@@ -22,7 +22,7 @@ RobotEntity = robot_entity.RobotEntity
 
 if __name__ == "__main__":
   with Timer('Initialize Window') as t:
-    window = Window(900, 900, "robotpy")
+    window = Window(1550, 900, "robotpy")
 
   with Timer('Initialize Shaders') as t:
     program = ShaderProgram('./robot/visual/glsl/vertex.glsl', './robot/visual/glsl/fragment.glsl')
