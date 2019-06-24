@@ -22,6 +22,20 @@ class AABB:
       if value > self.max[index]:
         self.max[index] = value
 
+  def contains(self, v : Vector3):
+    for low, value, high in zip(self.min, v, self.max):
+      if not low <= value <= high:
+        return False
+    return True 
+
+  def sphere_radius(self):
+    largest = 0
+    for corner in self.corners:
+      radius = self.center - corner
+      largest = max(radius.length(), largest)
+    
+    return largest
+
   @property
   def center(self):
     return self.min + (self.size / 2)
