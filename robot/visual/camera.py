@@ -156,9 +156,19 @@ class Camera():
     Dolly and track the camera to fit the provided bounding box in world space. 
     Update the target to the center of the bounding box.
     
-    Scale [0, 1] represents the percentage of the frame used (with 1 being full frame)
+    Scale [0, 1] represents the percentage of the frame used (with 1 being full frame).
+
+    This function is not perfect but performs well overall. There may be some edge cases out there lurking.
+    Some fits don't work on the first but it's usually close (and imperceptible with non-unity scale).
+    This is caused by a major point skipping to a different corner as a result of the camera's movement.
     '''
-    # TODO: This is a work in progress. Some edge cases remain.
+
+    # Check to see if the camera is in the scene bounding box
+    # This function generally doesn't behave well with the camera inside the box
+    # This is a bit of a cop-out since there are probably ways to handle those edge cases 
+    #   but those are hard to think about... and this works.
+    if world_aabb.contains(self.position):
+      self.camera_to_world *= Transform(translation = Vector3(0, 0, world_aabb.sphere_radius()))
 
     # Convert world bounding box corners to camera space
     camera_box_points = [self.world_to_camera(corner) for corner in world_aabb.corners]
