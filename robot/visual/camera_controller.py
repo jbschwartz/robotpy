@@ -88,7 +88,7 @@ class CameraController(Observer):
         self.dolly(Vector3(0, 0, 1))
 
   def window_resize(self, width, height):
-    self.camera.aspect = width / height
+    self.camera.projection.aspect = width / height
 
   def arrows(self, key, action, modifiers):
     # TODO: This doesn't handle both keys pressed at once
