@@ -138,4 +138,5 @@ class PerspectiveProjection(Projection):
     m33 = self.matrix.elements[10]
     m34 = self.matrix.elements[14]
 
+    # This code assumes that the w component is always 1 (thats why m44 is not present)
     return Vector3(m11 * v.x, m22 * v.y, m33 * v.z + m34) / -v.z
