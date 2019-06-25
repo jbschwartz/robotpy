@@ -3,16 +3,6 @@ import abc, enum, math
 from robot.spatial.matrix4 import Matrix4
 from robot.spatial.vector3 import Vector3
 
-def recalculate():
-  def _recalculate(f):
-    def wrapper(self, *args):
-      value = f(self, *args)
-      self.calculate()
-      self.calculate_inverse()
-      return value
-    return wrapper
-  return _recalculate
-
 class Projection(abc.ABC):
   def __init__(self, near_clip, far_clip):
     self.near_clip = near_clip
@@ -45,10 +35,6 @@ class Projection(abc.ABC):
   @abc.abstractmethod
   def project(self, v):
     pass
-
-  # @abc.abstractmethod
-  # def unproject(self, ndc):
-  #   pass
 
   @abc.abstractmethod
   def calculate(self):
