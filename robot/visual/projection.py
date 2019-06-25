@@ -15,6 +15,25 @@ def recalculate():
 
 class Projection(abc.ABC):
   def __init__(self):
+    self.update()
+
+  @abc.abstractmethod
+  def __setattr__(self, attribute, value, allowed):
+    if attribute in allowed:
+      object.__setattr__(self, attribute, value)
+      try:
+        self.update()
+      except AttributeError:
+        # It's possible we're here because the `allowed` values haven't been initialized
+        # So if the attribute is in `allowed`, we'll just ignore it
+        if attribute not in allowed:
+          raise AttributeError
+    elif attribute in ['matrix', 'inverse']:
+      object.__setattr__(self, attribute, value)
+    else:
+      raise AttributeError
+
+  def update(self):
     self.calculate()
     self.calculate_inverse()
 
@@ -81,56 +100,16 @@ class OrthoProjection(Projection):
 
 class PerspectiveProjection(Projection):
   def __init__(self, aspect = 16/9, fov = math.radians(60), near_clip = 100, far_clip = 10000):
-    self._aspect     = aspect
-    self._fov        = fov
-    self._near_clip  = near_clip
-    self._far_clip   = far_clip
+    self.aspect     = aspect
+    self.fov        = fov
+    self.near_clip  = near_clip
+    self.far_clip   = far_clip
     self.matrix      = Matrix4()
 
     super().__init__()
   
-  @property
-  def fov(self):
-    '''
-    Get the vertical field of view of the camera
-    '''
-    return self._fov
-
-  @fov.setter
-  def fov(self, fov):
-    self._fov = fov
-    self.calculate()
-    self.calculate_inverse()
-
-  @property
-  def near_clip(self):
-    return self._near_clip
-
-  @near_clip.setter
-  def near_clip(self, near_clip):
-    self._near_clip = near_clip
-    self.calculate()
-    self.calculate_inverse()
-
-  @property
-  def far_clip(self):
-    return self._far_clip
-
-  @far_clip.setter
-  def far_clip(self, far_clip):
-    self._far_clip = far_clip
-    self.calculate()
-    self.calculate_inverse()
-
-  @property
-  def aspect(self):
-    return self._aspect
-
-  @aspect.setter
-  def aspect(self, aspect):
-    self._aspect = aspect
-    self.calculate()
-    self.calculate_inverse()
+  def __setattr__(self, attribute, value):
+    super().__setattr__(attribute, value, ['aspect', 'fov', 'near_clip', 'far_clip'])
 
   def calculate(self):
     f = 1.0 / math.tan(self.fov / 2.0)
