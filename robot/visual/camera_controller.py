@@ -127,7 +127,7 @@ class CameraController(Observer):
     back_of_scene = min(camera_box, key = lambda point: point.z)
 
     # If we're zooming out, don't allow the camera to exceed the clipping plane
-    if displacement.z > 0 and (displacement.z - back_of_scene.z) > self.camera.far_clip:
+    if displacement.z > 0 and (displacement.z - back_of_scene.z) > self.camera.projection.far_clip:
       return
 
     self.camera.dolly(displacement)

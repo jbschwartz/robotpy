@@ -1,9 +1,9 @@
 import enum, math
 
 from robot                   import utils
-from robot.spatial.matrix4   import Matrix4
 from robot.spatial.transform import Transform
 from robot.spatial           import vector3
+from robot.visual.projection import OrthoProjection, PerspectiveProjection
 
 Vector3 = vector3.Vector3
 
@@ -15,37 +15,10 @@ class Camera():
   '''
   Camera model responsible for camera positioning and manipulation.
   '''
-  def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), aspect = 16/9):
-    self._fov = math.radians(60)
-    self._aspect = aspect
-    self.near_clip = 100
-    self.far_clip = 10000
+  def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), projection = PerspectiveProjection()):
+    self.projection = projection
     self.target = target
-
-    self.calculate_projection()
-
     self.look_at(position, target, up)
-
-  @property
-  def fov(self):
-    '''
-    Get the vertical field of view of the camera
-    '''
-    return self._fov
-
-  @fov.setter
-  def fov(self, fov):
-    self._fov = fov
-    self.calculate_projection()
-
-  @property
-  def aspect(self):
-    return self._aspect
-  
-  @aspect.setter
-  def aspect(self, aspect):
-    self._aspect = aspect
-    self.calculate_projection()
 
   def look_at(self, position, target, up):
     '''
@@ -134,6 +107,10 @@ class Camera():
     Often used to move the camera in and out while tracking toward the mouse location in world space.
     We tend to put the mouse where we're interested in dollying so this is useful.
     '''
+    if isinstance(self.projection, OrthoProjection):
+      # Camera movement in and out is not useful in orthographic projection. Leaving it in means the scene could clip. 
+      displacement.z = 0
+
     self.camera_to_world *= Transform(translation = displacement)
 
   def track(self, x, y):
@@ -173,8 +150,8 @@ class Camera():
 
     # Generate NDCs for a point in coordinate (z = 0, y = 1, z = 2)
     def ndc_coordinate(point, coordinate):
-      clip = self.project(point)
-      return clip[coordinate] / -point.z 
+      clip = self.projection.project(point)
+      return clip[coordinate] 
 
     sorted_points = {}
     sizes = {}
@@ -196,7 +173,7 @@ class Camera():
     #   aspect * (y_2 + delta_y) / (z_2 + delta_z) =  1
     # 
     # Note the coordinates (y and z) are given in camera space
-    def solve_deltas(major, v1, v2, v3, v4, fov_factor):
+    def solve_deltas(major, v1, v2, v3, v4, projection_factor):
       '''
       Solve the deltas for all three axis.
 
@@ -205,8 +182,8 @@ class Camera():
       `v1` and `v2` are the points along the major axis.
       `v3` and `v4` are the points along hte minor axis.
       '''
-      delta_major   = (-fov_factor * v1[major] - v1.z - fov_factor * v2[major] + v2.z) / (2 * fov_factor)
-      delta_distance = fov_factor * delta_major + fov_factor * v2[major] - v2.z
+      delta_major   = (-projection_factor * v1[major] - v1.z - projection_factor * v2[major] + v2.z) / (2 * projection_factor)
+      delta_distance = projection_factor * delta_major + projection_factor * v2[major] - v2.z
 
       minor = vector3.VECTOR_X if major == vector3.VECTOR_Y else vector3.VECTOR_Y
 
@@ -221,12 +198,12 @@ class Camera():
 
     if sizes[vector3.VECTOR_Y] > sizes[vector3.VECTOR_X]:
       # Height is the constraint: Y is the major axis
-      fov_factor = self.projection.elements[5] / scale
-      delta_y, delta_x, delta_z = solve_deltas(vector3.VECTOR_Y, y_max, y_min, x_max, x_min, fov_factor)
+      projection_factor = self.projection.matrix.elements[5] / scale
+      delta_y, delta_x, delta_z = solve_deltas(vector3.VECTOR_Y, y_max, y_min, x_max, x_min, projection_factor)
     else:
       # Width is the constraint: X is the major axis
-      fov_factor = self.projection.elements[0] / scale
-      delta_x, delta_y, delta_z = solve_deltas(vector3.VECTOR_X, x_max, x_min, y_max, y_min, fov_factor)
+      projection_factor = self.projection.matrix.elements[0] / scale
+      delta_x, delta_y, delta_z = solve_deltas(vector3.VECTOR_X, x_max, x_min, y_max, y_min, projection_factor)
 
     # Move the camera, remembering to adjust for the box being shifted off center
     self.camera_to_world *= Transform(translation = Vector3(-delta_x, -delta_y, -delta_z))
@@ -239,58 +216,12 @@ class Camera():
     '''
     # TODO: Verify that this is working correctly (with a test?).
 
-    # Manually unproject the ray and normalize
+    # Partially unproject the position and normalize
     # Choose the -z direction (so the ray comes out of the camera)
-
-    # TODO: Maybe factor the projection out into a Projection class as this (as well as other things) will be different with orthographic projection.
-    #    For example, camera dollying is worthless in orthographic projection. There is no concept of distance as objects are the same size at all distances
-
-    m11 = self.inverse_projection.elements[0]
-    m22 = self.inverse_projection.elements[5]
+    m11 = self.projection.inverse.elements[0]
+    m22 = self.projection.inverse.elements[5]
 
     return Vector3(m11 * ndc.x, m22 * ndc.y, -1).normalize()
-
-  def calculate_projection(self):
-    f = 1.0 / math.tan(self.fov / 2.0)
-    z_width = self.far_clip - self.near_clip
-
-    m11 = f / self.aspect
-    m22 = f
-    m33 = (self.far_clip + self.near_clip) / (-z_width)
-    m34 = 2 * self.far_clip * self.near_clip / (-z_width)
-
-    # Remember: the elements of the matrix look transposed 
-    self.projection = Matrix4([m11,  0.0,  0.0,  0.0, 
-                               0.0,  m22,  0.0,  0.0, 
-                               0.0,  0.0,  m33, -1.0, 
-                               0.0,  0.0,  m34,  0.0])
-
-    self.calculate_inverse_projection()
-
-  def project(self, v):
-    m11 = self.projection.elements[0]
-    m22 = self.projection.elements[5]
-    m33 = self.projection.elements[10]
-    m34 = self.projection.elements[14]
-
-    return Vector3(m11 * v.x, m22 * v.y, m33 * v.z + m34)
-
-  def calculate_inverse_projection(self):
-    p11 = self.projection.elements[0]
-    p22 = self.projection.elements[5]
-    p33 = self.projection.elements[10]
-    p34 = self.projection.elements[14]
-
-    m11 = 1 / p11
-    m22 = 1 / p22
-    m43 = 1 / p34 
-    m44 = p33 / p34
-
-    # Remember: the elements of the matrix look transposed 
-    self.inverse_projection = Matrix4([m11, 0.0,  0.0, 0.0, 
-                                       0.0, m22,  0.0, 0.0, 
-                                       0.0, 0.0,  0.0, m43, 
-                                       0.0, 0.0, -1.0, m44])
 
   @property
   def world_to_camera(self):

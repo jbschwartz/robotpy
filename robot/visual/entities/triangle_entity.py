@@ -59,7 +59,7 @@ class TriangleEntity():
 
     glUseProgram(self.shader_program.program_id)
 
-    self.shader_program.proj_matrix = camera.projection
+    self.shader_program.proj_matrix = camera.projection.matrix
     self.shader_program.view_matrix = camera.world_to_camera
 
     self.shader_program.light_position  = light.position
