@@ -198,12 +198,26 @@ class Camera():
 
     if sizes[vector3.VECTOR_Y] > sizes[vector3.VECTOR_X]:
       # Height is the constraint: Y is the major axis
-      projection_factor = self.projection.matrix.elements[5] / scale
-      delta_y, delta_x, delta_z = solve_deltas(vector3.VECTOR_Y, y_max, y_min, x_max, x_min, projection_factor)
+      if isinstance(self.projection, PerspectiveProjection): 
+        projection_factor = self.projection.matrix.elements[5] / scale
+        delta_y, delta_x, delta_z = solve_deltas(vector3.VECTOR_Y, y_max, y_min, x_max, x_min, projection_factor)
+      elif isinstance(self.projection, OrthoProjection):
+        delta_x = -(x_max.x + x_min.x) / 2
+        delta_y = -(y_max.y + y_min.y) / 2
+        delta_z = 0
+
+        self.projection.height = (y_max.y - y_min.y)
     else:
       # Width is the constraint: X is the major axis
-      projection_factor = self.projection.matrix.elements[0] / scale
-      delta_x, delta_y, delta_z = solve_deltas(vector3.VECTOR_X, x_max, x_min, y_max, y_min, projection_factor)
+      if isinstance(self.projection, PerspectiveProjection): 
+        projection_factor = self.projection.matrix.elements[0] / scale
+        delta_x, delta_y, delta_z = solve_deltas(vector3.VECTOR_X, x_max, x_min, y_max, y_min, projection_factor)
+      elif isinstance(self.projection, OrthoProjection):
+        delta_x = -(x_max.x + x_min.x) / 2
+        delta_y = -(y_max.y + y_min.y) / 2
+        delta_z = 0
+
+        self.projection.width = (x_max.x - x_min.x)
 
     # Move the camera, remembering to adjust for the box being shifted off center
     self.camera_to_world *= Transform(translation = Vector3(-delta_x, -delta_y, -delta_z))
