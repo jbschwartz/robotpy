@@ -128,14 +128,12 @@ class Camera():
     self.camera_to_world = Transform(translation = self.target) * self.camera_to_world
 
   def dolly(self, displacement):
-    # TODO: Update this comment
     '''
-    Move the camera in or out along its line of sight (z axis) while tracking as necessary
-
-    For example, the controller may request the camera track toward the mouse location in world space.
+    Move the camera along the provided displacement vector. 
+    
+    Often used to move the camera in and out while tracking toward the mouse location in world space.
     We tend to put the mouse where we're interested in dollying so this is useful.
     '''
-    # TODO: Restrict the amount of dollying so that the camera cannot pass through the target
     self.camera_to_world *= Transform(translation = displacement)
 
   def track(self, x, y):
