@@ -45,49 +45,53 @@ class Projection(abc.ABC):
     pass
 
 class OrthoProjection(Projection):
-  pass
-#   def __init__(self, aspect = 16/9, width = 1):
-#     self._aspect = aspect
-#     self._width  = width
+  def __init__(self, aspect, width, near_clip, far_clip):
+    self.aspect = aspect
+    self.width  = width
 
-#     super().__init__()
+    super().__init__(near_clip, far_clip)
 
-#   def calculate(self):
-#     m11 = 1 / self.width
-#     m22 = 1 / (self.width * self.aspect)
-#     m33 = -2 / (self.far_clip - self.near_clip)
-#     m34 = -(self.far_clip + self.near_clip) / (self.far_clip - self.near_clip)
+  def __setattr__(self, attribute, value):
+    super().__setattr__(attribute, value, ['aspect', 'width'])
 
-#     self.matrix = Matrix4([m11,  0.0,  0.0,  0.0,
-#                                         0.0,  m22,  0.0,  0.0,
-#                                         0.0,  0.0,  m33,  0.0,
-#                                         0.0,  0.0,  m34,  1.0])
+  def calculate(self):
+    z_width = self.far_clip - self.near_clip
 
+    m11 =  2 / (self.width)
+    m22 =  2 / (self.width / self.aspect)
+    m33 = -2 / (z_width)
+    m34 = -(self.far_clip + self.near_clip) / (z_width)
+
+    self.matrix = Matrix4([m11, 0.0, 0.0, 0.0,
+                           0.0, m22, 0.0, 0.0,
+                           0.0, 0.0, m33, 0.0,
+                           0.0, 0.0, m34, 1.0])
                                         
-#   def calculate_inverse(self):
-#     p11 = self.matrix.elements[0]
-#     p22 = self.matrix.elements[5]
-#     p33 = self.matrix.elements[10]
-#     p34 = self.matrix.elements[14]
+  def calculate_inverse(self):
+    p11 = self.matrix.elements[0]
+    p22 = self.matrix.elements[5]
+    p33 = self.matrix.elements[10]
+    p34 = self.matrix.elements[14]
 
-#     m11 = 1 / p11
-#     m22 = 1 / p22
-#     m43 = 1 / p34 
-#     m44 = p33 / p34
+    m11 = 1 / p11
+    m22 = 1 / p22
+    m33 = 1 / p33 
+    m43 = -m33 * p34
 
-#     # Remember: the elements of the matrix look transposed 
-#     self.inverse = Matrix4([m11, 0.0,  0.0, 0.0, 
-#                             0.0, m22,  0.0, 0.0, 
-#                             0.0, 0.0,  0.0, m43, 
-#                             0.0, 0.0, -1.0, m44])
+    # Remember: the elements of the matrix look transposed 
+    self.inverse = Matrix4([m11, 0.0, 0.0, 0.0, 
+                            0.0, m22, 0.0, 0.0, 
+                            0.0, 0.0, m33, m43, 
+                            0.0, 0.0, 0.0, 1.0])
 
-#   def project(self, v):
-#     m11 = self.projection.elements[0]
-#     m22 = self.projection.elements[5]
-#     m33 = self.projection.elements[10]
-#     m34 = self.projection.elements[14]
+  def project(self, v):
+    m11 = self.matrix.elements[0]
+    m22 = self.matrix.elements[5]
+    m33 = self.matrix.elements[10]
+    m34 = self.matrix.elements[14]
 
-#     return Vector3()
+    # This code assumes that the w component is always 1 (otherwise it would be `+ m34 * v.w` at the end)
+    return Vector3(m11 * v.x, m22 * v.y, m33 * v.z + m34)
 
 class PerspectiveProjection(Projection):
   def __init__(self, aspect = 16/9, fov = math.radians(60), near_clip = 100, far_clip = 10000):
