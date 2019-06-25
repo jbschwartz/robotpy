@@ -14,11 +14,15 @@ def recalculate():
   return _recalculate
 
 class Projection(abc.ABC):
-  def __init__(self):
+  def __init__(self, near_clip, far_clip):
+    self.near_clip = near_clip
+    self.far_clip  = far_clip
+
     self.update()
 
   @abc.abstractmethod
   def __setattr__(self, attribute, value, allowed):
+    # Watch values in the `allowed` list so that the projection can be recalculated when they change
     if attribute in allowed:
       object.__setattr__(self, attribute, value)
       try:
@@ -28,7 +32,8 @@ class Projection(abc.ABC):
         # So if the attribute is in `allowed`, we'll just ignore it
         if attribute not in allowed:
           raise AttributeError
-    elif attribute in ['matrix', 'inverse']:
+    elif attribute in ['matrix', 'inverse', 'near_clip', 'far_clip']:
+      # These are common to all projections
       object.__setattr__(self, attribute, value)
     else:
       raise AttributeError
@@ -102,14 +107,12 @@ class PerspectiveProjection(Projection):
   def __init__(self, aspect = 16/9, fov = math.radians(60), near_clip = 100, far_clip = 10000):
     self.aspect     = aspect
     self.fov        = fov
-    self.near_clip  = near_clip
-    self.far_clip   = far_clip
     self.matrix      = Matrix4()
 
-    super().__init__()
+    super().__init__(near_clip, far_clip)
   
   def __setattr__(self, attribute, value):
-    super().__setattr__(attribute, value, ['aspect', 'fov', 'near_clip', 'far_clip'])
+    super().__setattr__(attribute, value, ['aspect', 'fov'])
 
   def calculate(self):
     f = 1.0 / math.tan(self.fov / 2.0)
