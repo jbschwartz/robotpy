@@ -46,7 +46,7 @@ class CameraController(Observer):
   def drag(self, button, cursor, cursor_delta, modifiers):
     if button == glfw.MOUSE_BUTTON_MIDDLE:
       if modifiers & glfw.MOD_CONTROL:
-        self.request_track(cursor_delta.x, -cursor_delta.y)
+        self.track(cursor_delta.x, -cursor_delta.y)
       elif modifiers & glfw.MOD_ALT:
         angle = self.calculate_roll_angle(cursor, cursor_delta)
         self.roll(angle)
@@ -57,7 +57,7 @@ class CameraController(Observer):
         # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
         # The steps are too large and it looks choppy.
         direction = vector3.normalize(cursor_delta)
-        self.request_orbit(*direction.yx)
+        self.orbit(*direction.yx)
   
   def key(self, key, action, modifiers):
     if key == glfw.KEY_R and action == glfw.RELEASE:
@@ -78,7 +78,7 @@ class CameraController(Observer):
 
   def scroll(self, horizontal, vertical):
     if horizontal:
-      self.request_orbit(0, horizontal)
+      self.orbit(0, horizontal)
     if vertical:
       if vertical == self.DOLLY_IN:
         # Dolly in toward the mouse
@@ -101,17 +101,17 @@ class CameraController(Observer):
     
     if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT] and action in [glfw.PRESS, glfw.REPEAT]:
       if modifiers & glfw.MOD_CONTROL:
-        self.request_track(self.TRACK_SPEED_KEY * direction[key], 0)
+        self.track(self.TRACK_SPEED_KEY * direction[key], 0)
       elif modifiers & glfw.MOD_ALT:
         direction = 1 if key == glfw.KEY_LEFT else -1
         self.roll(self.ROLL_SPEED_KEY * direction)
       else:
-        self.request_orbit(0, direction[key])
+        self.orbit(0, direction[key])
     if key in [glfw.KEY_UP, glfw.KEY_DOWN] and action in [glfw.PRESS, glfw.REPEAT]:
       if modifiers & glfw.MOD_CONTROL:
-        self.request_track(0, self.TRACK_SPEED_KEY * direction[key])
+        self.track(0, self.TRACK_SPEED_KEY * direction[key])
       else:
-        self.request_orbit(direction[key], 0)
+        self.orbit(direction[key], 0)
 
   def ray_to_cursor(self):
     return self.camera.cast_ray_to(self.window.ndc(self.window.get_cursor()))
@@ -142,10 +142,10 @@ class CameraController(Observer):
 
       self.camera.target += self.camera.camera_to_world(displacement, type="vector")
 
-  def request_orbit(self, x, z):
+  def orbit(self, x, z):
     self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z, self.orbit_type)
 
-  def request_track(self, x, y):
+  def track(self, x, y):
     self.camera.track(self.TRACK_SPEED * x, self.TRACK_SPEED * y)
 
   def calculate_roll_angle(self, cursor, cursor_delta):
