@@ -189,8 +189,7 @@ class CameraController(Observer):
     elif key is SavedView.BACK.value:
       position = Vector3(0, radius, z_height)
     elif key is SavedView.ISO.value:
-      # TODO: Make this proper ISO view. The angles aren't currently correct.
-      position = Vector3(750, -750, 750)
+      position = Vector3(750, -750, 1250)
     else:
       return
 
