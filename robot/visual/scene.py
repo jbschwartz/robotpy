@@ -23,7 +23,6 @@ class Scene(Observer):
 
   def window_resize(self, width, height):
     if width and height:
-      self.camera.aspect = width / height
       glViewport(0, 0, width, height)
 
   def start_renderer(self):  
