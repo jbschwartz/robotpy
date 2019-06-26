@@ -52,7 +52,15 @@ class OrthoProjection(Projection):
     super().__init__(near_clip, far_clip)
 
   def __setattr__(self, attribute, value):
-    super().__setattr__(attribute, value, ['aspect', 'width'])
+    super().__setattr__(attribute, value, ['aspect', 'width', 'height'])
+
+  @property
+  def height(self):
+    return self.width / self.aspect
+
+  @height.setter
+  def height(self, height):
+    self.width = height * self.aspect
 
   def calculate(self):
     z_width = self.far_clip - self.near_clip
