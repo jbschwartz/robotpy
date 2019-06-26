@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
   triangle = TriangleEntity(flat_program)
 
-  camera = Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1), 1)
+  camera = Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
   world_frame = FrameEntity(Frame(), flat_program)
   light = AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
@@ -67,8 +67,8 @@ if __name__ == "__main__":
 
   scene.entities.append(world_frame)
   scene.entities.append(robot)
-  scene.entities.append(robot2)
-  scene.entities.append(triangle)
+  # scene.entities.append(robot2)
+  # scene.entities.append(triangle)
   window.register_observer(scene)
 
   window.run()
