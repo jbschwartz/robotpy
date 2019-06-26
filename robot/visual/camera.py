@@ -108,7 +108,7 @@ class Camera():
     We tend to put the mouse where we're interested in dollying so this is useful.
     '''
     if isinstance(self.projection, OrthoProjection):
-      # Camera movement in and out is not useful in orthographic projection. Leaving it in means the scene could clip. 
+      self.projection.width += displacement.z
       displacement.z = 0
 
     self.camera_to_world *= Transform(translation = displacement)

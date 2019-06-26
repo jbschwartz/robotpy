@@ -82,7 +82,14 @@ class CameraController(Observer):
     if vertical:
       if vertical == self.DOLLY_IN:
         # Dolly in toward the mouse
-        self.dolly(self.ray_to_cursor())
+        ray_direction = self.ray_to_cursor()
+
+        # TODO: Dolly to the mouse cursor in orthographic projection. 
+        # I think I need scene intersection in order to achieve this.
+        if isinstance(self.camera.projection, OrthoProjection):
+          ray_direction = Vector3(0, 0, -1)
+
+        self.dolly(ray_direction)
       else:
         # And out in the camera's z axis
         self.dolly(Vector3(0, 0, 1))
@@ -122,13 +129,14 @@ class CameraController(Observer):
     '''
     displacement = self.DOLLY_SPEED * direction
 
-    # Get the z value of the back of the scene in camera coordinates
-    camera_box = [self.camera.world_to_camera(corner) for corner in self.scene.aabb.corners]
-    back_of_scene = min(camera_box, key = lambda point: point.z)
+    if isinstance(self.camera.projection, PerspectiveProjection):
+      # Get the z value of the back of the scene in camera coordinates
+      camera_box = [self.camera.world_to_camera(corner) for corner in self.scene.aabb.corners]
+      back_of_scene = min(camera_box, key = lambda point: point.z)
 
-    # If we're zooming out, don't allow the camera to exceed the clipping plane
-    if displacement.z > 0 and (displacement.z - back_of_scene.z) > self.camera.projection.far_clip:
-      return
+      # If we're zooming out, don't allow the camera to exceed the clipping plane
+      if displacement.z > 0 and (displacement.z - back_of_scene.z) > self.camera.projection.far_clip:
+        return
 
     self.camera.dolly(displacement)
 
