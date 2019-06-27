@@ -224,9 +224,9 @@ class Camera():
     # Set the camera target to the center of the scene without changing it's direction
     self.target = self.camera_to_world(Vector3(0, 0, self.world_to_camera(world_aabb.center).z))
 
-  def cast_ray_to(self, ndc):
+  def camera_space(self, ndc):
     '''
-    Cast a ray from the camera through the provided ndc coordinates and return in eye coordinates
+    Transform a point in NDC to camera space. Place all points on the near clipping plane.
     '''
     # TODO: Verify that this is working correctly (with a test?).
 
@@ -235,7 +235,7 @@ class Camera():
     m11 = self.projection.inverse.elements[0]
     m22 = self.projection.inverse.elements[5]
 
-    return Vector3(m11 * ndc.x, m22 * ndc.y, -1).normalize()
+    return Vector3(m11 * ndc.x, m22 * ndc.y, -self.projection.near_clip)
 
   @property
   def world_to_camera(self):

@@ -80,19 +80,20 @@ class CameraController(Observer):
     if horizontal:
       self.orbit(0, horizontal)
     if vertical:
-      if vertical == self.DOLLY_IN:
-        # Dolly in toward the mouse
-        ray_direction = self.ray_to_cursor()
+      direction = 1 if vertical == self.DOLLY_IN else -1
 
-        # TODO: Dolly to the mouse cursor in orthographic projection. 
-        # I think I need scene intersection in order to achieve this.
-        if isinstance(self.camera.projection, OrthoProjection):
-          ray_direction = Vector3(0, 0, -1)
-
-        self.dolly(ray_direction)
+      if isinstance(self.camera.projection, OrthoProjection):
+        z = self.camera.projection.width
       else:
-        # And out in the camera's z axis
-        self.dolly(Vector3(0, 0, 1))
+        z = -self.camera.projection.near_clip
+
+      camera_point = self.cursor_to_camera()
+
+      # This code keeps the NDC of the mouse cursor constant as the camera dollys in by shifting the x and y coordinates to compensate for a closer camera.
+      camera_point = -(direction * self.DOLLY_SPEED * self.DOLLY_IN) / z * camera_point
+      camera_point.z = -direction * self.DOLLY_IN
+
+      self.dolly(camera_point)
 
   def window_resize(self, width, height):
     self.camera.projection.aspect = width / height
@@ -120,8 +121,8 @@ class CameraController(Observer):
       else:
         self.orbit(direction[key], 0)
 
-  def ray_to_cursor(self):
-    return self.camera.cast_ray_to(self.window.ndc(self.window.get_cursor()))
+  def cursor_to_camera(self):
+    return self.camera.camera_space(self.window.ndc(self.window.get_cursor()))
 
   def dolly(self, direction):
     '''
