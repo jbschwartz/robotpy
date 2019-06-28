@@ -36,9 +36,6 @@ class CameraController(Observer):
     self.window = window
     self.orbit_type = OrbitType.CONSTRAINED
 
-
-    self.last_cursor_position = None
-
   def click(self, button, action, cursor):
     pass
   
