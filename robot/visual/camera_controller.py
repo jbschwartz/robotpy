@@ -36,8 +36,6 @@ class CameraController(Observer):
     self.window = window
     self.orbit_type = OrbitType.CONSTRAINED
 
-    self.start_position = camera.position
-    self.start_target   = camera.target
 
     self.last_cursor_position = None
 
@@ -61,8 +59,6 @@ class CameraController(Observer):
         self.orbit(*direction.yx)
   
   def key(self, key, action, modifiers):
-    if key == glfw.KEY_R and action == glfw.RELEASE:
-      self.reset()
 
     if key == glfw.KEY_F and action == glfw.RELEASE:
       self.camera.fit(self.scene.aabb, self.FIT_SCALE)
@@ -174,9 +170,6 @@ class CameraController(Observer):
 
   def roll(self, amount):
     self.camera.roll(self.ROLL_SPEED * amount)
-
-  def reset(self):
-    self.camera.look_at(self.start_position, self.start_target, Vector3(0, 0, 1))
 
   def saved_views(self, key):
     radius = 1250
