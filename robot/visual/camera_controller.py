@@ -1,8 +1,9 @@
 import enum, math, glfw
 
-from robot.spatial         import vector3
-from robot.visual.camera   import Camera, OrbitType
-from robot.visual.observer import Observer
+from robot.spatial           import vector3
+from robot.visual.camera     import Camera, OrbitType
+from robot.visual.observer   import Observer
+from robot.visual.projection import OrthoProjection, PerspectiveProjection
 
 Vector3 = vector3.Vector3
 
