@@ -145,6 +145,10 @@ class Camera():
     if world_aabb.contains(self.position):
       self.camera_to_world *= Transform(translation = Vector3(0, 0, world_aabb.sphere_radius()))
 
+    # Centering the camera on the world bounding box first helps removes issues caused by 
+    # a major point skipping to a different corner as a result of the camera's zoom in movement.
+    self.track(*self.world_to_camera(world_aabb.center).xy)
+
     # Convert world bounding box corners to camera space
     camera_box_points = [self.world_to_camera(corner) for corner in world_aabb.corners]
 
