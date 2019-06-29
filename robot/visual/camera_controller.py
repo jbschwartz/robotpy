@@ -45,9 +45,9 @@ class CameraController(Observer):
       # TODO: Maybe do something with speed scaling. 
       # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
       # The steps are too large and it looks choppy.
-      direction = vector3.normalize(cursor_delta)
-      self.orbit(*direction.yx)
-  
+      angle = self.ORBIT_SPEED * vector3.normalize(cursor_delta)
+      self.camera.orbit(angle.y, angle.x, self.orbit_type)
+
   def key(self, key, action, modifiers):
     if action == glfw.PRESS:
       return
@@ -78,7 +78,7 @@ class CameraController(Observer):
 
   def scroll(self, horizontal, vertical):
     if horizontal:
-      self.orbit(0, horizontal)
+      self.camera.orbit(0, self.ORBIT_SPEED * horizontal)
     if vertical:
       direction = 1 if vertical == self.DOLLY_IN else -1
 
@@ -127,9 +127,6 @@ class CameraController(Observer):
       displacement.z = 0
 
       self.camera.target += self.camera.camera_to_world(displacement, type="vector")
-
-  def orbit(self, x, z):
-    self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z, self.orbit_type)
 
   def track_cursor(self, cursor, cursor_delta):
     '''
