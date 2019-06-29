@@ -3,6 +3,7 @@ import math
 from robot.spatial import vector3
 Vector3 = vector3.Vector3
 
+from robot.common.bindings                   import Bindings
 from robot.common.timer                      import Timer
 from robot.spatial.frame                     import Frame
 from robot.traj.linear_js                    import LinearJS
@@ -54,7 +55,9 @@ if __name__ == "__main__":
 
   scene = Scene(camera, light)
 
-  camera_controller = CameraController(camera, scene, window)
+  bindings = Bindings()
+
+  camera_controller = CameraController(camera, bindings, scene, window)
   
   window.register_observer(camera_controller, [ 
     WindowEvent.CLICK,

@@ -1,0 +1,39 @@
+import enum, glfw
+
+class Bindings():
+  def __init__(self):
+    # TODO: We can eventually save and load this from disk for user settings 
+    # TODO: Does glfw guarantee there is no overlap on their constants? (e.g. can MOUSE_BUTTON_MIDDLE be confused with a KEY_?)
+    # Always place modifers before keys
+    self.bindings = {
+      (glfw.MOUSE_BUTTON_MIDDLE):                   'orbit',
+      (glfw.MOUSE_BUTTON_MIDDLE, glfw.MOD_CONTROL): 'track',
+      (glfw.MOUSE_BUTTON_MIDDLE, glfw.MOD_ALT):     'roll',
+      (glfw.MOUSE_BUTTON_MIDDLE, glfw.MOD_SHIFT):   'zoom_on_axis',
+
+      (glfw.MOD_CONTROL, glfw.KEY_LEFT):  'track_right',
+      (glfw.MOD_CONTROL, glfw.KEY_RIGHT): 'track_left',
+      (glfw.MOD_CONTROL, glfw.KEY_UP):    'track_down',
+      (glfw.MOD_CONTROL, glfw.KEY_DOWN):  'track_up',
+
+      (glfw.MOD_ALT, glfw.KEY_RIGHT): 'roll_ccw',
+      (glfw.MOD_ALT, glfw.KEY_LEFT):  'roll_cw',
+
+      (0, glfw.KEY_Z):              'zoom_in',
+      (glfw.MOD_SHIFT, glfw.KEY_Z): 'zoom_out',
+
+      (0, glfw.KEY_F): 'fit',
+      (0, glfw.KEY_O): 'orbit_toggle',
+      (0, glfw.KEY_P): 'projection_toggle',
+      
+      (glfw.MOD_CONTROL, glfw.KEY_1): 'view_front',
+      (glfw.MOD_CONTROL, glfw.KEY_2): 'view_back',
+      (glfw.MOD_CONTROL, glfw.KEY_3): 'view_right',
+      (glfw.MOD_CONTROL, glfw.KEY_4): 'view_left',
+      (glfw.MOD_CONTROL, glfw.KEY_5): 'view_top',
+      (glfw.MOD_CONTROL, glfw.KEY_6): 'view_bottom',
+      (glfw.MOD_CONTROL, glfw.KEY_7): 'view_iso'
+    }
+
+  def get_command(self, input):
+    return self.bindings.get(input)

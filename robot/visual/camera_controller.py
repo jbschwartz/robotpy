@@ -30,8 +30,9 @@ class CameraController(Observer):
   DOLLY_IN        = 1
   FIT_SCALE       = 0.75
 
-  def __init__(self, camera : Camera, scene, window):
+  def __init__(self, camera : Camera, bindings, scene, window):
     self.camera = camera
+    self.bindings = bindings
     self.scene = scene
     self.window = window
     self.orbit_type = OrbitType.CONSTRAINED
@@ -56,19 +57,32 @@ class CameraController(Observer):
         self.orbit(*direction.yx)
   
   def key(self, key, action, modifiers):
+    if action == glfw.PRESS:
+      return
 
-    if key == glfw.KEY_F and action == glfw.RELEASE:
+    command = self.bindings.get_command((modifiers, key))
+
+    if command == 'fit':
       self.camera.fit(self.scene.aabb, self.FIT_SCALE)
-
-    if key == glfw.KEY_O and action == glfw.RELEASE:
+    elif command == 'orbit_toggle':
       self.orbit_type = OrbitType.FREE if self.orbit_type is OrbitType.CONSTRAINED else OrbitType.CONSTRAINED
 
-    if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT, glfw.KEY_UP, glfw.KEY_DOWN]:
-      self.arrows(key, action, modifiers)
+    elif command == 'track_left':
+      self.camera.track(-self.TRACK_SPEED_KEY, 0)
+    elif command == 'track_right':
+      self.camera.track(self.TRACK_SPEED_KEY, 0)
+    elif command == 'track_up':
+      self.camera.track(0, self.TRACK_SPEED_KEY)
+    elif command == 'track_down':
+      self.camera.track(0, -self.TRACK_SPEED_KEY)
 
-    if key in [glfw.KEY_1, glfw.KEY_2, glfw.KEY_3, glfw.KEY_4, glfw.KEY_5, glfw.KEY_6, glfw.KEY_7]:
-      if modifiers & glfw.MOD_CONTROL and action == glfw.PRESS:
-        self.saved_views(key)
+    elif command == 'roll_cw':
+      self.roll(-self.ROLL_SPEED_KEY)
+    elif command == 'roll_ccw':
+      self.roll(self.ROLL_SPEED_KEY)
+
+    elif command in ['view_front', 'view_back', 'view_right', 'view_left', 'view_top', 'view_bottom', 'view_iso']:
+      self.saved_views(command)
 
   def scroll(self, horizontal, vertical):
     if horizontal:
@@ -91,29 +105,6 @@ class CameraController(Observer):
 
   def window_resize(self, width, height):
     self.camera.projection.aspect = width / height
-
-  def arrows(self, key, action, modifiers):
-    # TODO: This doesn't handle both keys pressed at once
-    direction = {
-      glfw.KEY_RIGHT: 1,
-      glfw.KEY_LEFT: -1,
-      glfw.KEY_UP:    1,
-      glfw.KEY_DOWN: -1
-    }
-    
-    if key in [glfw.KEY_RIGHT, glfw.KEY_LEFT] and action in [glfw.PRESS, glfw.REPEAT]:
-      if modifiers & glfw.MOD_CONTROL:
-        self.track(self.TRACK_SPEED_KEY * direction[key], 0)
-      elif modifiers & glfw.MOD_ALT:
-        direction = 1 if key == glfw.KEY_LEFT else -1
-        self.roll(self.ROLL_SPEED_KEY * direction)
-      else:
-        self.orbit(0, direction[key])
-    if key in [glfw.KEY_UP, glfw.KEY_DOWN] and action in [glfw.PRESS, glfw.REPEAT]:
-      if modifiers & glfw.MOD_CONTROL:
-        self.track(0, self.TRACK_SPEED_KEY * direction[key])
-      else:
-        self.orbit(direction[key], 0)
 
   def cursor_to_camera(self):
     return self.camera.camera_space(self.window.ndc(self.window.get_cursor()))
@@ -168,27 +159,27 @@ class CameraController(Observer):
   def roll(self, amount):
     self.camera.roll(self.ROLL_SPEED * amount)
 
-  def saved_views(self, key):
+  def saved_views(self, command):
     radius = 1250
     z_height = 500
     target = Vector3(0, 0, z_height)
     up = Vector3(0, 0, 1)
 
-    if key is SavedView.TOP.value:
+    if command == 'view_top':
       position = Vector3(0, 0, radius)
       up = Vector3(0, 1, 0)
-    elif key is SavedView.BOTTOM.value:
+    elif command == 'view_bottom':
       position = Vector3(0, 0, -radius)
       up = Vector3(0, -1, 0)
-    elif key is SavedView.LEFT.value:
+    elif command == 'view_left':
       position = Vector3(-radius, 0, z_height)
-    elif key is SavedView.RIGHT.value:
+    elif command == 'view_right':
       position = Vector3(radius, 0, z_height)
-    elif key is SavedView.FRONT.value:
+    elif command == 'view_front':
       position = Vector3(0, -radius, z_height)
-    elif key is SavedView.BACK.value:
+    elif command == 'view_back':
       position = Vector3(0, radius, z_height)
-    elif key is SavedView.ISO.value:
+    elif command == 'view_iso':
       position = Vector3(750, -750, 1250)
     else:
       return
