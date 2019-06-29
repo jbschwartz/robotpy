@@ -49,6 +49,9 @@ class Projection(abc.ABC):
     pass
 
 class OrthoProjection(Projection):
+  WIDTH_MIN = 100
+  WIDTH_MAX = 10000
+
   def __init__(self, aspect, width, near_clip = 100, far_clip = 10000):
     self.aspect = aspect
     self.width  = width
@@ -106,7 +109,7 @@ class OrthoProjection(Projection):
     return Vector3(m11 * v.x, m22 * v.y, m33 * v.z + m34)
 
   def zoom(self, amount):
-    self.width += amount
+    self.width = min(max(self.width + amount, self.WIDTH_MIN), self.WIDTH_MAX)
 
 class PerspectiveProjection(Projection):
   def __init__(self, aspect = 16/9, fov = math.radians(60), near_clip = 100, far_clip = 10000):
