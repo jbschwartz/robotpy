@@ -1,4 +1,4 @@
-import enum, math, glfw
+import math, glfw
 
 from robot.spatial           import vector3
 from robot.visual.camera     import Camera, OrbitType
@@ -6,15 +6,6 @@ from robot.visual.observer   import Observer
 from robot.visual.projection import OrthoProjection, PerspectiveProjection
 
 Vector3 = vector3.Vector3
-
-class SavedView(enum.Enum):
-  FRONT  = glfw.KEY_1
-  BACK   = glfw.KEY_2
-  RIGHT  = glfw.KEY_3
-  LEFT   = glfw.KEY_4
-  TOP    = glfw.KEY_5
-  BOTTOM = glfw.KEY_6
-  ISO    = glfw.KEY_7
 
 # TODO: Mouse picking on all actions
 # This is what makes most CAD cameras feel very natural (I think)
