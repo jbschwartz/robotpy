@@ -163,18 +163,24 @@ class CameraController(Observer):
 
   def track_cursor(self, cursor, cursor_delta):
     '''
-    Move the camera with the cursor
+    Move the camera with the cursor.
+
+    That is, calculate the distance in cursor distance in NDC and convert that to camera motion.
     '''
-    # This approximates the scene moving the same speed as the cursor but it isn't exactly correct for perspective projection.
-    # I think perspective projection requires mouse picking.
     delta_ndc = self.window.ndc(cursor) - self.window.ndc(cursor + cursor_delta)
 
-    z = self.camera.world_to_camera(self.scene.aabb).center.z
+    delta_x = delta_ndc.x / self.camera.projection.matrix.elements[0]
+    delta_y = delta_ndc.y / self.camera.projection.matrix.elements[5]
 
-    delta_ndc.x = z * delta_ndc.x / self.camera.projection.matrix.elements[0]
-    delta_ndc.y = z * delta_ndc.y / self.camera.projection.matrix.elements[5]
-    
-    self.camera.track(*delta_ndc.xy)
+    if isinstance(self.camera.projection, PerspectiveProjection):
+      # This approximates the scene moving the same speed as the cursor but it isn't exactly correct for perspective projection.
+      # I think perspective projection requires mouse picking to determine the correct z.
+      z = -self.camera.world_to_camera(self.scene.aabb).center.z
+
+      delta_x *= z
+      delta_y *= z
+
+    self.camera.track(-delta_x, -delta_y)
 
   def calculate_roll_angle(self, cursor, cursor_delta):
     # Calculate the initial cursor position
