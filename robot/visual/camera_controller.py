@@ -26,7 +26,7 @@ class CameraController(Observer):
   TRACK_SPEED_KEY = 20
   DOLLY_SPEED     = 100
   ROLL_SPEED      = 0.005
-  ROLL_SPEED_KEY  = 15
+  ROLL_SPEED_KEY  = math.radians(5)
   DOLLY_IN        = 1
   FIT_SCALE       = 0.75
 
@@ -46,7 +46,7 @@ class CameraController(Observer):
         self.track(cursor_delta.x, -cursor_delta.y)
       elif modifiers & glfw.MOD_ALT:
         angle = self.calculate_roll_angle(cursor, cursor_delta)
-        self.roll(angle)
+        self.camera.roll(angle)
       elif modifiers & glfw.MOD_SHIFT:
         self.dolly(Vector3(0, 0, 3 * cursor_delta.y / self.DOLLY_SPEED))
       else:
@@ -77,9 +77,9 @@ class CameraController(Observer):
       self.camera.track(0, -self.TRACK_SPEED_KEY)
 
     elif command == 'roll_cw':
-      self.roll(-self.ROLL_SPEED_KEY)
+      self.camera.roll(-self.ROLL_SPEED_KEY)
     elif command == 'roll_ccw':
-      self.roll(self.ROLL_SPEED_KEY)
+      self.camera.roll(self.ROLL_SPEED_KEY)
 
     elif command in ['view_front', 'view_back', 'view_right', 'view_left', 'view_top', 'view_bottom', 'view_iso']:
       self.saved_views(command)
@@ -154,10 +154,7 @@ class CameraController(Observer):
     # Calculate the unit tangent vector to the circle at cursor_start_point
     t = Vector3(r.y, -r.x).normalize()
     # The contribution to the roll is the projection of the cursor_delta vector onto the tangent vector
-    return cursor_delta * t
-
-  def roll(self, amount):
-    self.camera.roll(self.ROLL_SPEED * amount)
+    return self.ROLL_SPEED * cursor_delta * t
 
   def saved_views(self, command):
     radius = 1250
