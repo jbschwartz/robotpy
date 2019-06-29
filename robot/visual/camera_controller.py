@@ -76,6 +76,11 @@ class CameraController(Observer):
     elif command == 'roll_ccw':
       self.camera.roll(self.ROLL_STEP)
 
+    elif command == 'zoom_in':
+      self.scale(-self.SCALE_STEP)
+    elif command == 'zoom_out':
+      self.scale(self.SCALE_STEP)
+
     elif command in ['view_front', 'view_back', 'view_right', 'view_left', 'view_top', 'view_bottom', 'view_iso']:
       self.saved_view(command)
 
