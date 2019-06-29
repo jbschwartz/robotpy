@@ -19,7 +19,7 @@ class Bindings():
       (glfw.MOD_ALT, glfw.KEY_RIGHT): 'roll_ccw',
       (glfw.MOD_ALT, glfw.KEY_LEFT):  'roll_cw',
 
-      (0, glfw.KEY_Z):              'zoom_in',
+      (0,              glfw.KEY_Z): 'zoom_in',
       (glfw.MOD_SHIFT, glfw.KEY_Z): 'zoom_out',
 
       (0, glfw.KEY_F): 'fit',
