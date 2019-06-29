@@ -21,14 +21,14 @@ class SavedView(enum.Enum):
 
 class CameraController(Observer):
   # TODO: Make a camera control settings class that can be persisted to disk
-  ORBIT_SPEED     = 0.05
-  TRACK_SPEED     = 1
-  TRACK_SPEED_KEY = 20
-  DOLLY_SPEED     = 100
-  ROLL_SPEED      = 0.005
-  ROLL_SPEED_KEY  = math.radians(5)
-  DOLLY_IN        = 1
-  FIT_SCALE       = 0.75
+  ORBIT_SPEED  = 0.05
+  DOLLY_SPEED  = 100
+  TRACK_SPEED  = 1
+  ROLL_SPEED   = 0.005
+  ROLL_STEP    = math.radians(5)
+  TRACK_STEP   = 20
+  DOLLY_IN     = 1
+  FIT_SCALE    = 0.75
 
   def __init__(self, camera : Camera, bindings, scene, window):
     self.camera = camera
@@ -68,18 +68,18 @@ class CameraController(Observer):
       self.orbit_type = OrbitType.FREE if self.orbit_type is OrbitType.CONSTRAINED else OrbitType.CONSTRAINED
 
     elif command == 'track_left':
-      self.camera.track(-self.TRACK_SPEED_KEY, 0)
+      self.camera.track(-self.TRACK_STEP, 0)
     elif command == 'track_right':
-      self.camera.track(self.TRACK_SPEED_KEY, 0)
+      self.camera.track(self.TRACK_STEP, 0)
     elif command == 'track_up':
-      self.camera.track(0, self.TRACK_SPEED_KEY)
+      self.camera.track(0, self.TRACK_STEP)
     elif command == 'track_down':
-      self.camera.track(0, -self.TRACK_SPEED_KEY)
+      self.camera.track(0, -self.TRACK_STEP)
 
     elif command == 'roll_cw':
-      self.camera.roll(-self.ROLL_SPEED_KEY)
+      self.camera.roll(-self.ROLL_STEP)
     elif command == 'roll_ccw':
-      self.camera.roll(self.ROLL_SPEED_KEY)
+      self.camera.roll(self.ROLL_STEP)
 
     elif command in ['view_front', 'view_back', 'view_right', 'view_left', 'view_top', 'view_bottom', 'view_iso']:
       self.saved_views(command)
