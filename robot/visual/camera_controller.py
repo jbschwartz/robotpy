@@ -32,20 +32,21 @@ class CameraController(Observer):
     pass
   
   def drag(self, button, cursor, cursor_delta, modifiers):
-    if button == glfw.MOUSE_BUTTON_MIDDLE:
-      if modifiers & glfw.MOD_CONTROL:
-        self.track(cursor_delta.x, -cursor_delta.y)
-      elif modifiers & glfw.MOD_ALT:
-        angle = self.calculate_roll_angle(cursor, cursor_delta)
-        self.camera.roll(angle)
-      elif modifiers & glfw.MOD_SHIFT:
-        self.dolly(Vector3(0, 0, 3 * cursor_delta.y / self.DOLLY_SPEED))
-      else:
-        # TODO: Maybe do something with speed scaling. 
-        # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
-        # The steps are too large and it looks choppy.
-        direction = vector3.normalize(cursor_delta)
-        self.orbit(*direction.yx)
+    command = self.bindings.get_command((modifiers, button))
+
+    if command == 'track':
+      self.track_cursor(cursor_delta.x, -cursor_delta.y)
+    elif command == 'roll':
+      angle = self.calculate_roll_angle(cursor, cursor_delta)
+      self.camera.roll(angle)
+    elif command == 'dolly':
+      self.dolly(Vector3(0, 0, 3 * cursor_delta.y / self.DOLLY_SPEED))
+    elif command == 'orbit':
+      # TODO: Maybe do something with speed scaling. 
+      # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
+      # The steps are too large and it looks choppy.
+      direction = vector3.normalize(cursor_delta)
+      self.orbit(*direction.yx)
   
   def key(self, key, action, modifiers):
     if action == glfw.PRESS:
