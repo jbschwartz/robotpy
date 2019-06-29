@@ -35,7 +35,7 @@ class CameraController(Observer):
     command = self.bindings.get_command((modifiers, button))
 
     if command == 'track':
-      self.track_cursor(cursor_delta.x, -cursor_delta.y)
+      self.track_cursor(cursor, cursor_delta)
     elif command == 'roll':
       angle = self.calculate_roll_angle(cursor, cursor_delta)
       self.camera.roll(angle)
@@ -131,8 +131,20 @@ class CameraController(Observer):
   def orbit(self, x, z):
     self.camera.orbit(self.ORBIT_SPEED * x, self.ORBIT_SPEED * z, self.orbit_type)
 
-  def track(self, x, y):
-    self.camera.track(self.TRACK_SPEED * x, self.TRACK_SPEED * y)
+  def track_cursor(self, cursor, cursor_delta):
+    '''
+    Move the camera with the cursor
+    '''
+    # This approximates the scene moving the same speed as the cursor but it isn't exactly correct for perspective projection.
+    # I think perspective projection requires mouse picking.
+    delta_ndc = self.window.ndc(cursor) - self.window.ndc(cursor + cursor_delta)
+
+    z = self.camera.world_to_camera(self.scene.aabb).center.z
+
+    delta_ndc.x = z * delta_ndc.x / self.camera.projection.matrix.elements[0]
+    delta_ndc.y = z * delta_ndc.y / self.camera.projection.matrix.elements[5]
+    
+    self.camera.track(*delta_ndc.xy)
 
   def calculate_roll_angle(self, cursor, cursor_delta):
     # Calculate the initial cursor position
