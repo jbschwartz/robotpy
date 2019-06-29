@@ -71,10 +71,6 @@ class Camera():
   def position(self):
     return self.camera_to_world.translation()
 
-  @property
-  def distance_to_target(self):
-    return (self.target - self.position).length()
-
   def orbit(self, pitch = 0, yaw = 0, orbit_type : OrbitType = OrbitType.FREE):
     '''
     Orbits the camera around the target point (with pitch and yaw)
