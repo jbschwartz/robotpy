@@ -4,12 +4,12 @@ class Bindings():
   def __init__(self):
     # TODO: We can eventually save and load this from disk for user settings 
     # TODO: Does glfw guarantee there is no overlap on their constants? (e.g. can MOUSE_BUTTON_MIDDLE be confused with a KEY_?)
-    # Always place modifers before keys
+    # Always place modifers before keys/buttons
     self.bindings = {
-      (glfw.MOUSE_BUTTON_MIDDLE):                   'orbit',
-      (glfw.MOUSE_BUTTON_MIDDLE, glfw.MOD_CONTROL): 'track',
-      (glfw.MOUSE_BUTTON_MIDDLE, glfw.MOD_ALT):     'roll',
-      (glfw.MOUSE_BUTTON_MIDDLE, glfw.MOD_SHIFT):   'zoom_on_axis',
+      (0,                glfw.MOUSE_BUTTON_MIDDLE): 'orbit',
+      (glfw.MOD_CONTROL, glfw.MOUSE_BUTTON_MIDDLE): 'track',
+      (glfw.MOD_ALT,     glfw.MOUSE_BUTTON_MIDDLE): 'roll',
+      (glfw.MOD_SHIFT,   glfw.MOUSE_BUTTON_MIDDLE): 'zoom_on_axis',
 
       (glfw.MOD_CONTROL, glfw.KEY_LEFT):  'track_right',
       (glfw.MOD_CONTROL, glfw.KEY_RIGHT): 'track_left',
