@@ -58,6 +58,8 @@ class CameraController(Observer):
       self.camera.fit(self.scene.aabb, self.FIT_SCALE)
     elif command == 'orbit_toggle':
       self.orbit_type = OrbitType.FREE if self.orbit_type is OrbitType.CONSTRAINED else OrbitType.CONSTRAINED
+    elif command == 'projection_toggle':
+      self.toggle_projection()
 
     elif command == 'track_left':
       self.camera.track(-self.TRACK_STEP, 0)
@@ -100,6 +102,37 @@ class CameraController(Observer):
 
   def cursor_to_camera(self):
     return self.camera.camera_space(self.window.ndc(self.window.get_cursor()))
+
+  def toggle_projection(self):
+    '''
+    Switch the camera projection while maintaining "scale".
+
+    That is, we try to make ndc_perspective = ndc_orthographic at the scene's center point.
+    We use the x coordinate and obtain: m11 * camera_x / - camera_z = 2 / width * camera_x 
+      With m11 being the first element in the perspective projection matrix.
+    '''
+    params = {
+      'aspect': self.camera.projection.aspect,
+      'near_clip': self.camera.projection.near_clip,
+      'far_clip': self.camera.projection.far_clip
+    }
+
+    if isinstance(self.camera.projection, PerspectiveProjection):
+      point = self.camera.world_to_camera(self.scene.aabb.center, type="point")
+      # Calculate the width from the above relation
+      params['width'] = -2 * point.z / self.camera.projection.matrix.elements[0]
+
+      self.camera.projection = OrthoProjection(**params)
+    else:
+      width = self.camera.projection.width
+
+      self.camera.projection = PerspectiveProjection(**params)
+      current = self.camera.world_to_camera(self.scene.aabb.center, type="point")
+      
+      # Calculate the z camera position from the above relation
+      desired = - self.camera.projection.matrix.elements[0] * width / 2
+      
+      self.camera.dolly(Vector3(0, 0, current.z - desired))
 
   def dolly(self, direction):
     '''

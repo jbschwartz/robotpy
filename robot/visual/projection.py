@@ -45,7 +45,7 @@ class Projection(abc.ABC):
     pass
 
 class OrthoProjection(Projection):
-  def __init__(self, aspect, width, near_clip, far_clip):
+  def __init__(self, aspect, width, near_clip = 100, far_clip = 10000):
     self.aspect = aspect
     self.width  = width
 
