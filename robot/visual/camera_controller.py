@@ -41,7 +41,7 @@ class CameraController(Observer):
       angle = self.calculate_roll_angle(cursor, cursor_delta)
       self.camera.roll(angle)
     elif command == 'scale':
-      self.scale(self.SCALE_SPEED * cursor_delta.y)
+      self.try_scale(self.SCALE_SPEED * cursor_delta.y)
     elif command == 'orbit':
       # TODO: Maybe do something with speed scaling. 
       # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
@@ -77,9 +77,9 @@ class CameraController(Observer):
       self.camera.roll(self.ROLL_STEP)
 
     elif command == 'zoom_in':
-      self.scale(-self.SCALE_STEP)
+      self.try_scale(-self.SCALE_STEP)
     elif command == 'zoom_out':
-      self.scale(self.SCALE_STEP)
+      self.try_scale(self.SCALE_STEP)
 
     elif command in ['view_front', 'view_back', 'view_right', 'view_left', 'view_top', 'view_bottom', 'view_iso']:
       self.saved_view(command)
@@ -121,12 +121,14 @@ class CameraController(Observer):
       
       # Calculate the z camera position from the above relation
       desired = - self.camera.projection.matrix.elements[0] * width / 2
+      delta = current.z - desired
 
-      self.camera.dolly(self.clamp_dolly(current.z - desired))
+      if not self.dolly_will_clip(delta):
+        self.camera.dolly(delta)
 
-  def clamp_dolly(self, displacement):
+  def dolly_will_clip(self, displacement):
     '''
-    Check to see if dollying will begin clipping the scene. If so, don't dolly.
+    Check to see if dollying will begin clipping the scene.
     '''
     # Get the z value of the back of the scene in camera coordinates
     camera_box = [self.camera.world_to_camera(corner) for corner in self.scene.aabb.corners]
@@ -134,9 +136,9 @@ class CameraController(Observer):
 
     # If we're dollying out, don't allow the camera to exceed the clipping plane
     if displacement > 0 and (displacement - back_of_scene.z) > self.camera.projection.far_clip:
-      return 0
-    else:
-      return displacement 
+      return True
+
+    return False 
 
   def track_cursor(self, cursor, cursor_delta):
     '''
@@ -172,9 +174,9 @@ class CameraController(Observer):
     else:
       delta_camera = -cursor_camera_point * delta_scale / self.camera.projection.width
      
-    is_scaled = self.scale(delta_scale)
+    was_scaled = self.try_scale(delta_scale)
 
-    if is_scaled: 
+    if was_scaled: 
       self.camera.track(delta_camera.x, delta_camera.y)
 
   def calculate_roll_angle(self, cursor, cursor_delta):
@@ -191,14 +193,24 @@ class CameraController(Observer):
     # The contribution to the roll is the projection of the cursor_delta vector onto the tangent vector
     return self.ROLL_SPEED * cursor_delta * t
 
-  def scale(self, amount):
+  def try_scale(self, amount):
+    '''
+    Attempt to scale the scene. 
+
+    Scaling is prevented if it causes clipping in the scene. Return True for successful scaling. Return False if no scaling occurs.
+    '''
     if isinstance(self.camera.projection, PerspectiveProjection):
-      delta_z = self.clamp_dolly(amount)
-      if math.isclose(delta_z, 0):
+      if self.dolly_will_clip(amount):
         return False
 
-      self.camera.dolly(delta_z)
+      self.camera.dolly(amount)
     else:
+      at_minimum = self.camera.projection.width <= self.camera.projection.WIDTH_MIN
+      at_maximum = self.camera.projection.width >= self.camera.projection.WIDTH_MAX
+      
+      if (at_minimum and amount < 0) or (at_maximum and amount > 0):
+        return False
+      
       self.camera.projection.zoom(amount)
     
     return True
