@@ -134,8 +134,6 @@ class Camera():
     Scale [0, 1] represents the percentage of the frame used (with 1 being full frame).
 
     This function is not perfect but performs well overall. There may be some edge cases out there lurking.
-    Some fits don't work on the first but it's usually close (and imperceptible with non-unity scale).
-    This is caused by a major point skipping to a different corner as a result of the camera's movement.
     '''
 
     # Check to see if the camera is in the scene bounding box
