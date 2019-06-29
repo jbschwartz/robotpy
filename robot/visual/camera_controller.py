@@ -113,6 +113,13 @@ class CameraController(Observer):
       params['width'] = -2 * point.z / self.camera.projection.matrix.elements[0]
 
       self.camera.projection = OrthoProjection(**params)
+      
+      # If the camera is inside the scene, conservatively move it outside (as otherwise there is no way to as an orthogonal camera)
+      # This can happen if the user brings the perspective camera inside the scene and then switches to orthogonal
+      if self.scene.aabb.contains(self.camera.position):
+        # This could cause clipping issues if the size of the scene is large
+        # This could be circumvented by a more precise calculation of the distance to the edge of the scene
+        self.camera.dolly(2 * self.scene.aabb.sphere_radius()) 
     else:
       width = self.camera.projection.width
 
