@@ -100,18 +100,11 @@ class Camera():
     # Move target back to position
     self.camera_to_world = Transform(translation = self.target) * self.camera_to_world
 
-  def dolly(self, displacement):
+  def dolly(self, z):
     '''
-    Move the camera along the provided displacement vector. 
-    
-    Often used to move the camera in and out while tracking toward the mouse location in world space.
-    We tend to put the mouse where we're interested in dollying so this is useful.
+    Move the camera in and out along the line of sight (z axis). 
     '''
-    if isinstance(self.projection, OrthoProjection):
-      self.projection.width += displacement.z
-      displacement.z = 0
-
-    self.camera_to_world *= Transform(translation = displacement)
+    self.camera_to_world *= Transform(translation = Vector3(0, 0, z))
 
   def track(self, x, y):
     '''

@@ -13,10 +13,11 @@ Vector3 = vector3.Vector3
 class CameraController(Observer):
   # TODO: Make a camera control settings class that can be persisted to disk
   ORBIT_SPEED  = 0.05
-  DOLLY_SPEED  = 100
   TRACK_SPEED  = 1
   ROLL_SPEED   = 0.005
+  SCALE_SPEED  = 5
   ROLL_STEP    = math.radians(5)
+  SCALE_STEP   = 100
   TRACK_STEP   = 20
   DOLLY_IN     = 1
   FIT_SCALE    = 0.75
@@ -39,8 +40,8 @@ class CameraController(Observer):
     elif command == 'roll':
       angle = self.calculate_roll_angle(cursor, cursor_delta)
       self.camera.roll(angle)
-    elif command == 'dolly':
-      self.dolly(Vector3(0, 0, 3 * cursor_delta.y / self.DOLLY_SPEED))
+    elif command == 'scale':
+      self.scale(self.SCALE_SPEED * cursor_delta.y)
     elif command == 'orbit':
       # TODO: Maybe do something with speed scaling. 
       # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
@@ -82,20 +83,7 @@ class CameraController(Observer):
     if horizontal:
       self.camera.orbit(0, self.ORBIT_SPEED * horizontal)
     if vertical:
-      direction = 1 if vertical == self.DOLLY_IN else -1
-
-      if isinstance(self.camera.projection, OrthoProjection):
-        z = self.camera.projection.width
-      else:
-        z = -self.camera.projection.near_clip
-
-      camera_point = self.cursor_to_camera()
-
-      # This code keeps the NDC of the mouse cursor constant as the camera dollys in by shifting the x and y coordinates to compensate for a closer camera.
-      camera_point = -(direction * self.DOLLY_SPEED * self.DOLLY_IN) / z * camera_point
-      camera_point.z = -direction * self.DOLLY_IN
-
-      self.dolly(camera_point)
+      self.scale(self.SCALE_STEP * vertical)
 
   def window_resize(self, width, height):
     self.camera.projection.aspect = width / height
@@ -131,35 +119,22 @@ class CameraController(Observer):
       
       # Calculate the z camera position from the above relation
       desired = - self.camera.projection.matrix.elements[0] * width / 2
-      
-      self.camera.dolly(Vector3(0, 0, current.z - desired))
 
-  def dolly(self, direction):
+      self.camera.dolly(self.clamp_dolly(current.z - desired))
+
+  def clamp_dolly(self, displacement):
     '''
-    Move the camera along the provided direction
+    Check to see if dollying will begin clipping the scene. If so, don't dolly.
     '''
-    displacement = self.DOLLY_SPEED * direction
+    # Get the z value of the back of the scene in camera coordinates
+    camera_box = [self.camera.world_to_camera(corner) for corner in self.scene.aabb.corners]
+    back_of_scene = min(camera_box, key = lambda point: point.z)
 
-    if isinstance(self.camera.projection, PerspectiveProjection):
-      # Get the z value of the back of the scene in camera coordinates
-      camera_box = [self.camera.world_to_camera(corner) for corner in self.scene.aabb.corners]
-      back_of_scene = min(camera_box, key = lambda point: point.z)
-
-      # If we're zooming out, don't allow the camera to exceed the clipping plane
-      if displacement.z > 0 and (displacement.z - back_of_scene.z) > self.camera.projection.far_clip:
-        return
-
-    self.camera.dolly(displacement)
-
-    # TODO: Improvement: track the target toward the mouse pick point so that the target approaches
-    #   the correct "camera z" value as we zoom in. This requires scene intersection to work properly
-
-    # Translate target laterally with camera
-    if displacement.x != 0 or displacement.y != 0:
-      # Remove the z component so the target doesn't move in and out of the scene with the camera
-      displacement.z = 0
-
-      self.camera.target += self.camera.camera_to_world(displacement, type="vector")
+    # If we're dollying out, don't allow the camera to exceed the clipping plane
+    if displacement > 0 and (displacement - back_of_scene.z) > self.camera.projection.far_clip:
+      return 0
+    else:
+      return displacement 
 
   def track_cursor(self, cursor, cursor_delta):
     '''
@@ -195,6 +170,13 @@ class CameraController(Observer):
     t = Vector3(r.y, -r.x).normalize()
     # The contribution to the roll is the projection of the cursor_delta vector onto the tangent vector
     return self.ROLL_SPEED * cursor_delta * t
+
+  def scale(self, amount):
+    if isinstance(self.camera.projection, PerspectiveProjection):
+      delta_z = self.clamp_dolly(amount)
+      self.camera.dolly(delta_z)
+    else:
+      self.camera.projection.zoom(amount)
 
   def saved_view(self, view):
     radius = 1250

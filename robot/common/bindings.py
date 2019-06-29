@@ -9,7 +9,7 @@ class Bindings():
       (0,                glfw.MOUSE_BUTTON_MIDDLE): 'orbit',
       (glfw.MOD_CONTROL, glfw.MOUSE_BUTTON_MIDDLE): 'track',
       (glfw.MOD_ALT,     glfw.MOUSE_BUTTON_MIDDLE): 'roll',
-      (glfw.MOD_SHIFT,   glfw.MOUSE_BUTTON_MIDDLE): 'dolly',
+      (glfw.MOD_SHIFT,   glfw.MOUSE_BUTTON_MIDDLE): 'scale',
 
       (glfw.MOD_CONTROL, glfw.KEY_LEFT):  'track_right',
       (glfw.MOD_CONTROL, glfw.KEY_RIGHT): 'track_left',

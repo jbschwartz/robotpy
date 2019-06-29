@@ -44,6 +44,10 @@ class Projection(abc.ABC):
   def calculate_inverse(self):
     pass
 
+  @abc.abstractmethod
+  def zoom(self):
+    pass
+
 class OrthoProjection(Projection):
   def __init__(self, aspect, width, near_clip = 100, far_clip = 10000):
     self.aspect = aspect
@@ -101,6 +105,9 @@ class OrthoProjection(Projection):
     # This code assumes that the w component is always 1 (otherwise it would be `+ m34 * v.w` at the end)
     return Vector3(m11 * v.x, m22 * v.y, m33 * v.z + m34)
 
+  def zoom(self, amount):
+    self.width += amount
+
 class PerspectiveProjection(Projection):
   def __init__(self, aspect = 16/9, fov = math.radians(60), near_clip = 100, far_clip = 10000):
     self.aspect     = aspect
@@ -152,3 +159,6 @@ class PerspectiveProjection(Projection):
 
     # This code assumes that the w component is always 1 (thats why m44 is not present)
     return Vector3(m11 * v.x, m22 * v.y, m33 * v.z + m34) / -v.z
+
+  def zoom(self, amount):
+    self.fov += amount
