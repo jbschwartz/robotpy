@@ -74,7 +74,7 @@ class CameraController(Observer):
       self.camera.roll(self.ROLL_STEP)
 
     elif command in ['view_front', 'view_back', 'view_right', 'view_left', 'view_top', 'view_bottom', 'view_iso']:
-      self.saved_views(command)
+      self.saved_view(command)
 
   def scroll(self, horizontal, vertical):
     if horizontal:
@@ -157,27 +157,27 @@ class CameraController(Observer):
     # The contribution to the roll is the projection of the cursor_delta vector onto the tangent vector
     return self.ROLL_SPEED * cursor_delta * t
 
-  def saved_views(self, command):
+  def saved_view(self, view):
     radius = 1250
     z_height = 500
     target = Vector3(0, 0, z_height)
     up = Vector3(0, 0, 1)
 
-    if command == 'view_top':
+    if view == 'view_top':
       position = Vector3(0, 0, radius)
       up = Vector3(0, 1, 0)
-    elif command == 'view_bottom':
+    elif view == 'view_bottom':
       position = Vector3(0, 0, -radius)
       up = Vector3(0, -1, 0)
-    elif command == 'view_left':
+    elif view == 'view_left':
       position = Vector3(-radius, 0, z_height)
-    elif command == 'view_right':
+    elif view == 'view_right':
       position = Vector3(radius, 0, z_height)
-    elif command == 'view_front':
+    elif view == 'view_front':
       position = Vector3(0, -radius, z_height)
-    elif command == 'view_back':
+    elif view == 'view_back':
       position = Vector3(0, radius, z_height)
-    elif command == 'view_iso':
+    elif view == 'view_iso':
       position = Vector3(750, -750, 1250)
     else:
       return
