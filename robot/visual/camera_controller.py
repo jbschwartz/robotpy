@@ -172,8 +172,10 @@ class CameraController(Observer):
     else:
       delta_camera = -cursor_camera_point * delta_scale / self.camera.projection.width
      
-    self.camera.track(delta_camera.x, delta_camera.y)
-    self.scale(delta_scale)
+    is_scaled = self.scale(delta_scale)
+
+    if is_scaled: 
+      self.camera.track(delta_camera.x, delta_camera.y)
 
   def calculate_roll_angle(self, cursor, cursor_delta):
     # Calculate the initial cursor position
@@ -192,9 +194,14 @@ class CameraController(Observer):
   def scale(self, amount):
     if isinstance(self.camera.projection, PerspectiveProjection):
       delta_z = self.clamp_dolly(amount)
+      if math.isclose(delta_z, 0):
+        return False
+
       self.camera.dolly(delta_z)
     else:
       self.camera.projection.zoom(amount)
+    
+    return True
 
   def saved_view(self, view):
     radius = 1250
