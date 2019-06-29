@@ -88,13 +88,10 @@ class CameraController(Observer):
     if horizontal:
       self.camera.orbit(0, self.ORBIT_SPEED * horizontal)
     if vertical:
-      self.scale(self.SCALE_STEP * vertical)
+      self.scale_to_cursor(self.window.get_cursor(), vertical)
 
   def window_resize(self, width, height):
     self.camera.projection.aspect = width / height
-
-  def cursor_to_camera(self):
-    return self.camera.camera_space(self.window.ndc(self.window.get_cursor()))
 
   def toggle_projection(self):
     '''
@@ -161,6 +158,22 @@ class CameraController(Observer):
       delta_y *= z
 
     self.camera.track(-delta_x, -delta_y)
+
+  def scale_to_cursor(self, cursor, direction):
+    ndc = self.window.ndc(cursor)
+
+    cursor_camera_point = self.camera.camera_space(ndc)
+
+    # This is delta z for perspective and delta width for orthographic
+    delta_scale = direction * self.SCALE_STEP
+
+    if isinstance(self.camera.projection, PerspectiveProjection):
+      delta_camera = -cursor_camera_point * delta_scale
+    else:
+      delta_camera = -cursor_camera_point * delta_scale / self.camera.projection.width
+     
+    self.camera.track(delta_camera.x, delta_camera.y)
+    self.scale(delta_scale)
 
   def calculate_roll_angle(self, cursor, cursor_delta):
     # Calculate the initial cursor position
