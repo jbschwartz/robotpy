@@ -102,15 +102,19 @@ class Camera():
     '''
     self.camera_to_world *= Transform(translation = Vector3(0, 0, z))
 
-  def track(self, x, y):
+  def track(self, x = 0, y = 0, v = None):
     '''
-    Move the camera vertically and horizontally (with respect to camera coordinate frame)
+    Move the camera vertically and horizontally.
+    
+    x, y, and v are in camera space.
     '''
-    camera_displacement_in_world = self.camera_to_world(Vector3(x, y), type="vector")
+    # Accept vector input if it is provided. Makes calls a bit cleaner if the caller is using a vector already.
+    v = Vector3(*v.xy) if v else Vector3(x, y)
 
+    self.camera_to_world *= Transform(translation = v)
+
+    camera_displacement_in_world = self.camera_to_world(v, type="vector")
     self.target += camera_displacement_in_world
-
-    self.camera_to_world = Transform(translation = camera_displacement_in_world) * self.camera_to_world
 
   def roll(self, angle):
     self.camera_to_world *= Transform(axis = Vector3(0, 0, 1), angle = angle)
@@ -134,7 +138,7 @@ class Camera():
 
     # Centering the camera on the world bounding box first helps removes issues caused by 
     # a major point skipping to a different corner as a result of the camera's zoom in movement.
-    self.track(*self.world_to_camera(world_aabb.center).xy)
+    self.track(v = self.world_to_camera(world_aabb.center))
 
     # Convert world bounding box corners to camera space
     camera_box_points = self.world_to_camera(world_aabb.corners)

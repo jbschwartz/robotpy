@@ -155,18 +155,14 @@ class CameraController(Observer):
     '''
     delta_ndc = self.window.ndc(cursor) - self.window.ndc(cursor + cursor_delta)
 
-    delta_x = delta_ndc.x / self.camera.projection.matrix.elements[0]
-    delta_y = delta_ndc.y / self.camera.projection.matrix.elements[5]
+    delta = self.camera.camera_space(delta_ndc)
 
     if isinstance(self.camera.projection, PerspectiveProjection):
       # This approximates the scene moving the same speed as the cursor but it isn't exactly correct for perspective projection.
       # I think perspective projection requires mouse picking to determine the correct z.
-      z = -self.camera.world_to_camera(self.scene.aabb).center.z
+      delta *= -self.camera.world_to_camera(self.scene.aabb).center.z
 
-      delta_x *= z
-      delta_y *= z
-
-    self.camera.track(-delta_x, -delta_y)
+    self.camera.track(v = -delta)
 
   def scale_to_cursor(self, cursor, direction):
     ndc = self.window.ndc(cursor)
