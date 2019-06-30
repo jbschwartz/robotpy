@@ -1,4 +1,4 @@
-import enum, math, glfw
+import enum, json, math, glfw
 
 from robot.spatial           import vector3
 from robot.visual.camera     import Camera, OrbitType
@@ -12,6 +12,7 @@ Vector3 = vector3.Vector3
 
 class CameraSettings():
   class Defaults(enum.Enum):
+    FILE_PATH    = './robot/settings.json'
     ORBIT_SPEED  = 0.05
     ROLL_SPEED   = 0.005
     SCALE_SPEED  = 5
@@ -21,8 +22,39 @@ class CameraSettings():
     SCALE_IN     = 1
     FIT_SCALE    = 0.75
 
+  def __init__(self, path = Defaults.FILE_PATH.value):
+    self.get_settings(path)
+
+    self.needs_write = {}
+
   def __getattr__(self, attribute):
-    return getattr(self.Defaults, attribute).value
+    if attribute == 'needs_write':
+      self.needs_write = {}
+      return self.needs_write
+
+    return getattr(self.Defaults, str.upper(attribute)).value
+
+  def __setattr__(self, attribute, value):
+    self.__dict__[attribute] = value
+    if attribute != 'needs_write':
+      self.needs_write[attribute] = value
+
+  def get_settings(self, path):
+    settings = self.load(path)
+    for name, value in settings['camera'].items():
+      setattr(self, str.upper(name), value)
+
+  def load(self, path):
+    with open(path) as f:
+      return json.load(f)
+
+  def write(self, path = Defaults.FILE_PATH.value):
+    settings = self.load(path)
+    with open(path, 'w') as f:
+      for name, value in self.needs_write.items():
+        settings['camera'][name] = value
+      json.dump(settings, f, indent=2)
+
 
 class CameraController(Observer):
   VIEWS = {

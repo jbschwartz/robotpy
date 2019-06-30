@@ -1,0 +1,12 @@
+{
+  "camera": {
+    "orbit_speed": 0.05,
+    "roll_speed": 0.005,
+    "scale_speed": 5,
+    "roll_step": 0.0872,
+    "scale_step": 100,
+    "track_step": 20,
+    "scale_in": 1,
+    "fit_scale": 0.75
+  }
+}
