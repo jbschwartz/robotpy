@@ -9,7 +9,7 @@ from robot.spatial.frame                     import Frame
 from robot.traj.linear_js                    import LinearJS
 from robot.visual.ambient_light              import AmbientLight
 from robot.visual.camera                     import Camera
-from robot.visual.camera_controller          import CameraController
+from robot.visual.camera_controller          import CameraController, CameraSettings
 from robot.visual.entities                   import robot_entity
 from robot.visual.entities.triangle_entity   import TriangleEntity
 from robot.visual.entities.frame_entity      import FrameEntity
@@ -56,8 +56,8 @@ if __name__ == "__main__":
   scene = Scene(camera, light)
 
   bindings = Bindings()
-
-  camera_controller = CameraController(camera, bindings, scene, window)
+  settings = CameraSettings()
+  camera_controller = CameraController(camera, settings, bindings, scene, window)
   
   window.register_observer(camera_controller, [ 
     WindowEvent.CLICK,

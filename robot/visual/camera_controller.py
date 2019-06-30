@@ -1,4 +1,4 @@
-import math, glfw
+import enum, math, glfw
 
 from robot.spatial           import vector3
 from robot.visual.camera     import Camera, OrbitType
@@ -10,18 +10,21 @@ Vector3 = vector3.Vector3
 # TODO: Mouse picking on all actions
 # This is what makes most CAD cameras feel very natural (I think)
 
-class CameraController(Observer):
-  # TODO: Make a camera control settings class that can be persisted to disk
-  ORBIT_SPEED  = 0.05
-  TRACK_SPEED  = 1
-  ROLL_SPEED   = 0.005
-  SCALE_SPEED  = 5
-  ROLL_STEP    = math.radians(5)
-  SCALE_STEP   = 100
-  TRACK_STEP   = 20
-  SCALE_IN     = 1
-  FIT_SCALE    = 0.75
+class CameraSettings():
+  class Defaults(enum.Enum):
+    ORBIT_SPEED  = 0.05
+    ROLL_SPEED   = 0.005
+    SCALE_SPEED  = 5
+    ROLL_STEP    = math.radians(5)
+    SCALE_STEP   = 100
+    TRACK_STEP   = 20
+    SCALE_IN     = 1
+    FIT_SCALE    = 0.75
 
+  def __getattr__(self, attribute):
+    return getattr(self.Defaults, attribute).value
+
+class CameraController(Observer):
   VIEWS = {
     'view_top':    { 'position': Vector3(0, 0,  1250), 'up': Vector3(0,  1, 0) },
     'view_bottom': { 'position': Vector3(0, 0, -1250), 'up': Vector3(0, -1, 0) },
@@ -32,8 +35,9 @@ class CameraController(Observer):
     'view_iso':    { 'position': Vector3(750, -750, 1250) },
   }
 
-  def __init__(self, camera : Camera, bindings, scene, window):
+  def __init__(self, camera : Camera, settings, bindings, scene, window):
     self.camera = camera
+    self.settings = settings
     self.bindings = bindings
     self.scene = scene
     self.window = window
@@ -51,12 +55,12 @@ class CameraController(Observer):
       angle = self.calculate_roll_angle(cursor, cursor_delta)
       self.camera.roll(angle)
     elif command == 'scale':
-      self.try_scale(self.SCALE_SPEED * cursor_delta.y)
+      self.try_scale(self.settings.SCALE_SPEED * cursor_delta.y)
     elif command == 'orbit':
       # TODO: Maybe do something with speed scaling.
       # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
       # The steps are too large and it looks choppy.
-      angle = self.ORBIT_SPEED * vector3.normalize(cursor_delta)
+      angle = self.settings.ORBIT_SPEED * vector3.normalize(cursor_delta)
       self.camera.orbit(angle.y, angle.x, self.orbit_type)
 
   def key(self, key, action, modifiers):
@@ -66,39 +70,39 @@ class CameraController(Observer):
     command = self.bindings.get_command((modifiers, key))
 
     if command == 'fit':
-      self.camera.fit(self.scene.aabb, self.FIT_SCALE)
+      self.camera.fit(self.scene.aabb, self.settings.FIT_SCALE)
     elif command == 'orbit_toggle':
       self.orbit_type = OrbitType.FREE if self.orbit_type is OrbitType.CONSTRAINED else OrbitType.CONSTRAINED
     elif command == 'projection_toggle':
       self.toggle_projection()
 
     elif command == 'track_left':
-      self.camera.track(-self.TRACK_STEP, 0)
+      self.camera.track(-self.settings.TRACK_STEP, 0)
     elif command == 'track_right':
-      self.camera.track(self.TRACK_STEP, 0)
+      self.camera.track(self.settings.TRACK_STEP, 0)
     elif command == 'track_up':
-      self.camera.track(0, self.TRACK_STEP)
+      self.camera.track(0, self.settings.TRACK_STEP)
     elif command == 'track_down':
-      self.camera.track(0, -self.TRACK_STEP)
+      self.camera.track(0, -self.settings.TRACK_STEP)
 
     elif command == 'roll_cw':
-      self.camera.roll(-self.ROLL_STEP)
+      self.camera.roll(-self.settings.ROLL_STEP)
     elif command == 'roll_ccw':
-      self.camera.roll(self.ROLL_STEP)
+      self.camera.roll(self.settings.ROLL_STEP)
 
     elif command == 'zoom_in':
-      self.try_scale(-self.SCALE_STEP)
+      self.try_scale(-self.settings.SCALE_STEP)
     elif command == 'zoom_out':
-      self.try_scale(self.SCALE_STEP)
+      self.try_scale(self.settings.SCALE_STEP)
 
     elif command in ['view_front', 'view_back', 'view_right', 'view_left', 'view_top', 'view_bottom', 'view_iso']:
       self.view(command)
 
   def scroll(self, horizontal, vertical):
     if horizontal:
-      self.camera.orbit(0, self.ORBIT_SPEED * horizontal)
+      self.camera.orbit(0, self.settings.ORBIT_SPEED * horizontal)
     if vertical:
-      self.scale_to_cursor(self.window.get_cursor(), vertical * self.SCALE_IN)
+      self.scale_to_cursor(self.window.get_cursor(), vertical * self.settings.SCALE_IN)
 
   def window_resize(self, width, height):
     self.camera.projection.aspect = width / height
@@ -180,7 +184,7 @@ class CameraController(Observer):
     cursor_camera_point = self.camera.camera_space(ndc)
 
     # This is delta z for perspective and delta width for orthographic
-    delta_scale = direction * self.SCALE_STEP
+    delta_scale = direction * self.settings.SCALE_STEP
     delta_camera = -cursor_camera_point * delta_scale
 
     if isinstance(self.camera.projection, OrthoProjection):
@@ -203,7 +207,7 @@ class CameraController(Observer):
     # Calculate the unit tangent vector to the circle at cursor_start_point
     t = Vector3(r.y, -r.x).normalize()
     # The contribution to the roll is the projection of the cursor_delta vector onto the tangent vector
-    return self.ROLL_SPEED * cursor_delta * t
+    return self.settings.ROLL_SPEED * cursor_delta * t
 
   def try_scale(self, amount):
     '''
@@ -235,4 +239,4 @@ class CameraController(Observer):
       view.get('target', Vector3(0, 0, 500)),
       view.get('up', Vector3(0, 0, 1))
     )
-    self.camera.fit(self.scene.aabb, self.FIT_SCALE)
+    self.camera.fit(self.scene.aabb, self.settings.FIT_SCALE)
