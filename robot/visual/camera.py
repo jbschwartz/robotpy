@@ -137,7 +137,7 @@ class Camera():
     self.track(*self.world_to_camera(world_aabb.center).xy)
 
     # Convert world bounding box corners to camera space
-    camera_box_points = [self.world_to_camera(corner) for corner in world_aabb.corners]
+    camera_box_points = self.world_to_camera(world_aabb.corners)
 
     # Generate NDCs for a point in coordinate (z = 0, y = 1, z = 2)
     def ndc_coordinate(point, coordinate):

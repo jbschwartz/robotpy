@@ -138,8 +138,8 @@ class CameraController(Observer):
     Check to see if dollying will begin clipping the scene.
     '''
     # Get the z value of the back of the scene in camera coordinates
-    camera_box = [self.camera.world_to_camera(corner) for corner in self.scene.aabb.corners]
-    back_of_scene = min(camera_box, key = lambda point: point.z)
+    camera_box_points = self.camera.world_to_camera(self.scene.aabb.corners)
+    back_of_scene = min(camera_box_points, key = lambda point: point.z)
 
     # If we're dollying out, don't allow the camera to exceed the clipping plane
     if displacement > 0 and (displacement - back_of_scene.z) > self.camera.projection.far_clip:

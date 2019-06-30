@@ -51,6 +51,8 @@ class Transform:
       return self.transform_mesh(other)
     elif isinstance(other, AABB):
       return self.transform_aabb(other)
+    elif isinstance(other, list):
+      return [self.__call__(item) for item in other]
         
   def transform_vector(self, vector):
     d = Dual(Quaternion(0, *vector.xyz), Quaternion(0, 0, 0, 0))
