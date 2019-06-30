@@ -31,7 +31,7 @@ class CameraController(Observer):
 
   def click(self, button, action, cursor):
     pass
-  
+
   def drag(self, button, cursor, cursor_delta, modifiers):
     command = self.bindings.get_command((modifiers, button))
 
@@ -43,7 +43,7 @@ class CameraController(Observer):
     elif command == 'scale':
       self.try_scale(self.SCALE_SPEED * cursor_delta.y)
     elif command == 'orbit':
-      # TODO: Maybe do something with speed scaling. 
+      # TODO: Maybe do something with speed scaling.
       # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
       # The steps are too large and it looks choppy.
       angle = self.ORBIT_SPEED * vector3.normalize(cursor_delta)
@@ -98,7 +98,7 @@ class CameraController(Observer):
     Switch the camera projection while maintaining "scale".
 
     That is, we try to make ndc_perspective = ndc_orthographic at the scene's center point.
-    We use the x coordinate and obtain: m11 * camera_x / - camera_z = 2 / width * camera_x 
+    We use the x coordinate and obtain: m11 * camera_x / - camera_z = 2 / width * camera_x
       With m11 being the first element in the perspective projection matrix.
     '''
     params = {
@@ -113,7 +113,7 @@ class CameraController(Observer):
       params['width'] = -2 * point.z / self.camera.projection.matrix.elements[0]
 
       self.camera.projection = OrthoProjection(**params)
-      
+
       # If the camera is inside the scene, conservatively move it outside (as otherwise there is no way to as an orthogonal camera)
       # This can happen if the user brings the perspective camera inside the scene and then switches to orthogonal
       if self.scene.aabb.contains(self.camera.position):
@@ -125,7 +125,7 @@ class CameraController(Observer):
 
       self.camera.projection = PerspectiveProjection(**params)
       current = self.camera.world_to_camera(self.scene.aabb.center, type="point")
-      
+
       # Calculate the z camera position from the above relation
       desired = - self.camera.projection.matrix.elements[0] * width / 2
       delta = current.z - desired
@@ -145,7 +145,7 @@ class CameraController(Observer):
     if displacement > 0 and (displacement - back_of_scene.z) > self.camera.projection.far_clip:
       return True
 
-    return False 
+    return False
 
   def track_cursor(self, cursor, cursor_delta):
     '''
@@ -180,10 +180,10 @@ class CameraController(Observer):
       delta_camera = -cursor_camera_point * delta_scale
     else:
       delta_camera = -cursor_camera_point * delta_scale / self.camera.projection.width
-     
+
     was_scaled = self.try_scale(delta_scale)
 
-    if was_scaled: 
+    if was_scaled:
       self.camera.track(delta_camera.x, delta_camera.y)
 
   def calculate_roll_angle(self, cursor, cursor_delta):
@@ -193,7 +193,7 @@ class CameraController(Observer):
     r = Vector3(cursor_start_point.x - self.window.width / 2, cursor_start_point.y - self.window.height / 2)
 
     if math.isclose(r.length(), 0):
-      return 
+      return
 
     # Calculate the unit tangent vector to the circle at cursor_start_point
     t = Vector3(r.y, -r.x).normalize()
@@ -202,7 +202,7 @@ class CameraController(Observer):
 
   def try_scale(self, amount):
     '''
-    Attempt to scale the scene. 
+    Attempt to scale the scene.
 
     Scaling is prevented if it causes clipping in the scene. Return True for successful scaling. Return False if no scaling occurs.
     '''

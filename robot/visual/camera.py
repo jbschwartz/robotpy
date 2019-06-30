@@ -46,7 +46,7 @@ class Camera():
 
     forward = (position - target).normalize()       # Step 2
     angle_z = math.acos(Vector3(0, 0, 1) * forward) # Step 3
-    
+
     right = (up % forward).normalize()
     align_z = Transform(axis=right, angle=angle_z)  # Step 4
 
@@ -54,7 +54,7 @@ class Camera():
 
     dot = right * intermediate_x
     angle_x = utils.safe_acos(dot)
-    
+
     if math.isclose(angle_x, 0):
       # Our intermediate x axis is already where it should be. We do no further rotation.
       align_x = Transform(translation=position) # Step 8
