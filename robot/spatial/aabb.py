@@ -36,6 +36,33 @@ class AABB:
     
     return largest
 
+  def intersect(self, ray, min_t = 0, max_t = math.inf):
+    t = [min_t, max_t]
+
+    # Check bounding slab intersections per component (x, y, z)
+    for minimum, maximum, origin, direction in zip(self.min, self.max, ray.origin, ray.direction):
+      try:
+        inv_direction = 1 / direction
+      except ZeroDivisionError:
+        inv_direction = math.inf
+
+      t_min = (minimum - origin) * inv_direction
+      t_max = (maximum - origin) * inv_direction
+
+      # Swap if reording is necessary
+      if t_min > t_max:
+        t_min, t_max = t_max, t_min
+
+      if t_min > t[0]:
+        t[0] = t_min
+      if t_max < t[1]:
+        t[1] = t_max
+
+      if t[0] > t[1]:
+        return False
+
+    return True
+
   @property
   def center(self):
     return self.min + (self.size / 2)

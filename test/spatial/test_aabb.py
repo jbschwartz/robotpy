@@ -1,6 +1,7 @@
 import unittest
 
 from robot.spatial.aabb    import AABB
+from robot.spatial.ray     import Ray
 from robot.spatial.vector3 import Vector3
 
 class TestAABB(unittest.TestCase):
@@ -35,3 +36,24 @@ class TestAABB(unittest.TestCase):
     expected = (self.v1 - self.v2) / 2 + self.v2
 
     self.assertAlmostEqual(self.aabb.center, expected)
+
+  def test_intersect(self):
+    origin = Vector3(2, 3, 1)
+
+    pairs = [
+      (Ray(origin, Vector3( 1,  0,  0)), False),
+      (Ray(origin, Vector3(-1,  0,  0)), False),
+      (Ray(origin, Vector3( 0,  1,  0)), False),
+      (Ray(origin, Vector3( 0, -1,  0)), False),
+      (Ray(origin, Vector3( 0,  0,  1)), False),
+      (Ray(origin, Vector3( 0,  0, -1)), False),
+      (Ray(origin, Vector3(-2,  1,  1)), False),
+      (Ray(origin, Vector3(-1,  0,  1)), False),
+      (Ray(origin, Vector3(-1, -1,  1)), True),
+      (Ray(origin, Vector3(-1, -1,  0)), True),
+      (Ray(origin, Vector3(-2, -1,  0)), True)
+    ]
+
+    for index, (ray, expected) in enumerate(pairs):
+      with self.subTest(msg=f"Test #{index}, Ray {ray}"):
+        self.assertEqual(self.aabb.intersect(ray), expected)
