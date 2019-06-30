@@ -19,7 +19,7 @@ class CameraController(Observer):
   ROLL_STEP    = math.radians(5)
   SCALE_STEP   = 100
   TRACK_STEP   = 20
-  DOLLY_IN     = 1
+  SCALE_IN     = 1
   FIT_SCALE    = 0.75
 
   VIEWS = {
@@ -98,7 +98,7 @@ class CameraController(Observer):
     if horizontal:
       self.camera.orbit(0, self.ORBIT_SPEED * horizontal)
     if vertical:
-      self.scale_to_cursor(self.window.get_cursor(), vertical)
+      self.scale_to_cursor(self.window.get_cursor(), vertical * self.SCALE_IN)
 
   def window_resize(self, width, height):
     self.camera.projection.aspect = width / height
