@@ -22,6 +22,16 @@ class CameraController(Observer):
   DOLLY_IN     = 1
   FIT_SCALE    = 0.75
 
+  VIEWS = {
+    'view_top':    { 'position': Vector3(0, 0,  1250), 'up': Vector3(0,  1, 0) },
+    'view_bottom': { 'position': Vector3(0, 0, -1250), 'up': Vector3(0, -1, 0) },
+    'view_left':   { 'position': Vector3(-1250, 0, 500) },
+    'view_right':  { 'position': Vector3( 1250, 0, 500) },
+    'view_front':  { 'position': Vector3(0, -1250, 500) },
+    'view_back':   { 'position': Vector3(0,  1250, 500) },
+    'view_iso':    { 'position': Vector3(750, -750, 1250) },
+  }
+
   def __init__(self, camera : Camera, bindings, scene, window):
     self.camera = camera
     self.bindings = bindings
@@ -82,7 +92,7 @@ class CameraController(Observer):
       self.try_scale(self.SCALE_STEP)
 
     elif command in ['view_front', 'view_back', 'view_right', 'view_left', 'view_top', 'view_bottom', 'view_iso']:
-      self.saved_view(command)
+      self.view(command)
 
   def scroll(self, horizontal, vertical):
     if horizontal:
@@ -171,11 +181,10 @@ class CameraController(Observer):
 
     # This is delta z for perspective and delta width for orthographic
     delta_scale = direction * self.SCALE_STEP
+    delta_camera = -cursor_camera_point * delta_scale
 
-    if isinstance(self.camera.projection, PerspectiveProjection):
-      delta_camera = -cursor_camera_point * delta_scale
-    else:
-      delta_camera = -cursor_camera_point * delta_scale / self.camera.projection.width
+    if isinstance(self.camera.projection, OrthoProjection):
+      delta_camera /= self.camera.projection.width
 
     was_scaled = self.try_scale(delta_scale)
 
@@ -218,30 +227,12 @@ class CameraController(Observer):
     
     return True
 
-  def saved_view(self, view):
-    radius = 1250
-    z_height = 500
-    target = Vector3(0, 0, z_height)
-    up = Vector3(0, 0, 1)
+  def view(self, view_name):
+    view = self.VIEWS[view_name]
 
-    if view == 'view_top':
-      position = Vector3(0, 0, radius)
-      up = Vector3(0, 1, 0)
-    elif view == 'view_bottom':
-      position = Vector3(0, 0, -radius)
-      up = Vector3(0, -1, 0)
-    elif view == 'view_left':
-      position = Vector3(-radius, 0, z_height)
-    elif view == 'view_right':
-      position = Vector3(radius, 0, z_height)
-    elif view == 'view_front':
-      position = Vector3(0, -radius, z_height)
-    elif view == 'view_back':
-      position = Vector3(0, radius, z_height)
-    elif view == 'view_iso':
-      position = Vector3(750, -750, 1250)
-    else:
-      return
-
-    self.camera.look_at(position, target, up)
+    self.camera.look_at(
+      view['position'],
+      view.get('target', Vector3(0, 0, 500)),
+      view.get('up', Vector3(0, 0, 1))
+    )
     self.camera.fit(self.scene.aabb, self.FIT_SCALE)
