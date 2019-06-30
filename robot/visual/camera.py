@@ -197,7 +197,7 @@ class Camera():
         delta_y = -(y_max.y + y_min.y) / 2
         delta_z = 0
 
-        self.projection.height = (y_max.y - y_min.y)
+        self.projection.height = (y_max.y - y_min.y) / scale
     else:
       # Width is the constraint: X is the major axis
       if isinstance(self.projection, PerspectiveProjection): 
@@ -208,7 +208,7 @@ class Camera():
         delta_y = -(y_max.y + y_min.y) / 2
         delta_z = 0
 
-        self.projection.width = (x_max.x - x_min.x)
+        self.projection.width = (x_max.x - x_min.x) / scale
 
     # Move the camera, remembering to adjust for the box being shifted off center
     self.camera_to_world *= Transform(translation = Vector3(-delta_x, -delta_y, -delta_z))
