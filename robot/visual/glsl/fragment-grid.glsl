@@ -10,29 +10,34 @@ uniform vec3 in_minor_grid_color;
 
 void main(void)
 {
-  vec2 major_f = fract(vout_world_pos.xy / step_size);
-  vec2 minor_f = fract(vout_world_pos.xy / minor_step_size);
+  // Pick a coordinate to visualize in a grid
+  vec2 coord = vout_world_pos.xy / 500;
+  vec2 coord2 = vout_world_pos.xy / 100;
+
+  // Compute anti-aliased world-space grid lines
+  vec2 line = abs(fract(coord) - 0.5) / fwidth(coord);
+  vec2 line2 = abs(fract(coord2) - 0.5) / fwidth(coord2);
+  vec2 weight = max(vec2(0), min(line - 0.35, vec2(1)));
+  vec2 weight2 = max(vec2(0), min(line2 - 0.005, vec2(1)));
 
   vec4 background = vec4(0, 0, 0, 0);
-  vec4 grid_color = vec4(in_grid_color, 1);
-  vec4 minor_grid_color = vec4(in_minor_grid_color, 1);
+  vec4 grid_color = vec4(0.55, 0.55, 0.55, 1);
+  vec4 minor_grid_color = vec4(0.95, 0.95, 0.95, 1);
 
-  float line_width = 0.025;
-  vec2 major_mult = smoothstep(0, line_width, major_f) - smoothstep(1 - line_width, 1, major_f);
-  vec2 minor_mult = smoothstep(0, line_width, minor_f) - smoothstep(1 - line_width, 1, minor_f);
-
-  float radius = sqrt(vout_world_pos.x * vout_world_pos.x + vout_world_pos.y * vout_world_pos.y);
-  // float alpha = 1
-
-  float major_blend = min(major_mult.x, major_mult.y);
+  // Just visualize the grid lines directly
+  float major_blend = min(weight.x, weight.y);
+  float minor_blend = min(weight2.x, weight2.y);
   vec4 major_color = mix(grid_color, background, major_blend);
-  vec4 minor_color = mix(minor_grid_color, background, min(minor_mult.x, minor_mult.y));
+  vec4 minor_color = mix(minor_grid_color, background, minor_blend);
 
-  // float blend = smoothstep(0, 0, major_blend);
+  vec4 total;
+  if (major_blend != 1) {
+    total = major_color;
+  } else{
+    total = minor_color;
+  }
 
-  vec4 total = major_color + minor_color;
-  total.a = total.a - smoothstep(750, 2500, radius);
+  gl_FragColor = total;
+  gl_FragColor.a = gl_FragColor.a - smoothstep(2000, 4000, length(vout_world_pos.xy));
 
-  gl_FragColor = total; //+ major_color;
-  // gl_FragColor.a = gl_;
 }
