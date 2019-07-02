@@ -13,7 +13,7 @@ from robot.visual.shader_program  import ShaderProgram
 class GridEntity(Entity):
   def __init__(self, shader_program : ShaderProgram = None):
     self.buffer = []
-    self.scale = 5000
+    self.scale = 10000
 
     Entity.__init__(self, shader_program)
 
@@ -25,6 +25,13 @@ class GridEntity(Entity):
       -0.5, -0.5,  0,
        0.5, -0.5,  0,
        0.5,  0.5,  0,
+
+      -0.5, -0.5,  0,
+      -0.5,  0.5,  0,
+       0.5,  0.5,  0,
+       0.5,  0.5,  0,
+       0.5, -0.5,  0,
+      -0.5, -0.5,  0,
     ]
     
     self.buffer = np.array(data_list, dtype=np.float32)
@@ -69,6 +76,6 @@ class GridEntity(Entity):
 
     glBindVertexArray(self.vao)
 
-    glDrawArrays(GL_TRIANGLES, 0, 6)
+    glDrawArrays(GL_TRIANGLES, 0, 12)
   
     glBindVertexArray(0)
