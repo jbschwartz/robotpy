@@ -26,7 +26,7 @@ class Scene(Observer):
       glViewport(0, 0, width, height)
 
   def start_renderer(self):  
-    glClearColor(0.65, 1.0, 0.50, 1)
+    glClearColor(1, 1, 1, 1)
 
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_MULTISAMPLE)
