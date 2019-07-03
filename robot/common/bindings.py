@@ -25,6 +25,7 @@ class Bindings():
       (0, glfw.KEY_F): 'fit',
       (0, glfw.KEY_O): 'orbit_toggle',
       (0, glfw.KEY_P): 'projection_toggle',
+      (0, glfw.KEY_V): 'normal_to',
       
       (glfw.MOD_CONTROL, glfw.KEY_1): 'view_front',
       (glfw.MOD_CONTROL, glfw.KEY_2): 'view_back',

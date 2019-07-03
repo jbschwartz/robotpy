@@ -107,6 +107,8 @@ class CameraController(Observer):
       self.orbit_type = OrbitType.FREE if self.orbit_type is OrbitType.CONSTRAINED else OrbitType.CONSTRAINED
     elif command == 'projection_toggle':
       self.toggle_projection()
+    elif command == 'normal_to':
+      self.normal_to()
 
     elif command == 'track_left':
       self.camera.track(-self.settings.TRACK_STEP, 0)
@@ -138,6 +140,35 @@ class CameraController(Observer):
 
   def window_resize(self, width, height):
     self.camera.projection.aspect = width / height
+
+  def normal_to(self):
+    minimum = math.radians(180)
+    direction = Vector3()
+    forward = self.camera.camera_to_world(Vector3(0, 0, 1), type="vector")
+    for coordinate in [Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1), Vector3(-1, 0, 0), Vector3(0, -1, 0), Vector3(0, 0, -1)]:
+      angle = vector3.angle_between(coordinate, forward)
+      if angle < minimum:
+        minimum = angle
+        direction = coordinate
+
+    axis = vector3.cross(forward, direction)
+    self.camera.camera_to_world = Transform(axis = axis, angle = minimum) * self.camera.camera_to_world
+    
+    right = self.camera.camera_to_world(Vector3(1, 0, 0), type="vector")
+
+    first_direction = direction
+    minimum = math.radians(180)
+    for coordinate in [Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)]:
+      if first_direction == coordinate:
+        continue
+
+      angle = vector3.angle_between(coordinate, right)
+      if angle < minimum:
+        minimum = angle
+        direction = coordinate
+
+    axis = vector3.cross(right, direction)
+    self.camera.camera_to_world = Transform(axis = axis, angle = minimum) * self.camera.camera_to_world
 
   def toggle_projection(self):
     '''
