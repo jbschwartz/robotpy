@@ -1,6 +1,8 @@
 import enum, json, math, glfw
 
 from robot.spatial           import vector3
+from robot.spatial.ray       import Ray
+from robot.spatial.transform import Transform
 from robot.visual.camera     import Camera, OrbitType
 from robot.visual.observer   import Observer
 from robot.visual.projection import OrthoProjection, PerspectiveProjection
@@ -76,7 +78,18 @@ class CameraController(Observer):
     self.orbit_type = OrbitType.CONSTRAINED
 
   def click(self, button, action, cursor):
-    pass
+    if button == glfw.MOUSE_BUTTON_MIDDLE and action == glfw.PRESS:
+      direction = self.camera.camera_space(self.window.ndc(cursor))
+      direction.z = -1
+      direction.normalize()
+
+      r = Ray(self.camera.position, self.camera.camera_to_world(direction, type="vector"))
+      intersection = self.scene.intersect(r)
+
+      if intersection is not None:
+        print(intersection)
+        # self.camera.look_at(self.camera.position, intersection, Vector3(0, 0, 1))
+        self.camera.target = intersection
 
   def drag(self, button, cursor, cursor_delta, modifiers):
     command = self.bindings.get_command((modifiers, button))

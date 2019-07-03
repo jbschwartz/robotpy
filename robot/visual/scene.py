@@ -1,6 +1,7 @@
 from OpenGL.GL import *
 
 from robot.spatial.aabb         import AABB
+from robot.spatial.ray          import Ray
 from robot.visual.camera        import Camera
 from robot.visual.observer      import Observer
 
@@ -21,11 +22,29 @@ class Scene(Observer):
         pass
     return aabb
 
+  def intersect(self, ray):
+    if not self.aabb.intersect(ray):
+      return self.aabb.center
+
+    for entity in self.entities:
+      try:
+        aabb = entity.aabb
+      except AttributeError:
+        continue
+      
+      if aabb.intersect(ray):
+        try:
+          return entity.intersect(ray)
+        except AttributeError:
+          continue
+
+    return self.aabb.center
+
   def window_resize(self, width, height):
     if width and height:
       glViewport(0, 0, width, height)
 
-  def start_renderer(self):  
+  def start_renderer(self):
     glClearColor(1, 1, 1, 1)
 
     glEnable(GL_DEPTH_TEST)

@@ -5,6 +5,7 @@ from robot.mech.joint        import Joint
 from robot.mech.link         import Link
 from robot.spatial.aabb      import AABB
 from robot.spatial.frame     import Frame
+from robot.spatial.ray       import Ray
 from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
 
@@ -48,6 +49,13 @@ class Serial:
       aabb.extend(link.aabb)
 
     return aabb
+
+  def intersect(self, ray):
+    for link in self.links:
+      if link.aabb.intersect(ray):
+        return link.aabb.center
+
+    return None
 
   def position(self, v):
     transform = Transform(translation = v)

@@ -11,6 +11,7 @@ from robot.mech.serial                     import Serial
 from robot.spatial.aabb                    import AABB
 from robot.spatial.frame                   import Frame
 from robot.spatial.matrix4                 import Matrix4
+from robot.spatial.ray                     import Ray
 from robot.spatial.vector3                 import Vector3
 from robot.visual.exceptions               import ParserError
 from robot.visual.entities.entity          import Entity
@@ -66,6 +67,9 @@ class RobotEntity(Entity):
   @property
   def aabb(self):
     return self.serial.aabb
+
+  def intersect(self, ray):
+    return self.serial.intersect(ray)
 
   def build_buffer(self):
     data_list = []
