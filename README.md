@@ -30,10 +30,10 @@ See `robot/common/bindings.py` for all keyboard and mouse bindings.
 - <kbd>→</kbd>: Orbit Right
 - <kbd>↑</kbd>: Orbit Up
 - <kbd>↓</kbd>: Orbit Down
-- <kbd>Ctrl</kbd> + <kbd>←</kbd>: Track Left
-- <kbd>Ctrl</kbd> + <kbd>→</kbd>: Track Right
-- <kbd>Ctrl</kbd> + <kbd>↑</kbd>: Track Up
-- <kbd>Ctrl</kbd> + <kbd>↓</kbd>: Track Down
+- <kbd>Ctrl</kbd> + <kbd>←</kbd>: Track Right
+- <kbd>Ctrl</kbd> + <kbd>→</kbd>: Track Left
+- <kbd>Ctrl</kbd> + <kbd>↑</kbd>: Track Down
+- <kbd>Ctrl</kbd> + <kbd>↓</kbd>: Track Up
 - <kbd>Alt</kbd> + <kbd>←</kbd>: Roll Counter Clockwise
 - <kbd>Alt</kbd> + <kbd>→</kbd>: Roll Clockwise
 - <kbd>Z</kbd>: Scale In
