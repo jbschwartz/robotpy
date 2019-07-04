@@ -26,6 +26,10 @@ See `robot/common/bindings.py` for all keyboard and mouse bindings.
 - <kbd>Alt</kbd> + Middle Mouse Drag: Roll
 - <kbd>Shift</kbd> + Middle Mouse Drag: Scale
 #### Camera Movement
+- <kbd>←</kbd>: Orbit Left
+- <kbd>→</kbd>: Orbit Right
+- <kbd>↑</kbd>: Orbit Up
+- <kbd>↓</kbd>: Orbit Down
 - <kbd>Ctrl</kbd> + <kbd>←</kbd>: Track Left
 - <kbd>Ctrl</kbd> + <kbd>→</kbd>: Track Right
 - <kbd>Ctrl</kbd> + <kbd>↑</kbd>: Track Up

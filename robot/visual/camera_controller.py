@@ -18,6 +18,7 @@ class CameraSettings():
     ORBIT_SPEED  = 0.05
     ROLL_SPEED   = 0.005
     SCALE_SPEED  = 5
+    ORBIT_STEP   = math.radians(5)
     ROLL_STEP    = math.radians(5)
     SCALE_STEP   = 100
     TRACK_STEP   = 20
@@ -131,6 +132,15 @@ class CameraController(Observer):
       self.camera.track(0, self.settings.TRACK_STEP)
     elif command == 'track_down':
       self.camera.track(0, -self.settings.TRACK_STEP)
+
+    elif command == 'orbit_left':
+      self.camera.orbit(0, -self.settings.ORBIT_STEP, self.orbit_type)
+    elif command == 'orbit_right':
+      self.camera.orbit(0, self.settings.ORBIT_STEP, self.orbit_type)
+    elif command == 'orbit_up':
+      self.camera.orbit(-self.settings.ORBIT_STEP, 0, self.orbit_type)
+    elif command == 'orbit_down':
+      self.camera.orbit(self.settings.ORBIT_STEP, 0, self.orbit_type)
 
     elif command == 'roll_cw':
       self.camera.roll(-self.settings.ROLL_STEP)
