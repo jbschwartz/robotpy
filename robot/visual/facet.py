@@ -20,9 +20,11 @@ class Facet:
     Returns the ray origin when the ray origin is in the triangle and the ray points towards
     '''
     edges = self.compute_edges()
-    P = ray.direction % edges[1]
+    E1 = edges[0]
+    E2 = -edges[2]
+    P = ray.direction % E2
     
-    det = edges[0] * (P)
+    det = P * E1
 
     if not check_back_facing and det < 0:
       # The ray intersects the back of the triangle
@@ -32,16 +34,16 @@ class Facet:
       return None
 
     T = ray.origin - self.vertices[0] 
-    Q = T % edges[0]
+    Q = T % E1
 
-    u = P * T / det
+    u = (P * T) / det
     v = Q * ray.direction / det
 
     # Checking if the point of intersection is outside the bounds of the triangle
     if not (0 <= u <= 1) or (v < 0) or (u + v > 1):
       return None
 
-    t = Q * edges[1] / det
+    t = Q * E2 / det
 
     return ray.evaluate(t)
 
