@@ -3,6 +3,7 @@ import math
 import robot.spatial.dual       as     dual
 import robot.spatial.quaternion as     quaternion
 from robot.spatial.aabb         import AABB
+from robot.spatial.ray          import Ray
 from robot.spatial.vector3      import Vector3
 from robot.visual.facet         import Facet
 from robot.visual.mesh          import Mesh
@@ -51,6 +52,8 @@ class Transform:
       return self.transform_mesh(other)
     elif isinstance(other, AABB):
       return self.transform_aabb(other)
+    elif isinstance(other, Ray):
+      return self.transform_ray(other)
     elif isinstance(other, list):
       return [self.__call__(item) for item in other]
         
@@ -82,6 +85,12 @@ class Transform:
     new_vertices = list(map(self.transform_point, facet.vertices))
 
     return Facet(new_vertices, new_normal)
+
+  def transform_ray(self, ray):
+    new_origin    = self.transform_point(ray.origin)
+    new_direction = self.transform_vector(ray.direction)
+
+    return Ray(new_origin, new_direction)
 
   def translation(self) -> Vector3:
     # "Undo" what was done in the __init__ function by working backwards

@@ -88,8 +88,6 @@ class CameraController(Observer):
       intersection = self.scene.intersect(r)
 
       if intersection is not None:
-        print(intersection)
-        # self.camera.look_at(self.camera.position, intersection, Vector3(0, 0, 1))
         self.camera.target = intersection
 
   def drag(self, button, cursor, cursor_delta, modifiers):
