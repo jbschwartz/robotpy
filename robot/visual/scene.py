@@ -24,7 +24,7 @@ class Scene(Observer):
 
   def intersect(self, ray):
     if not self.aabb.intersect(ray):
-      return self.aabb.center
+      return None
 
     for entity in self.entities:
       try:
@@ -38,7 +38,7 @@ class Scene(Observer):
         except AttributeError:
           continue
 
-    return self.aabb.center
+    return None
 
   def window_resize(self, width, height):
     if width and height:

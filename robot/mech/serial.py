@@ -51,19 +51,15 @@ class Serial:
     return aabb
 
   def intersect(self, ray):
-    minimum = [math.inf, None]
+    closest = None
 
-    for index, link in enumerate(self.links):
-      point = link.intersect(ray)
+    for link in self.links:
+      t = link.intersect(ray)
       
-      if point is not None:
-        distance = (ray.origin - point).length()
+      if t and (closest is None or t < closest):
+        closest = t
 
-        if distance < minimum[0]:
-          minimum[0] = distance
-          minimum[1] = point
-
-    return minimum[1]
+    return closest
 
   def position(self, v):
     transform = Transform(translation = v)

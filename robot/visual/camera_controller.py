@@ -85,10 +85,13 @@ class CameraController(Observer):
       direction.normalize()
 
       r = Ray(self.camera.position, self.camera.camera_to_world(direction, type="vector"))
-      intersection = self.scene.intersect(r)
+      t = self.scene.intersect(r)
 
-      if intersection is not None:
+      if t is not None:
+        intersection = r.evaluate(t)
         self.camera.target = intersection
+      else:
+        self.camera.target = self.scene.aabb.center
 
   def drag(self, button, cursor, cursor_delta, modifiers):
     command = self.bindings.get_command((modifiers, button))

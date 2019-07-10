@@ -1,3 +1,5 @@
+import math
+
 from robot.spatial.aabb  import AABB
 from robot.spatial.frame import Frame
 from robot.spatial.ray   import Ray
@@ -19,12 +21,8 @@ class Link:
 
   def intersect(self, world_ray : Ray):
     if self.aabb.intersect(world_ray):
-      link_to_world = self.frame.transform
-      world_to_link = link_to_world.inverse()
+      world_to_link = self.frame.transform.inverse()
 
-      link_ray = world_to_link(world_ray)
-      link_point = self.mesh.intersect(link_ray)
+      return self.mesh.intersect(world_to_link(world_ray))
 
-      return link_to_world(link_point, type="point")
-    
     return None

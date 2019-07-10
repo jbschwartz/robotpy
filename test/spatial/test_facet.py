@@ -20,21 +20,38 @@ class TestFacet(unittest.TestCase):
     ]
 
   def test_intersect(self):
+    def compute_t(ray, intersection):
+      '''Backwards compute parameter t given a ray and intersection'''
+      if intersection is not None:
+        return (ray.origin - intersection).length()
+      else:
+        return None
+
     rays = [
-      (Ray(self.origins[0], Vector3(0, 0,  1)), None),
-      (Ray(self.origins[0], Vector3(0, 0, -1)), self.origins[0] ),
-      (Ray(self.origins[1], Vector3(0, 0, -1)), self.origins[0] ),
-      (Ray(self.origins[1], Vector3(0, 0,  1)), None),
-      (Ray(self.origins[1], Vector3(0.5, 0.25, -1)), Vector3(0.5, 0.25, 0)),
-      (Ray(self.origins[2], Vector3(0, 0, -1)), None),
-      (Ray(self.origins[2], Vector3(-1, -1, -1)), Vector3()),
+      Ray(self.origins[0], Vector3(0, 0,  1)),
+      Ray(self.origins[0], Vector3(0, 0, -1)),
+      Ray(self.origins[1], Vector3(0, 0, -1)),
+      Ray(self.origins[1], Vector3(0, 0,  1)),
+      Ray(self.origins[1], Vector3(0.5, 0.25, -1)),
+      Ray(self.origins[2], Vector3(0, 0, -1)),
+      Ray(self.origins[2], Vector3(-1, -1, -1))
     ]
-    
-    for (ray, expected) in rays:
+
+    intersections = [
+      None,
+      self.origins[0],
+      self.origins[0],
+      None,
+      Vector3(0.5, 0.25, 0),
+      None,
+      Vector3(),
+    ]
+
+    expecteds = [compute_t(ray, intersection) for ray, intersection in zip(rays, intersections)]
+
+    for (ray, expected) in zip(rays, expecteds):
       with self.subTest(f"Check {ray}"):
         result = self.facet.intersect(ray)
 
-        if expected is None:
-          self.assertIsNone(result)
-        else:
+        if expected is not None:
           self.assertAlmostEqual(result, expected)

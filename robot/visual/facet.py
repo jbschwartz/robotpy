@@ -1,5 +1,7 @@
 import math
 
+from typing import Tuple
+
 from robot.spatial.vector3   import Vector3
 from robot.spatial.ray       import Ray
 from robot.visual.exceptions import DegenerateTriangleError
@@ -12,7 +14,7 @@ class Facet:
   def is_triangle(self):
     return len(self.vertices) == 3
 
-  def intersect(self, ray, check_back_facing = False) -> Vector3:
+  def intersect(self, ray, check_back_facing = False) -> Tuple[Vector3, float]:
     '''
     Implementation of the Moller-Trumbore intersection algorithm. Returns the point of intersection (or None for a miss).
     
@@ -45,7 +47,7 @@ class Facet:
 
     t = Q * E2 / det
 
-    return ray.evaluate(t)
+    return t
 
   def compute_edges(self):
     # TODO: Consider caching this result

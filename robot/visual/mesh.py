@@ -26,16 +26,12 @@ class Mesh:
     self.facets.append(facet)
 
   def intersect(self, local_ray : Ray):
-    minimum = [math.inf, None]
+    closest = None
 
     # TODO: This would be the place to look into using a KD Tree
     for triangle in self.facets:
-      point = triangle.intersect(local_ray)
-      if point is not None:
-        # TODO: This is redundant. Return parameter t from the intersection test
-        distance = (local_ray.origin - point).length()
-        if distance < minimum[0]:
-          minimum[0] = distance
-          minimum[1] = point
-    
-    return minimum[1]
+      t = triangle.intersect(local_ray)
+      if t and (closest is None or t < closest):
+        closest = t
+
+    return closest
