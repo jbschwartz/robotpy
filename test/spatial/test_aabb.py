@@ -27,6 +27,29 @@ class TestAABB(unittest.TestCase):
     self.assertAlmostEqual(self.v2, self.aabb.min)
     self.assertAlmostEqual(self.v4, self.aabb.max)
 
+  def test_split(self):
+    # TODO: Make this into a nice decorator to sprinkle throughout test cases
+    self.longMessage = False
+
+    value = -0.5
+
+    for index in range(0, 3):
+    # for axis in [AXIS.X, AXIS.Y, AXIS.Z]:
+      with self.subTest(f'Split on axis {index}'):
+        left, right = self.aabb.split(index, value)
+
+        left_max  = Vector3(*self.v1)
+        left_max[index] = value
+      
+        right_min = Vector3(*self.v2)
+        right_min[index] = value
+
+        self.assertAlmostEqual(left.min, self.aabb.min, msg='Left split incorrect minimum')
+        self.assertAlmostEqual(left.max, left_max, msg='Left split incorrect maximum')
+        
+        self.assertAlmostEqual(right.min, right_min, msg='Right split incorrect minimum')
+        self.assertAlmostEqual(right.max, self.aabb.max, msg='Right split incorrect maximum')
+
   def test_size(self):
     expected = self.v1 - self.v2
 

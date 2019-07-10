@@ -3,9 +3,10 @@ import math
 from robot.spatial.vector3 import Vector3
 
 class AABB:
-  def __init__(self):
-    self.min = Vector3(math.inf, math.inf, math.inf)
-    self.max = Vector3(-math.inf, -math.inf, -math.inf)
+  def __init__(self, corner_min = None, corner_max = None):
+    # TODO: Handle the case where passsed parameters are out of order
+    self.min = corner_min if corner_min else Vector3(math.inf, math.inf, math.inf)
+    self.max = corner_max if corner_max else Vector3(-math.inf, -math.inf, -math.inf)
 
   def extend(self, *args):
     for other in args:
@@ -62,6 +63,24 @@ class AABB:
         return False
 
     return True
+
+  def split(self, axis, value):
+    # TODO: Instead of passing an integer into axis, consider an Enum maybe.
+
+    # TODO: Handle the case where value is outside the bounding box
+    #   Maybe an exception?
+
+    left_max = Vector3(*self.max)
+    left_max[axis] = value
+
+    left  = AABB(self.min, left_max)
+
+    right_min = Vector3(*self.min)
+    right_min[axis] = value
+
+    right = AABB(right_min, self.max)
+
+    return left, right
 
   @property
   def center(self):
