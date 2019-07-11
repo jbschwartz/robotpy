@@ -1,6 +1,7 @@
 import math
 
 from robot.spatial.vector3 import Vector3
+from robot.visual.facet    import Facet
 
 class AABB:
   def __init__(self, corner_min = None, corner_max = None):
@@ -23,8 +24,18 @@ class AABB:
       if value > self.max[index]:
         self.max[index] = value
 
-  def contains(self, v : Vector3):
-    for low, value, high in zip(self.min, v, self.max):
+  def contains(self, element):
+    if isinstance(element, Vector3):
+      return self.contains_point(element)
+    elif isinstance(element, Facet):
+      for vertex in element.vertices:
+        if self.contains_point(vertex):
+          return True
+
+        return False
+
+  def contains_point(self, point):
+    for low, value, high in zip(self.min, point, self.max):
       if not low <= value <= high:
         return False
     return True 
@@ -63,6 +74,9 @@ class AABB:
         return False
 
     return True
+
+  def __str__(self):
+    return f"Min: {self.min}, Max: {self.max}"
 
   def split(self, axis, value):
     # TODO: Instead of passing an integer into axis, consider an Enum maybe.

@@ -3,6 +3,7 @@ import unittest
 from robot.spatial.aabb    import AABB
 from robot.spatial.ray     import Ray
 from robot.spatial.vector3 import Vector3
+from robot.visual.facet    import Facet
 
 class TestAABB(unittest.TestCase):
   def setUp(self):
@@ -59,6 +60,27 @@ class TestAABB(unittest.TestCase):
     expected = (self.v1 - self.v2) / 2 + self.v2
 
     self.assertAlmostEqual(self.aabb.center, expected)
+
+  def test_contains(self):
+    # Test contains with points
+    self.assertTrue(self.aabb.contains(self.v3))
+    self.assertFalse(self.aabb.contains(self.v4))
+
+    # Test contains with facets
+    facet_inside = Facet([
+      self.v3,
+      Vector3(5, 5, 5),
+      Vector3(6, 6, 4)
+    ])
+
+    facet_outside = Facet([
+      Vector3(4, 4, 4),
+      Vector3(5, 5, 5),
+      Vector3(6, 6, 4)
+    ])
+
+    self.assertTrue(self.aabb.contains(facet_inside))
+    self.assertFalse(self.aabb.contains(facet_outside))
 
   def test_intersect(self):
     origin = Vector3(2, 3, 1)
