@@ -1,13 +1,15 @@
 import math
 
-from robot.spatial.aabb import AABB 
-from robot.spatial.ray  import Ray 
-from robot.visual.facet import Facet 
+from robot.spatial.aabb   import AABB 
+from robot.spatial.kdtree import KDTree 
+from robot.spatial.ray    import Ray 
+from robot.visual.facet   import Facet 
 
 class Mesh:
   def __init__(self, name = None):
     self.name = name
     self.facets = []
+    self.kd_tree = None
     self.aabb = AABB()
 
   def vertices(self):
@@ -26,12 +28,8 @@ class Mesh:
     self.facets.append(facet)
 
   def intersect(self, local_ray : Ray):
-    closest = None
+    # TODO: Need to handle case where there is no KD_Tree
+    return self.kd_tree.traverse(local_ray)
 
-    # TODO: This would be the place to look into using a KD Tree
-    for triangle in self.facets:
-      t = triangle.intersect(local_ray)
-      if t and (closest is None or t < closest):
-        closest = t
-
-    return closest
+  def construct_kd_tree(self):
+    self.kd_tree = KDTree(self)

@@ -5,6 +5,7 @@ from OpenGL.GL import *
 
 from ctypes import c_void_p
 
+from robot.common.timer                    import Timer
 from robot.mech.joint                      import Joint
 from robot.mech.link                       import Link
 from robot.mech.serial                     import Serial
@@ -45,7 +46,10 @@ def load(filename):
 
       joints.append(Joint(**joint_params))
 
-    for link_parameters, mesh in zip(data['links'], meshes):
+    for index, (link_parameters, mesh) in enumerate(zip(data['links'], meshes)):
+      with Timer(f'Construct KD Tree for mesh {index}') as t:
+        mesh.construct_kd_tree()
+
       link_parameters['mesh_file'] = data['mesh_file']
       link = Link(link_parameters['name'], mesh, link_parameters['color'])
       links.append(link)
