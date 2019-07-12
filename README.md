@@ -4,6 +4,8 @@
 
 Robot kinematics (and eventually dynamics) written in Python 3.
 
+All development for this project is done live on Twitch. Follow [@jschwartz](https://www.twitch.tv/jschwartz) for notifications.
+
 ## Running
 
 `py -m robot`
