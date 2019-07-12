@@ -5,7 +5,6 @@ from robot.mech.joint        import Joint
 from robot.mech.link         import Link
 from robot.spatial.aabb      import AABB
 from robot.spatial.frame     import Frame
-from robot.spatial.ray       import Ray
 from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
 
@@ -51,15 +50,10 @@ class Serial:
     return aabb
 
   def intersect(self, ray):
-    closest = None
-
-    for link in self.links:
-      t = link.intersect(ray)
-      
-      if t and (closest is None or t < closest):
-        closest = t
-
-    return closest
+    if self.aabb.intersect(ray):
+      return ray.closest_intersection(self.links)
+    else:
+      return None
 
   def position(self, v):
     transform = Transform(translation = v)
@@ -68,9 +62,9 @@ class Serial:
 
   def update_links(self):
     last_frame = self.links[0].frame
-    for link, joint in zip(self.links[1:], self.joints):
-      link.frame = joint.transform * last_frame 
-      last_frame = link.frame
+    # for link, joint in zip(self.links[1:], self.joints):
+    #   link.frame = joint.transform * last_frame 
+    #   last_frame = link.frame
 
   def pose(self) -> Frame: 
     return self.links[-1].frame

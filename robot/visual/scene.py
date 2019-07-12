@@ -1,9 +1,8 @@
 from OpenGL.GL import *
 
-from robot.spatial.aabb         import AABB
-from robot.spatial.ray          import Ray
-from robot.visual.camera        import Camera
-from robot.visual.observer      import Observer
+from robot.spatial.aabb    import AABB
+from robot.visual.camera   import Camera
+from robot.visual.observer import Observer
 
 class Scene(Observer):
   def __init__(self, camera, light):
@@ -23,22 +22,10 @@ class Scene(Observer):
     return aabb
 
   def intersect(self, ray):
-    if not self.aabb.intersect(ray):
+    if self.aabb.intersect(ray):
+      return ray.closest_intersection(self.entities)
+    else:
       return None
-
-    for entity in self.entities:
-      try:
-        aabb = entity.aabb
-      except AttributeError:
-        continue
-      
-      if aabb.intersect(ray):
-        try:
-          return entity.intersect(ray)
-        except AttributeError:
-          continue
-
-    return None
 
   def window_resize(self, width, height):
     if width and height:
