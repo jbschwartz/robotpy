@@ -4,16 +4,23 @@ from typing import Tuple
 
 from robot.spatial.aabb      import AABB
 from robot.spatial.vector3   import Vector3
-from robot.spatial.ray       import Ray
 from robot.visual.exceptions import DegenerateTriangleError
 
 class Facet:
   def __init__(self, vertices = [], normal = Vector3()):
     self.aabb = AABB()
     self.vertices = vertices
+    self._edges = None
     self.normal = normal
 
     self.compute_aabb()
+
+  @property
+  def edges(self):
+    if not self._edges:
+      self.compute_edges()
+
+    return self._edges
 
   def compute_aabb(self):
     self.aabb.extend(*self.vertices)
@@ -28,9 +35,9 @@ class Facet:
     Returns `None` when the ray origin is in the triangle and the ray points away
     Returns the ray origin when the ray origin is in the triangle and the ray points towards
     '''
-    edges = self.compute_edges()
-    E1 = edges[0]
-    E2 = -edges[2]
+
+    E1 = self.edges[0]
+    E2 = -self.edges[2]
     P = ray.direction % E2
     
     det = P * E1
@@ -57,19 +64,11 @@ class Facet:
     return t
 
   def compute_edges(self):
-    # TODO: Consider caching this result
-    edges = []
-
-    for v2, v1 in zip(self.vertices[1:], self.vertices):
-      edges.append(v2 - v1)
-
-    edges.append(self.vertices[0] - self.vertices[-1])
-
-    return edges
+    self._edges =  [(v2 - v1) for v1, v2 in zip(self.vertices, self.vertices[1:])]
+    self._edges.append(self.vertices[0] - self.vertices[-1])
 
   def computed_normal(self):
-    edges = self.compute_edges()
-    normal = edges[0] % edges[1]
+    normal = self.edges[0] % self.edges[1]
 
     if math.isclose(normal.length(), 0.0):
       raise DegenerateTriangleError('Degenerate triangle found')
