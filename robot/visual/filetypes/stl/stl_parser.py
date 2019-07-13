@@ -226,24 +226,20 @@ class STLParser:
   def endfacet(self):
     current_facet = self.current['facet']
 
-    try:
-      if self.compute_normals:
-        computed = current_facet.computed_normal()
-
-        if self.show_warnings:
-          if not vector3.almost_equal(current_facet.normal, computed, 0.0001):
-            self.add_warning(WarningType.CONFLICTING_NORMALS)
-        
-        current_facet.normal = computed
-    except DegenerateTriangleError:
-      if self.show_warnings:
-        self.add_warning(WarningType.DEGENERATE_TRIANGLE)
-
     # TODO: Switch how the ASCII parser constructs facets. 
     # Instead of appending vertices into a constructed facet
     # Hold onto vertices and then construct the facet directly here (i.e. Facet(vertices, normal))
     self.current_facet.compute_aabb()
     self.current_facet.compute_edges()
+
+    try:
+      if self.compute_normals and self.show_warnings:
+        computed = self.current['facet'].computed_normal
+        if not vector3.almost_equal(current_facet.normal, computed, 0.0001):
+            self.add_warning(WarningType.CONFLICTING_NORMALS)
+    except DegenerateTriangleError:
+      if self.show_warnings:
+        self.add_warning(WarningType.DEGENERATE_TRIANGLE)
 
     self.current['mesh'].append(current_facet)
     self.current['state'] = ParserState.PARSE_FACET

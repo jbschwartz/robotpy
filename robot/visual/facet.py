@@ -8,8 +8,9 @@ from robot.visual.exceptions import DegenerateTriangleError
 
 class Facet:
   def __init__(self, vertices = [], normal = Vector3()):
-    self._aabb  = None
-    self._edges = None
+    self._aabb            = None
+    self._computed_normal = None
+    self._edges           = None
 
     self.normal   = normal
     self.vertices = vertices
@@ -21,6 +22,14 @@ class Facet:
       self.compute_aabb()
 
     return self._aabb
+
+  @property
+  def computed_normal(self):
+    '''Lazy return the Facet's computed normal.'''
+    if not self._computed_normal:
+      self.compute_normal()
+
+    return self._computed_normal
 
   @property
   def edges(self):
@@ -101,13 +110,9 @@ class Facet:
     '''Construct the AABB bounding the Facet from the Facet's current vertices.'''
     self._aabb = AABB(elements=self.vertices)
 
-  def computed_normal(self):
-    '''Return the normal vector computed from the Facet's current vertices.'''
-    normal = self.edges[0] % self.edges[1]
-
-    if math.isclose(normal.length(), 0.0):
+  def compute_normal(self):
+    '''Compute the normal vector from the Facet's current vertices.'''
+    try:
+      self._computed_normal = (self.edges[0] % self.edges[1]).normalize()
+    except ZeroDivisionError:
       raise DegenerateTriangleError('Degenerate triangle found')
-    
-    normal.normalize()
-
-    return normal 
