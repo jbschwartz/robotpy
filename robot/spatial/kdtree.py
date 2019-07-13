@@ -9,14 +9,17 @@ class KDTreeNode():
   def is_leaf(self):
     return self.facets is not None
 
-  def axis(self, depth):
-    return depth % 3
+  def can_branch(self, depth):
+    if len(self.facets) == 0 or depth >= DEPTH_BOUND:
+      return False
 
-  def split_aabb(self, axis):
-    split_plane = self.aabb.center[axis]
-    left, right = self.aabb.split(axis, split_plane)
+    return True
 
-    return split_plane, left, right
+  def splitting_plane(self, depth):
+    axis = depth % 3
+    plane_value = self.aabb.center[axis]
+
+    return axis, plane_value
 
   def split_facets(self, axis, split_plane):
     '''Split the list of facets in the node into left and right lists based on splitting axis and plane'''
@@ -33,29 +36,16 @@ class KDTreeNode():
     return left, right
 
   def branch(self, depth = 0):
-    if len(self.facets) == 0: 
-      return None
-
-    if depth >= DEPTH_BOUND:
+    if not self.can_branch(depth):
       return
 
-    axis = self.axis(depth)
+    splitting_plane = self.splitting_plane(depth)
 
-    # split_plane, *boxes = self.split_aabb(axis)
+    boxes = self.aabb.split(*splitting_plane)
 
-    # *all_facets = self.split_facets(split_plane, facets)
+    facet_groups = self.split_facets(*splitting_plane)
 
-    # if any(filter(lambda child: child is not None, self.children))
-    #   self.facets = None
-
-    split_plane, left, right = self.split_aabb(axis)
-
-    left_facets, right_facets = self.split_facets(axis, split_plane)
-
-    self.children = [
-        KDTreeNode(left, left_facets),
-        KDTreeNode(right, right_facets),
-      ]
+    self.children = [KDTreeNode(aabb, facets) for aabb, facets in zip(boxes, facet_groups)]
 
     for child in self.children:
       if child:
