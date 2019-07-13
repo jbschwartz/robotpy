@@ -62,9 +62,9 @@ class Serial:
 
   def update_links(self):
     last_frame = self.links[0].frame
-    # for link, joint in zip(self.links[1:], self.joints):
-    #   link.frame = joint.transform * last_frame 
-    #   last_frame = link.frame
+    for link, joint in zip(self.links[1:], self.joints):
+      link.frame = joint.transform * last_frame 
+      last_frame = link.frame
 
   def pose(self) -> Frame: 
     return self.links[-1].frame
