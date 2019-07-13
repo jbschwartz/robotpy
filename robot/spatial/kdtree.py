@@ -82,8 +82,14 @@ class KDTree():
   def __init__(self, mesh):
     self.root = KDTreeNode(mesh.aabb, mesh.facets)
 
+    self.construct()
+
   def construct(self):
     self.root.branch()
 
   def intersect(self, ray):
     return self.root.intersect(ray)
+
+  def update(self, mesh, facet):
+    # The full tree needs to be reconstructed when the mesh is changed so just re-initialize
+    self.__init__(mesh)
