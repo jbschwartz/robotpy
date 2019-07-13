@@ -80,11 +80,7 @@ class CameraController(Observer):
 
   def click(self, button, action, cursor):
     if button == glfw.MOUSE_BUTTON_MIDDLE and action == glfw.PRESS:
-      direction = self.camera.camera_space(self.window.ndc(cursor))
-      direction.z = -1
-      direction.normalize()
-
-      r = Ray(self.camera.position, self.camera.camera_to_world(direction, type="vector"))
+      r = self.camera.cast_ray(self.window.ndc(cursor))
       t = self.scene.intersect(r)
 
       if t is not None:

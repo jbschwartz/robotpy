@@ -1,6 +1,7 @@
 import enum, math
 
 from robot                   import utils
+from robot.spatial.ray       import Ray
 from robot.spatial.transform import Transform
 from robot.spatial           import vector3
 from robot.visual.projection import OrthoProjection, PerspectiveProjection
@@ -231,6 +232,22 @@ class Camera():
     m22 = self.projection.inverse.elements[5]
 
     return Vector3(m11 * ndc.x, m22 * ndc.y, -self.projection.near_clip)
+
+  def cast_ray(self, ndc):
+    point_camera_space = self.camera_space(ndc)
+
+    if isinstance(self.projection, PerspectiveProjection): 
+      origin = self.position
+
+      direction = point_camera_space
+      direction.z = -1
+      direction.normalize()
+    elif isinstance(self.projection, OrthoProjection):
+      origin = self.camera_to_world(self.camera_space(ndc), type="point")
+      
+      direction = Vector3(0, 0, -1)
+
+    return Ray(origin, self.camera_to_world(direction, type="vector"))
 
   @property
   def world_to_camera(self):
