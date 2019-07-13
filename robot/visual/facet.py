@@ -8,12 +8,10 @@ from robot.visual.exceptions import DegenerateTriangleError
 
 class Facet:
   def __init__(self, vertices = [], normal = Vector3()):
-    self.aabb = AABB()
+    self._aabb = None
     self.vertices = vertices
     self._edges = None
     self.normal = normal
-
-    self.compute_aabb()
 
   @property
   def edges(self):
@@ -22,8 +20,15 @@ class Facet:
 
     return self._edges
 
+  @property
+  def aabb(self):
+    if not self._aabb:
+      self.compute_aabb()
+
+    return self._aabb
+
   def compute_aabb(self):
-    self.aabb.extend(*self.vertices)
+    self._aabb = AABB(elements=self.vertices)
 
   def is_triangle(self):
     return len(self.vertices) == 3
