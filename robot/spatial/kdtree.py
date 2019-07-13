@@ -13,14 +13,7 @@ class KDTreeNode():
     if self.aabb.intersect(ray):
       if self.facets is not None:
         # Leaf node
-        closest = None
-
-        for triangle in self.facets:
-          t = triangle.intersect(ray)
-          if t and (closest is None or t < closest):
-            closest = t
-
-        return closest
+        return ray.closest_intersection(self.facets)
       else:
         t_left = None
         t_right = None
