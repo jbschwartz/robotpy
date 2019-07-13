@@ -9,12 +9,14 @@ from robot.visual.exceptions import DegenerateTriangleError
 class Facet:
   def __init__(self, vertices = [], normal = Vector3()):
     self._aabb = None
-    self.vertices = vertices
     self._edges = None
+
     self.normal = normal
+    self.vertices = vertices
 
   @property
   def edges(self):
+    '''Lazy return a list of Facet edges.'''
     if not self._edges:
       self.compute_edges()
 
@@ -22,12 +24,19 @@ class Facet:
 
   @property
   def aabb(self):
+    '''Lazy return an AABB bounding the Facet.'''
     if not self._aabb:
       self.compute_aabb()
 
     return self._aabb
 
   def append(self, vertex, recompute=True):
+    '''
+    Add a vertex to the Facet.
+
+    Choose whether or not to recompute the lazy evaluated properties (e.g. edges, aabb).
+    '''
+
     self.vertices.append(vertex)
 
     if recompute:
@@ -43,14 +52,17 @@ class Facet:
       ])
 
   def is_triangle(self):
+    '''Returns True if the Facet has 3 vertices.'''
     return len(self.vertices) == 3
 
   def intersect(self, ray, check_back_facing = False) -> Tuple[Vector3, float]:
     '''
-    Implementation of the Moller-Trumbore intersection algorithm. Returns the point of intersection (or None for a miss).
-    
-    Returns `None` when the ray origin is in the triangle and the ray points away
-    Returns the ray origin when the ray origin is in the triangle and the ray points towards
+    Returns the point of ray intersection (or None for a miss).
+
+    Returns `None` when the ray origin is in the triangle and the ray points away.
+    Returns the ray origin when the ray origin is in the triangle and the ray points towards.
+
+    This function implements the Moller-Trumbore intersection algorithm. 
     '''
 
     E1 = self.edges[0]
@@ -81,13 +93,16 @@ class Facet:
     return t
 
   def compute_edges(self):
+    '''Construct a list of edges from the Facet's current vertices.'''
     self._edges =  [(v2 - v1) for v1, v2 in zip(self.vertices, self.vertices[1:])]
     self._edges.append(self.vertices[0] - self.vertices[-1])
 
   def compute_aabb(self):
+    '''Construct the AABB bounding the Facet from the Facet's current vertices.'''
     self._aabb = AABB(elements=self.vertices)
 
   def computed_normal(self):
+    '''Return the normal vector computed from the Facet's current vertices.'''
     normal = self.edges[0] % self.edges[1]
 
     if math.isclose(normal.length(), 0.0):
