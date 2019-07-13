@@ -1,7 +1,7 @@
 DEPTH_BOUND = 8
 
 class KDTreeNode():
-  def __init__(self, aabb, facets = None):
+  def __init__(self, aabb, facets):
     self.aabb = aabb
     self.facets = facets
     self.children = []
