@@ -22,38 +22,65 @@ from robot.visual.filetypes.stl.stl_parser import STLParser
 from robot.visual.mesh                     import Mesh
 from robot.visual.shader_program           import ShaderProgram
 
-def load(filename):
+loaded_files = {}
+
+def parse_mesh(file_path):
+  p = STLParser()
+
+  try:
+    meshes = p.parse(file_path)
+  except ParserError as error:
+    print('\033[91m' + f'Parsing error on line {error.line}: {error}' + '\033[0m')
+    # TODO: It's probably no longer appropriate for this to be a quit() here
+    quit()
+
+  for index, mesh in enumerate(meshes):
+    with Timer(f'Construct KD Tree for mesh {index}') as t:
+      mesh.accelerator = KDTree
+
+  return meshes
+
+def get_joint_params(joint_json):
+  for joint_params in joint_json:
+    for param, value in joint_params.items():
+      if param == 'limits':
+        value['low'] = math.radians(value['low'])
+        value['high'] = math.radians(value['high'])
+      elif param in ['alpha', 'theta']:
+        joint_params[param] = math.radians(value)
+  
+  return joint_json
+
+def load(file_path):
+  links = []
+
+  cached_result = loaded_files.get(file_path)
+
   joints = []
   links = []
-  with open(filename) as json_file:  
-    data = json.load(json_file)
 
-    p = STLParser()
+  if not cached_result:
+    with open(file_path) as json_file:  
+      data = json.load(json_file)
 
-    try:
-      meshes = p.parse(f'robot/mech/robots/meshes/{data["mesh_file"]}')
-    except ParserError as error:
-      print('\033[91m' + f'Parsing error on line {error.line}: {error}' + '\033[0m')
-      # TODO: It's probably no longer appropriate for this to be a quit() here
-      quit()
+    meshes = parse_mesh(f'robot/mech/robots/meshes/{data["mesh_file"]}')
+    joint_params = get_joint_params(data['joints'])
+    link_params = data['links']
 
-    for joint_params in data['joints']:
-      for param, value in joint_params.items():
-        if param == 'limits':
-          value['low'] = math.radians(value['low'])
-          value['high'] = math.radians(value['high'])
-        elif param in ['alpha', 'theta']:
-          joint_params[param] = math.radians(value)
+    loaded_files[file_path] = {
+      'meshes': meshes,
+      'joint_params': joint_params,
+      'link_params': link_params
+    }
+  else:
+    meshes = cached_result['meshes']
+    joint_params = cached_result['joint_params']
+    link_params = cached_result['link_params']
 
-      joints.append(Joint(**joint_params))
-
-    for index, (link_parameters, mesh) in enumerate(zip(data['links'], meshes)):
-      with Timer(f'Construct KD Tree for mesh {index}') as t:
-        mesh.accelerator = KDTree
-
-      link_parameters['mesh_file'] = data['mesh_file']
-      link = Link(link_parameters['name'], mesh, link_parameters['color'])
-      links.append(link)
+  for joint in joint_params:
+    joints.append(Joint(**joint))
+  for link, mesh in zip(link_params, meshes):
+    links.append(Link(link['name'], mesh, link['color']))
 
   return RobotEntity(Serial(joints, links))
 
