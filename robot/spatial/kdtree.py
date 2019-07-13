@@ -45,28 +45,23 @@ class KDTreeNode():
 
     # *all_facets = self.split_facets(split_plane, facets)
 
-    # self.children = [KDTreeNode(box, facets) for box, facets in zip(boxes, all_facets)]
-
     # if any(filter(lambda child: child is not None, self.children))
     #   self.facets = None
 
     split_plane, left, right = self.split_aabb(axis)
 
-    # left_facets  = []
-    # right_facets = []
-
     left_facets, right_facets = self.split_facets(axis, split_plane)
 
-    left = KDTreeNode(left, left_facets)
-    right = KDTreeNode(right, right_facets)
+    self.children = [
+        KDTreeNode(left, left_facets),
+        KDTreeNode(right, right_facets),
+      ]
 
-    self.children = [left, right]
+    for child in self.children:
+      if child:
+        self.facets = None
 
-    if left or right:
-      self.facets = None
-
-    left.branch(depth + 1),
-    right.branch(depth + 1)
+      child.branch(depth + 1)
 
   def intersect(self, ray):
     '''Intersect ray with node and return the ray's t parameter for found intersections. Return None for no intersections.'''
