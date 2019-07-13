@@ -85,5 +85,5 @@ class KDTree():
   def construct(self):
     self.root.branch()
 
-  def traverse(self, ray):
+  def intersect(self, ray):
     return self.root.intersect(ray)
