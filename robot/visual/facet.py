@@ -8,19 +8,11 @@ from robot.visual.exceptions import DegenerateTriangleError
 
 class Facet:
   def __init__(self, vertices = [], normal = Vector3()):
-    self._aabb = None
+    self._aabb  = None
     self._edges = None
 
-    self.normal = normal
+    self.normal   = normal
     self.vertices = vertices
-
-  @property
-  def edges(self):
-    '''Lazy return a list of Facet edges.'''
-    if not self._edges:
-      self.compute_edges()
-
-    return self._edges
 
   @property
   def aabb(self):
@@ -29,6 +21,14 @@ class Facet:
       self.compute_aabb()
 
     return self._aabb
+
+  @property
+  def edges(self):
+    '''Lazy return a list of Facet edges.'''
+    if not self._edges:
+      self.compute_edges()
+
+    return self._edges
 
   def append(self, vertex, recompute=True):
     '''
