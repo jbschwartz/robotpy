@@ -2,35 +2,27 @@ class KDTreeNode():
   def __init__(self, aabb, facets = None, left = None, right = None):
     self.aabb = aabb
     self.facets = facets
-    self.left = left
-    self.right = right
+    self.children = [left, right]
+
+  def is_leaf(self):
+    return self.facets is not None
 
   def intersect(self, ray):
-    if self.aabb.intersect(ray):
-      if self.facets is not None:
-        # Leaf node
-        return ray.closest_intersection(self.facets)
-      else:
-        t_left = None
-        t_right = None
-
-        if self.left:
-          t_left = self.left.intersect(ray)
-
-        if self.right:
-          t_right = self.right.intersect(ray)
-
-        if t_left is None and t_right is None:
-          return None
-        elif t_left is None:
-          return t_right
-        elif t_right is None:
-          return t_left
-        else:
-          return min(t_left, t_right)
-    else:
+    '''Intersect ray with node and return the ray's t parameter for found intersections. Return None for no intersections.'''
+    if not self.aabb.intersect(ray):
       return None
 
+    if self.is_leaf():
+      return ray.closest_intersection(self.facets)
+    else:
+      return self.intersect_children(ray)
+
+  def intersect_children(self, ray):
+    '''Intersect ray with children and return the ray's t parameter for found intersections. Return None for no intersections.'''
+    intersections = [child.intersect(ray) for child in self.children if child is not None]
+    valid_intersections = [inter for inter in intersections if inter is not None]
+
+    return min(valid_intersections) if valid_intersections else None
 
 class KDTree():
   DEPTH_BOUND = 8
