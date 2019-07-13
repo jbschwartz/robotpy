@@ -10,7 +10,15 @@ class Mesh:
     self.facets = []
     self.aabb = AABB()
     
-    self.kd_tree = KDTree(self)
+    self._accelerator = None
+
+  @property
+  def accelerator(self):
+    return self._accelerator
+
+  @accelerator.setter
+  def accelerator(self, accelerator):
+    self._accelerator = accelerator(self)
 
   def vertices(self):
     '''
@@ -27,10 +35,13 @@ class Mesh:
       
     facet.compute_aabb()
     self.facets.append(facet)
+    
+    if self.accelerator:
+      self.accelerator.update(self, facet)
 
   def intersect(self, local_ray : Ray):
-    # TODO: Need to handle case where there is no KD_Tree
-    return self.kd_tree.intersect(local_ray)
-
-  def construct_kd_tree(self):
-    self.kd_tree.construct()
+    if self.accelerator:
+      return self.accelerator.intersect(local_ray)
+    else:
+      # Otherwise we brute force the computation
+      return local_ray.closest_intersection(self.facets)

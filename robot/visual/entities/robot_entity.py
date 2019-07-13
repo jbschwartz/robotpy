@@ -11,6 +11,7 @@ from robot.mech.link                       import Link
 from robot.mech.serial                     import Serial
 from robot.spatial.aabb                    import AABB
 from robot.spatial.frame                   import Frame
+from robot.spatial.kdtree                  import KDTree
 from robot.spatial.matrix4                 import Matrix4
 from robot.spatial.ray                     import Ray
 from robot.spatial.vector3                 import Vector3
@@ -48,7 +49,7 @@ def load(filename):
 
     for index, (link_parameters, mesh) in enumerate(zip(data['links'], meshes)):
       with Timer(f'Construct KD Tree for mesh {index}') as t:
-        mesh.construct_kd_tree()
+        mesh.accelerator = KDTree
 
       link_parameters['mesh_file'] = data['mesh_file']
       link = Link(link_parameters['name'], mesh, link_parameters['color'])
