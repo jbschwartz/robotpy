@@ -1,7 +1,3 @@
-from robot.spatial.vector3   import Vector3
-from robot.spatial.ray       import Ray
-from robot.visual.exceptions import DegenerateTriangleError
-
 class KDTreeNode():
   def __init__(self, aabb, facets = None, left = None, right = None):
     self.aabb = aabb
@@ -37,22 +33,16 @@ class KDTreeNode():
 
 
 class KDTree():
-  MINIMUM_FACETS = 20
-  DEPTH_BOUND = 3
+  DEPTH_BOUND = 8
 
   def __init__(self, mesh):
-    self.mesh = mesh
-
     self.root = self.branch(mesh.aabb, mesh.facets)
 
   def branch(self, aabb, facets, depth = 0) -> KDTreeNode:
-    num_facets = len(facets)
-
-    if num_facets == 0: 
+    if len(facets) == 0: 
       return None
 
-    # TODO: Is this a good condition to stop branching?
-    if num_facets <= self.MINIMUM_FACETS or depth >= self.DEPTH_BOUND:
+    if depth >= self.DEPTH_BOUND:
       # Return a leaf node
       return KDTreeNode(aabb, facets=facets)
 
