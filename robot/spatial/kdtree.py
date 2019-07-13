@@ -1,19 +1,16 @@
 DEPTH_BOUND = 8
 
 class KDTreeNode():
-  def __init__(self, aabb, facets = None, left = None, right = None):
+  def __init__(self, aabb, facets = None):
     self.aabb = aabb
     self.facets = facets
-    self.children = [left, right]
+    self.children = []
 
   def is_leaf(self):
-    return self.facets is not None
+    return len(self.children) == 0
 
   def can_branch(self, depth):
-    if len(self.facets) == 0 or depth >= DEPTH_BOUND:
-      return False
-
-    return True
+    return len(self.facets) > 0 and depth < DEPTH_BOUND
 
   def splitting_plane(self, depth):
     axis = depth % 3
@@ -45,13 +42,13 @@ class KDTreeNode():
 
     facet_groups = self.split_facets(*splitting_plane)
 
-    self.children = [KDTreeNode(aabb, facets) for aabb, facets in zip(boxes, facet_groups)]
+    for aabb, facets in zip(boxes, facet_groups):
+      new_child = KDTreeNode(aabb, facets)
+      new_child.branch(depth + 1)
 
-    for child in self.children:
-      if child:
-        self.facets = None
+      self.children.append(new_child)
 
-      child.branch(depth + 1)
+    self.facets = None
 
   def intersect(self, ray):
     '''Intersect ray with node and return the ray's t parameter for found intersections. Return None for no intersections.'''
@@ -65,7 +62,7 @@ class KDTreeNode():
 
   def intersect_children(self, ray):
     '''Intersect ray with children and return the ray's t parameter for found intersections. Return None for no intersections.'''
-    intersections = [child.intersect(ray) for child in self.children if child is not None]
+    intersections = [child.intersect(ray) for child in self.children]
     valid_intersections = [inter for inter in intersections if inter is not None]
 
     return min(valid_intersections) if valid_intersections else None
