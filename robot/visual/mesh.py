@@ -1,7 +1,6 @@
 import math
 
 from robot.spatial.aabb   import AABB 
-from robot.spatial.kdtree import KDTree 
 from robot.spatial.ray    import Ray 
 
 class Mesh:
@@ -21,17 +20,15 @@ class Mesh:
     self._accelerator = accelerator(self)
 
   def vertices(self):
-    '''
-    Iterable list of vertex data returned in the format (vx, vy, vz)
-    '''
+    '''Iterable list of mesh vertices returned grouped by facet.'''
     for facet in self.facets:
       yield facet.vertices[0]
       yield facet.vertices[1]
       yield facet.vertices[2]
 
   def append(self, facet):
-    for vertex in facet.vertices:
-      self.aabb.extend(vertex)
+    '''Add a facet to the mesh.'''
+    self.aabb.extend(*facet.vertices)
 
     self.facets.append(facet)
     
@@ -39,6 +36,7 @@ class Mesh:
       self.accelerator.update(self, facet)
 
   def intersect(self, local_ray : Ray):
+    '''Intersect a ray with mesh and return the ray's t parameter for found intersections. Return None for no intersections.'''
     if self.accelerator:
       return self.accelerator.intersect(local_ray)
     else:
