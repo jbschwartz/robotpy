@@ -18,7 +18,6 @@ class Camera():
   '''
   def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), projection = PerspectiveProjection()):
     self.projection = projection
-    self.target = target
     self.look_at(position, target, up)
 
   def look_at(self, position, target, up):
@@ -42,8 +41,6 @@ class Camera():
       9.  Otherwise, we need to then calculate which direction to rotate the intermediate x to get to desired.
       10. Rotate around our desired z axis to complete the transformation
     '''
-
-    self.target = target
 
     forward = (position - target).normalize()       # Step 2
     angle_z = math.acos(Vector3(0, 0, 1) * forward) # Step 3
@@ -72,13 +69,13 @@ class Camera():
   def position(self):
     return self.camera_to_world.translation()
 
-  def orbit(self, pitch = 0, yaw = 0, orbit_type : OrbitType = OrbitType.FREE):
+  def orbit(self, target: Vector3, pitch = 0, yaw = 0, orbit_type : OrbitType = OrbitType.FREE):
     '''
     Orbits the camera around the target point (with pitch and yaw)
     '''
 
     # Move target to the origin
-    self.camera_to_world = Transform(translation = -self.target) * self.camera_to_world
+    self.camera_to_world = Transform(translation = -target) * self.camera_to_world
 
     if pitch != 0:
       # Rotation around camera x axis in world coordinates
@@ -95,7 +92,7 @@ class Camera():
       self.camera_to_world = Transform(axis = yaw_axis, angle = yaw) * self.camera_to_world
 
     # Move target back to position
-    self.camera_to_world = Transform(translation = self.target) * self.camera_to_world
+    self.camera_to_world = Transform(translation = target) * self.camera_to_world
 
   def dolly(self, z):
     '''
@@ -114,17 +111,13 @@ class Camera():
 
     self.camera_to_world *= Transform(translation = v)
 
-    camera_displacement_in_world = self.camera_to_world(v, type="vector")
-    self.target += camera_displacement_in_world
-
   def roll(self, angle):
     self.camera_to_world *= Transform(axis = Vector3(0, 0, 1), angle = angle)
 
   def fit(self, world_aabb, scale = 1):
     '''
     Dolly and track the camera to fit the provided bounding box in world space. 
-    Update the target to the center of the bounding box.
-    
+
     Scale [0, 1] represents the percentage of the frame used (with 1 being full frame).
 
     This function is not perfect but performs well overall. There may be some edge cases out there lurking.
@@ -217,8 +210,6 @@ class Camera():
 
     # Move the camera, remembering to adjust for the box being shifted off center
     self.camera_to_world *= Transform(translation = Vector3(-delta_x, -delta_y, -delta_z))
-    # Set the camera target to the center of the scene without changing it's direction
-    self.target = self.camera_to_world(Vector3(0, 0, self.world_to_camera(world_aabb.center).z))
 
   def camera_space(self, ndc):
     '''
@@ -244,7 +235,7 @@ class Camera():
       direction.normalize()
     elif isinstance(self.projection, OrthoProjection):
       origin = self.camera_to_world(self.camera_space(ndc), type="point")
-      
+
       direction = Vector3(0, 0, -1)
 
     return Ray(origin, self.camera_to_world(direction, type="vector"))

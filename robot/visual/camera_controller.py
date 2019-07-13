@@ -76,6 +76,7 @@ class CameraController(Observer):
     self.bindings = bindings
     self.scene = scene
     self.window = window
+    self.target = self.scene.aabb.center
     self.orbit_type = OrbitType.CONSTRAINED
 
   def click(self, button, action, cursor):
@@ -84,10 +85,9 @@ class CameraController(Observer):
       t = self.scene.intersect(r)
 
       if t is not None:
-        intersection = r.evaluate(t)
-        self.camera.target = intersection
+        self.target = r.evaluate(t)
       else:
-        self.camera.target = self.scene.aabb.center
+        self.target = self.scene.aabb.center
 
   def drag(self, button, cursor, cursor_delta, modifiers):
     command = self.bindings.get_command((modifiers, button))
@@ -104,7 +104,7 @@ class CameraController(Observer):
       # It's hard to orbit slowly and precisely when the orbit speed is set where it needs to be for general purpose orbiting
       # The steps are too large and it looks choppy.
       angle = self.settings.ORBIT_SPEED * vector3.normalize(cursor_delta)
-      self.camera.orbit(angle.y, angle.x, self.orbit_type)
+      self.camera.orbit(self.target, angle.y, angle.x, self.orbit_type)
 
   def key(self, key, action, modifiers):
     if action == glfw.PRESS:
@@ -131,13 +131,13 @@ class CameraController(Observer):
       self.camera.track(0, -self.settings.TRACK_STEP)
 
     elif command == 'orbit_left':
-      self.camera.orbit(0, -self.settings.ORBIT_STEP, self.orbit_type)
+      self.camera.orbit(self.target, 0, -self.settings.ORBIT_STEP, self.orbit_type)
     elif command == 'orbit_right':
-      self.camera.orbit(0, self.settings.ORBIT_STEP, self.orbit_type)
+      self.camera.orbit(self.target, 0, self.settings.ORBIT_STEP, self.orbit_type)
     elif command == 'orbit_up':
-      self.camera.orbit(-self.settings.ORBIT_STEP, 0, self.orbit_type)
+      self.camera.orbit(self.target, -self.settings.ORBIT_STEP, 0, self.orbit_type)
     elif command == 'orbit_down':
-      self.camera.orbit(self.settings.ORBIT_STEP, 0, self.orbit_type)
+      self.camera.orbit(self.target, self.settings.ORBIT_STEP, 0, self.orbit_type)
 
     elif command == 'roll_cw':
       self.camera.roll(-self.settings.ROLL_STEP)
