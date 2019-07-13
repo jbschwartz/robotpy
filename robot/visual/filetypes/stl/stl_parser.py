@@ -239,6 +239,11 @@ class STLParser:
       if self.show_warnings:
         self.add_warning(WarningType.DEGENERATE_TRIANGLE)
 
+    # TODO: Switch how the ASCII parser constructs facets. 
+    # Instead of appending vertices into a constructed facet
+    # Hold onto vertices and then construct the facet directly here (i.e. Facet(vertices, normal))
+    self.current_facet.compute_aabb()
+
     self.current['mesh'].append(current_facet)
     self.current['state'] = ParserState.PARSE_FACET
 

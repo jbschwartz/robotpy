@@ -13,6 +13,8 @@ class Facet:
     self.vertices = vertices
     self.normal = normal
 
+    self.compute_aabb()
+
   def compute_aabb(self):
     self.aabb.extend(*self.vertices)
 

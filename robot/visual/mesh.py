@@ -32,8 +32,7 @@ class Mesh:
   def append(self, facet):
     for vertex in facet.vertices:
       self.aabb.extend(vertex)
-      
-    facet.compute_aabb()
+
     self.facets.append(facet)
     
     if self.accelerator:
