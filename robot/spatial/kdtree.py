@@ -72,9 +72,9 @@ class KDTree():
     right_facets = []
 
     for facet in facets:
-      if left.contains(facet):
+      if facet.aabb.min[axis] < split_plane:
         left_facets.append(facet)
-      if right.contains(facet):
+      if facet.aabb.max[axis] > split_plane:
         right_facets.append(facet)
 
     return KDTreeNode(

@@ -29,9 +29,8 @@ class Mesh:
     self.facets.append(facet)
 
   def intersect(self, local_ray : Ray):
-    return local_ray.closest_intersection(self.facets)
     # TODO: Need to handle case where there is no KD_Tree
-    # return self.kd_tree.traverse(local_ray)
+    return self.kd_tree.traverse(local_ray)
 
   def construct_kd_tree(self):
     self.kd_tree = KDTree(self)

@@ -1,7 +1,6 @@
 import math
 
 from robot.spatial.vector3 import Vector3
-from robot.visual.facet    import Facet
 
 class AABB:
   def __init__(self, corner_min = None, corner_max = None):
@@ -27,12 +26,6 @@ class AABB:
   def contains(self, element):
     if isinstance(element, Vector3):
       return self.contains_point(element)
-    elif isinstance(element, Facet):
-      for vertex in element.vertices:
-        if self.contains_point(vertex):
-          return True
-
-        return False
 
   def contains_point(self, point):
     for low, value, high in zip(self.min, point, self.max):
