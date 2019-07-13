@@ -210,7 +210,7 @@ class STLParser:
   @check_state(ParserState.PARSE_VERTEX)
   def vertex(self, x, y, z):
     v = Vector3(x, y, z)
-    self.current['facet'].vertices.append(v)
+    self.current['facet'].append(v, recompute=False)
     self.stats['vertices'] += 1
   
   @check_state(ParserState.PARSE_VERTEX)
@@ -243,6 +243,7 @@ class STLParser:
     # Instead of appending vertices into a constructed facet
     # Hold onto vertices and then construct the facet directly here (i.e. Facet(vertices, normal))
     self.current_facet.compute_aabb()
+    self.current_facet.compute_edges()
 
     self.current['mesh'].append(current_facet)
     self.current['state'] = ParserState.PARSE_FACET

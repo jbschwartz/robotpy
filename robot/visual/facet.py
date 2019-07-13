@@ -27,8 +27,20 @@ class Facet:
 
     return self._aabb
 
-  def compute_aabb(self):
-    self._aabb = AABB(elements=self.vertices)
+  def append(self, vertex, recompute=True):
+    self.vertices.append(vertex)
+
+    if recompute:
+      self._aabb.extend(vertex)
+
+      # Remove the last edge as it no longer exists
+      # Insert two new edges created by new vertex
+      del self._edges[-1]
+    
+      self.edges.extend([
+        vertex - self.vertices[-1],
+        self.vertices[0] - vertex
+      ])
 
   def is_triangle(self):
     return len(self.vertices) == 3
@@ -71,6 +83,9 @@ class Facet:
   def compute_edges(self):
     self._edges =  [(v2 - v1) for v1, v2 in zip(self.vertices, self.vertices[1:])]
     self._edges.append(self.vertices[0] - self.vertices[-1])
+
+  def compute_aabb(self):
+    self._aabb = AABB(elements=self.vertices)
 
   def computed_normal(self):
     normal = self.edges[0] % self.edges[1]
