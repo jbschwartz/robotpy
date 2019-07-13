@@ -9,8 +9,9 @@ class Mesh:
   def __init__(self, name = None):
     self.name = name
     self.facets = []
-    self.kd_tree = None
     self.aabb = AABB()
+    
+    self.kd_tree = KDTree(self)
 
   def vertices(self):
     '''
@@ -33,4 +34,4 @@ class Mesh:
     return self.kd_tree.traverse(local_ray)
 
   def construct_kd_tree(self):
-    self.kd_tree = KDTree(self)
+    self.kd_tree.construct()
