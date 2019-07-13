@@ -2,14 +2,19 @@ import math
 
 from typing import Tuple
 
+from robot.spatial.aabb      import AABB
 from robot.spatial.vector3   import Vector3
 from robot.spatial.ray       import Ray
 from robot.visual.exceptions import DegenerateTriangleError
 
 class Facet:
   def __init__(self, vertices = [], normal = Vector3()):
+    self.aabb = AABB()
     self.vertices = vertices
     self.normal = normal
+
+  def compute_aabb(self):
+    self.aabb.extend(*self.vertices)
 
   def is_triangle(self):
     return len(self.vertices) == 3

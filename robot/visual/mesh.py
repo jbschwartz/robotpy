@@ -25,6 +25,7 @@ class Mesh:
     for vertex in facet.vertices:
       self.aabb.extend(vertex)
       
+    facet.compute_aabb()
     self.facets.append(facet)
 
   def intersect(self, local_ray : Ray):
