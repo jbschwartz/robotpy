@@ -30,6 +30,15 @@ class KDTree():
   def __init__(self, mesh):
     self.root = self.branch(mesh.aabb, mesh.facets)
 
+  def axis(self, depth):
+    return depth % 3
+
+  def split(self, aabb, axis):
+    split_plane = aabb.center[axis]
+    left, right = aabb.split(axis, split_plane)
+
+    return split_plane, left, right
+
   def branch(self, aabb, facets, depth = 0) -> KDTreeNode:
     if len(facets) == 0: 
       return None
@@ -38,10 +47,8 @@ class KDTree():
       # Return a leaf node
       return KDTreeNode(aabb, facets=facets)
 
-    axis = depth % 3
-
-    split_plane = aabb.center[axis]
-    left, right = aabb.split(axis, split_plane)
+    axis = self.axis(depth)
+    split_plane, left, right = self.split(aabb, axis)
 
     left_facets  = []
     right_facets = []
