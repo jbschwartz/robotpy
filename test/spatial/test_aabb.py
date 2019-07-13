@@ -66,22 +66,6 @@ class TestAABB(unittest.TestCase):
     self.assertTrue(self.aabb.contains(self.v3))
     self.assertFalse(self.aabb.contains(self.v4))
 
-    # Test contains with facets
-    facet_inside = Facet([
-      self.v3,
-      Vector3(5, 5, 5),
-      Vector3(6, 6, 4)
-    ])
-
-    facet_outside = Facet([
-      Vector3(4, 4, 4),
-      Vector3(5, 5, 5),
-      Vector3(6, 6, 4)
-    ])
-
-    self.assertTrue(self.aabb.contains(facet_inside))
-    self.assertFalse(self.aabb.contains(facet_outside))
-
   def test_intersect(self):
     origin = Vector3(2, 3, 1)
 

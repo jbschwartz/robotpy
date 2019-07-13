@@ -15,6 +15,7 @@ class AABB:
       elif isinstance(other, AABB):
         self._extend_vector(other.min)
         self._extend_vector(other.max)
+    # TODO: Extend with Facet
 
   def _extend_vector(self, v : Vector3):
     for index, value in enumerate(v):
