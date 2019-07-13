@@ -32,21 +32,23 @@ class KDTreeNode():
     
     return left, right
 
+  def candidate_children(self, splitting_plane):
+    child_boxes = self.aabb.split(*splitting_plane)
+    child_facets = self.split_facets(*splitting_plane)
+
+    return zip(child_boxes, child_facets)
+
   def branch(self, depth = 0):
     if not self.can_branch(depth):
       return
 
     splitting_plane = self.splitting_plane(depth)
 
-    boxes = self.aabb.split(*splitting_plane)
+    for aabb, facets in self.candidate_children(splitting_plane):
+      node = KDTreeNode(aabb, facets)
+      node.branch(depth + 1)
 
-    facet_groups = self.split_facets(*splitting_plane)
-
-    for aabb, facets in zip(boxes, facet_groups):
-      new_child = KDTreeNode(aabb, facets)
-      new_child.branch(depth + 1)
-
-      self.children.append(new_child)
+      self.children.append(node)
 
     self.facets = None
 
