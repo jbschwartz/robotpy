@@ -54,7 +54,7 @@ class Facet:
       # Remove the last edge as it no longer exists
       # Insert two new edges created by new vertex
       del self._edges[-1]
-    
+
       self.edges.extend([
         vertex - self.vertices[-1],
         self.vertices[0] - vertex
@@ -77,21 +77,24 @@ class Facet:
     E1 = self.edges[0]
     E2 = -self.edges[2]
     P = ray.direction % E2
-    
+
     det = P * E1
 
     if not check_back_facing and det < 0:
       # The ray intersects the back of the triangle
       return None
-    elif math.isclose(det, 0):
+
+    try:
+      inv_det = 1 / det
+    except ZeroDivisionError:
       # The ray is parallel to the triangle
       return None
 
     T = ray.origin - self.vertices[0] 
     Q = T % E1
 
-    u = (P * T) / det
-    v = Q * ray.direction / det
+    u = (P * T) * inv_det
+    v = Q * ray.direction * inv_det
 
     # Checking if the point of intersection is outside the bounds of the triangle
     if not (0 <= u <= 1) or (v < 0) or (u + v > 1):
