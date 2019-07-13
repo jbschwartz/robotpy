@@ -163,7 +163,8 @@ class CameraController(Observer):
       self.scale_to_cursor(self.window.get_cursor(), vertical * self.settings.SCALE_IN)
 
   def window_resize(self, width, height):
-    self.camera.projection.aspect = width / height
+    if not math.isclose(height, 0):
+      self.camera.projection.aspect = width / height
 
   def normal_to(self):
     minimum = math.radians(180)
