@@ -66,6 +66,7 @@ GL_TYPE_UNIFORM_FN = {
 
 class Uniform:
   def __init__(self, program_id, index):
+    self._value = None
     self.program_id = program_id
     self.index = index
 
@@ -89,8 +90,11 @@ class Uniform:
   def ascii_list_to_string(self, ascii_list):
     return ''.join(list(map(chr, ascii_list))).strip('\x00').strip('[0]')
 
-  def value(self, *args):
-    self.set_function(self.location, *args)
+  @property
+  def value(self, ):
+    return self._value
   
-  # 'value' property has no need for a getter
-  value = property(None, value)
+  @value.setter
+  def value(self, *args):
+    self._value = args
+    self.set_function(self.location, *args)
