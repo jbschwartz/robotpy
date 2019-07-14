@@ -57,18 +57,20 @@ class ShaderProgram():
       vs_id = self.add_shader(files[0], GL_VERTEX_SHADER)
       frag_id = self.add_shader(files[1], GL_FRAGMENT_SHADER)
 
-    glAttachShader(self.program_id, vs_id)
-    glAttachShader(self.program_id, frag_id)
+    shaders = [vs_id, frag_id]
+
+    [glAttachShader(self.program_id, shader.id) for shader in shaders] 
+
     glLinkProgram(self.program_id)
 
     if glGetProgramiv(self.program_id, GL_LINK_STATUS) != GL_TRUE:
       info = glGetProgramInfoLog(self.program_id)
       glDeleteProgram(self.program_id)
-      glDeleteShader(vs_id)
-      glDeleteShader(frag_id)
+      [shader.delete() for shader in shaders] 
+
       raise RuntimeError('Error linking program: %s' % (info))
-    glDeleteShader(vs_id)
-    glDeleteShader(frag_id)
+    
+    [shader.delete() for shader in shaders] 
 
     self.get_uniforms()
 
@@ -118,8 +120,7 @@ class ShaderProgram():
 
   def add_shader(self, name, shader_type):
     path = self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
-    shader = Shader(path, shader_type)
-    return shader.id
+    return Shader(path, shader_type)
 
   def attribute_location(self, name):
     return glGetAttribLocation(self.program_id, name)
