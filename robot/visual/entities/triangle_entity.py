@@ -16,16 +16,16 @@ class TriangleEntity():
     self.buffer = []
     self.color = color
     self.shader_program = shader_program
-    self.scale = 50
+    self.scale = 20
 
   def use_shader(self, shader_program):
     self.shader_program = shader_program
 
   def build_buffer(self):
     data_list = [
-       0.5, 0, -0.33,
-       0.0, 0,  0.66,
-      -0.5, 0, -0.33
+       0.5, -0.33, 0,
+       0.0,  0.66, 0,
+      -0.5, -0.33, 0
     ]
     
     self.buffer = np.array(data_list, dtype=np.float32)
@@ -48,7 +48,10 @@ class TriangleEntity():
     pass
 
   def draw(self, camera, light):
-    target = camera.target
+    try:
+      target = Vector3(*camera.target)
+    except:
+      return
 
     self.transform = Matrix4([
       1, 0, 0, 0,

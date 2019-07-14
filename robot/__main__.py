@@ -30,6 +30,7 @@ if __name__ == "__main__":
     program = ShaderProgram('./robot/visual/glsl/vertex.glsl', './robot/visual/glsl/fragment.glsl')
     flat_program = ShaderProgram('./robot/visual/glsl/vertex-flat.glsl', './robot/visual/glsl/fragment-flat.glsl')
     grid_program = ShaderProgram('./robot/visual/glsl/vertex-grid.glsl', './robot/visual/glsl/fragment-grid.glsl')
+    bill_program = ShaderProgram('./robot/visual/glsl/vertex-bill.glsl', './robot/visual/glsl/fragment-bill.glsl')
     
   ee_frame = FrameEntity(Frame(), flat_program)
   bb = BoundingEntity(flat_program)
@@ -49,7 +50,7 @@ if __name__ == "__main__":
   robot2.color = (0.5, 1, 0)
   robot2.serial.traj = LinearJS([0] * 6, [math.radians(-45)] * 6, 4)
 
-  triangle = TriangleEntity(flat_program)
+  triangle = TriangleEntity(bill_program)
 
   camera = Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
