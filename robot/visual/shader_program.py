@@ -51,13 +51,7 @@ class ShaderProgram():
     self.uniforms = []
     self.program_id = glCreateProgram()
 
-    if isinstance(files, str):
-      vs_id, frag_id = self.compile_one_file(files)
-    else:
-      vs_id = self.add_shader(files[0], GL_VERTEX_SHADER)
-      frag_id = self.add_shader(files[1], GL_FRAGMENT_SHADER)
-
-    shaders = [vs_id, frag_id]
+    shaders = self.create_shaders(files)
 
     [glAttachShader(self.program_id, shader.id) for shader in shaders] 
 
@@ -118,9 +112,17 @@ class ShaderProgram():
       location = values[2]
       array_size = values[3]
 
-  def add_shader(self, name, shader_type):
-    path = self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
-    return Shader(path, shader_type)
+  def create_shaders(self, names):
+    if isinstance(names, str):
+      names = [names, names]
+
+    files = [self.get_path(name) for name in names]
+    shader_types = (GL_VERTEX_SHADER, GL_FRAGMENT_SHADER)
+
+    return [Shader(f, t) for f, t in zip(files, shader_types)]
+
+  def get_path(self, name):
+    return self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
 
   def attribute_location(self, name):
     return glGetAttribLocation(self.program_id, name)
