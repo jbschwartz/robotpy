@@ -27,10 +27,10 @@ if __name__ == "__main__":
     window = Window(1550, 900, "robotpy")
 
   with Timer('Initialize Shaders') as t:
-    program = ShaderProgram(['./robot/visual/glsl/vertex.glsl', './robot/visual/glsl/fragment.glsl'])
-    flat_program = ShaderProgram(['./robot/visual/glsl/vertex-flat.glsl', './robot/visual/glsl/fragment-flat.glsl'])
-    grid_program = ShaderProgram(['./robot/visual/glsl/vertex-grid.glsl', './robot/visual/glsl/fragment-grid.glsl'])
-    bill_program = ShaderProgram(['./robot/visual/glsl/vertex-bill.glsl', './robot/visual/glsl/fragment-bill.glsl'])
+    program = ShaderProgram(['serial_v', 'serial_f'])
+    flat_program = ShaderProgram('flat')
+    grid_program = ShaderProgram('grid')
+    bill_program = ShaderProgram('billboard')
     
   ee_frame = FrameEntity(Frame(), flat_program)
   bb = BoundingEntity(flat_program)
@@ -73,10 +73,10 @@ if __name__ == "__main__":
   ])
 
   scene.entities.append(world_frame)
-  scene.entities.append(robot)
   scene.entities.append(grid)
-  # scene.entities.append(robot2)
-  # scene.entities.append(triangle)
+  scene.entities.append(robot2)
+  scene.entities.append(robot)
+  scene.entities.append(triangle)
   window.register_observer(scene)
 
   window.run()

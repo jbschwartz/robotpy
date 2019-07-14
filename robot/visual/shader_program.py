@@ -3,6 +3,9 @@ from OpenGL.GL import *
 from robot.visual.uniform import Uniform
 
 class ShaderProgram():
+  DEFAULT_FOLDER = './robot/visual/glsl/'
+  DEFAULT_EXTENSION = '.glsl'
+
   def __init__(self, files):
     self.uniforms = []
     self.program_id = glCreateProgram()
@@ -73,11 +76,12 @@ class ShaderProgram():
       array_size = values[3]
 
   def add_shader(self, filename, shader_type):
+    path = self.DEFAULT_FOLDER + filename + self.DEFAULT_EXTENSION
     # TODO: Need to handle other types of shaders I'm sure.
     shader_main = 'VERTEX' if shader_type == GL_VERTEX_SHADER else 'FRAGMENT'
     try:
       shader_id = glCreateShader(shader_type)
-      with open(filename, 'r') as file:
+      with open(path) as file:
         source = file.read()
         glShaderSource(shader_id, f'#version 330\n#define {shader_main}\n' + source)
         glCompileShader(shader_id)
