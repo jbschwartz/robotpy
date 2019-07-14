@@ -2,6 +2,47 @@ from OpenGL.GL import *
 
 from robot.visual.uniform import Uniform
 
+class Shader():
+  # TODO: Need to handle other types of shaders I'm sure.
+  DEFINES = {
+    GL_VERTEX_SHADER:   'VERTEX',
+    GL_FRAGMENT_SHADER: 'FRAGMENT'
+  }
+
+  def __init__(self, path, shader_type, version = 430):
+    self.id          = None
+    self.path        = path
+    self.shader_type = shader_type
+    self.version     = version
+
+    self.load()
+
+  def create(self):
+    self.id = glCreateShader(self.shader_type)
+
+  def source(self):
+    with open(self.path) as file:
+      source = file.read()
+
+    version_str = f'#version {self.version}'
+    define_str  = f'#define {self.DEFINES[self.shader_type]}'
+
+    glShaderSource(self.id, '\n'.join([version_str, define_str, source]))
+
+  def load(self):
+    self.create()
+    self.source()
+
+    glCompileShader(self.id)
+
+    if glGetShaderiv(self.id, GL_COMPILE_STATUS) != GL_TRUE:
+      msg = glGetShaderInfoLog(self.id).decode('unicode_escape')
+      self.delete()
+      raise RuntimeError(f'Shader compilation failed: {msg}')
+
+  def delete(self):
+    glDeleteShader(self.id)
+
 class ShaderProgram():
   DEFAULT_FOLDER = './robot/visual/glsl/'
   DEFAULT_EXTENSION = '.glsl'
@@ -75,23 +116,10 @@ class ShaderProgram():
       location = values[2]
       array_size = values[3]
 
-  def add_shader(self, filename, shader_type):
-    path = self.DEFAULT_FOLDER + filename + self.DEFAULT_EXTENSION
-    # TODO: Need to handle other types of shaders I'm sure.
-    shader_main = 'VERTEX' if shader_type == GL_VERTEX_SHADER else 'FRAGMENT'
-    try:
-      shader_id = glCreateShader(shader_type)
-      with open(path) as file:
-        source = file.read()
-        glShaderSource(shader_id, f'#version 330\n#define {shader_main}\n' + source)
-        glCompileShader(shader_id)
-        if glGetShaderiv(shader_id, GL_COMPILE_STATUS) != GL_TRUE:
-          msg = glGetShaderInfoLog(shader_id).decode('unicode_escape')
-          raise RuntimeError(f'Shader compilation failed: {msg}')
-        return shader_id
-    except:
-      glDeleteShader(shader_id)
-      raise
+  def add_shader(self, name, shader_type):
+    path = self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
+    shader = Shader(path, shader_type)
+    return shader.id
 
   def attribute_location(self, name):
     return glGetAttribLocation(self.program_id, name)
