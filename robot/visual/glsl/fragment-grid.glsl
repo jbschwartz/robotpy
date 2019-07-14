@@ -1,5 +1,3 @@
-#version 330
-
 in vec4 vout_world_pos;
 out vec4 gl_FragColor;
 

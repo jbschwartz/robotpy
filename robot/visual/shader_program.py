@@ -67,7 +67,7 @@ class ShaderProgram():
       shader_id = glCreateShader(shader_type)
       with open(filename, 'r') as file:
         source = file.read()
-        glShaderSource(shader_id, source)
+        glShaderSource(shader_id, '#version 330\n #define vertex_main main\n' + source)
         glCompileShader(shader_id)
         if glGetShaderiv(shader_id, GL_COMPILE_STATUS) != GL_TRUE:
           info = glGetShaderInfoLog(shader_id)

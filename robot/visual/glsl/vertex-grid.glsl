@@ -1,5 +1,3 @@
-#version 330
-
 in vec3 vin_position;
 out vec4 vout_world_pos;
 out vec4 gl_Position;

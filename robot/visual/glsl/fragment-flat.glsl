@@ -1,5 +1,3 @@
-#version 330
-
 out vec4 fout_color;
 
 uniform vec3 color_in;

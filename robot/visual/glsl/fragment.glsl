@@ -1,5 +1,3 @@
-#version 330
-
 in vec3 vout_color;
 in vec3 vout_normal;
 in vec3 frag_pos;

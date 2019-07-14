@@ -1,5 +1,3 @@
-#version 330
-
 in vec3 vin_position;
 
 uniform mat4 proj_matrix;

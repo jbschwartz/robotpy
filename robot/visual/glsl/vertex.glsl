@@ -1,5 +1,3 @@
-#version 330
-
 in vec3 vin_position;
 in vec3 vin_normal;
 in int vin_mesh_index;
