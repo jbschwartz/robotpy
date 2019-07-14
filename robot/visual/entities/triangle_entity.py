@@ -60,7 +60,8 @@ class TriangleEntity():
       target.x, target.y, target.z, 1
     ])
 
-    glUseProgram(self.shader_program.id)
+    # TODO: This maybe could be a decorator to the draw function inside the entity
+    self.shader_program.use()
 
     self.shader_program.proj_matrix = camera.projection.matrix
     self.shader_program.view_matrix = camera.world_to_camera

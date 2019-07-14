@@ -197,7 +197,7 @@ class FrameEntity(Entity):
     if not transform:
       transform = self.frame.transform
       
-    glUseProgram(self.shader_program.id)
+    self.shader_program.use()
 
     self.shader_program.proj_matrix = camera.projection.matrix
     self.shader_program.view_matrix = camera.world_to_camera

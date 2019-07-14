@@ -89,6 +89,9 @@ class ShaderProgram():
       msg = glGetProgramInfoLog(self.id).decode('unicode_escape')
       raise RuntimeError(f'Error linking program: {msg}')
 
+  def use(self):
+    glUseProgram(self.id)
+
   def get_uniforms(self):
     self.uniforms = {}
 
