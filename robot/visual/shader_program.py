@@ -3,11 +3,11 @@ from OpenGL.GL import *
 from robot.visual.uniform import Uniform
 
 class ShaderProgram():
-  def __init__(self, vertex_file, fragment_file):
+  def __init__(self, files):
     self.uniforms = []
     self.program_id = glCreateProgram()
-    vs_id = self.add_shader(vertex_file, GL_VERTEX_SHADER)
-    frag_id = self.add_shader(fragment_file, GL_FRAGMENT_SHADER)
+    vs_id = self.add_shader(files[0], GL_VERTEX_SHADER)
+    frag_id = self.add_shader(files[1], GL_FRAGMENT_SHADER)
 
     glAttachShader(self.program_id, vs_id)
     glAttachShader(self.program_id, frag_id)
