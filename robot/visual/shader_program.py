@@ -1,15 +1,16 @@
+import enum
+
 from OpenGL.GL import *
 
 from robot.visual.uniform import Uniform
 
-class Shader():
-  # TODO: Need to handle other types of shaders I'm sure.
-  DEFINES = {
-    GL_VERTEX_SHADER:   'VERTEX',
-    GL_FRAGMENT_SHADER: 'FRAGMENT'
-  }
+# TODO: Need to handle other types of shaders I'm sure.
+class ShaderTypes(enum.Enum):
+  VERTEX   = GL_VERTEX_SHADER
+  FRAGMENT = GL_FRAGMENT_SHADER
 
-  def __init__(self, path, shader_type, version = 430):
+class Shader():
+  def __init__(self, shader_type, path, version = 430):
     self.id          = None
     self.path        = path
     self.shader_type = shader_type
@@ -18,14 +19,14 @@ class Shader():
     self.load()
 
   def create(self):
-    self.id = glCreateShader(self.shader_type)
+    self.id = glCreateShader(self.shader_type.value)
 
   def source(self):
     with open(self.path) as file:
       source = file.read()
 
     version_str = f'#version {self.version}'
-    define_str  = f'#define {self.DEFINES[self.shader_type]}'
+    define_str  = f'#define {self.shader_type.name}'
 
     glShaderSource(self.id, '\n'.join([version_str, define_str, source]))
 
@@ -47,11 +48,18 @@ class ShaderProgram():
   DEFAULT_FOLDER = './robot/visual/glsl/'
   DEFAULT_EXTENSION = '.glsl'
 
-  def __init__(self, files):
+  def __init__(self, name=None, **names):
     self.uniforms = []
     self.program_id = glCreateProgram()
 
-    shaders = self.create_shaders(files)
+    # Use `name` for all shaders by default, replacing any specifically passed in
+    # Also re-key the dictionary with ShaderType enum objects
+    self.shader_names = {
+      **{k: name for k in ShaderTypes}, 
+      **{ShaderTypes[k.upper()]: name for k, name in names.items()}
+    }
+
+    shaders = self.create_shaders(self.shader_names)
 
     [glAttachShader(self.program_id, shader.id) for shader in shaders] 
 
@@ -67,12 +75,6 @@ class ShaderProgram():
     [shader.delete() for shader in shaders] 
 
     self.get_uniforms()
-
-  def compile_one_file(self, file):
-    vs_id = self.add_shader(file, GL_VERTEX_SHADER)
-    frag_id = self.add_shader(file, GL_FRAGMENT_SHADER)
-
-    return vs_id, frag_id
 
   def __getattr__(self, attribute):
     if attribute != 'uniforms' and attribute not in self.uniforms: 
@@ -112,17 +114,12 @@ class ShaderProgram():
       location = values[2]
       array_size = values[3]
 
-  def create_shaders(self, names):
-    if isinstance(names, str):
-      names = [names, names]
+  def create_shaders(self, shaders : dict):
+    get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
 
-    files = [self.get_path(name) for name in names]
-    shader_types = (GL_VERTEX_SHADER, GL_FRAGMENT_SHADER)
+    files = {k: get_path(name) for k, name in shaders.items()}
 
-    return [Shader(f, t) for f, t in zip(files, shader_types)]
-
-  def get_path(self, name):
-    return self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
+    return (Shader(shader_type, file_path) for shader_type, file_path in files.items())
 
   def attribute_location(self, name):
     return glGetAttribLocation(self.program_id, name)
