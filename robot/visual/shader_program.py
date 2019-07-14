@@ -48,32 +48,25 @@ class ShaderProgram():
   DEFAULT_EXTENSION = '.glsl'
 
   def __init__(self, name=None, **names):
-    self.uniforms = []
-    self.program_id = glCreateProgram()
+    # self.uniforms must be declared before any other properties
+    # TODO: Make this not so
+    self.uniforms = [] 
+
+    self.id = None
 
     # Use `name` for all shaders by default, replacing any specifically passed in
     # Also re-key the dictionary with ShaderType enum objects
-    self.shader_names = {
+    shader_names = {
       **{k: name for k in ShaderTypes}, 
       **{ShaderTypes[k.upper()]: name for k, name in names.items()}
     }
 
-    shaders = self.create_shaders(self.shader_names)
-
-    [glAttachShader(self.program_id, shader.id) for shader in shaders] 
-
-    glLinkProgram(self.program_id)
-
-    if glGetProgramiv(self.program_id, GL_LINK_STATUS) != GL_TRUE:
-      info = glGetProgramInfoLog(self.program_id)
-      glDeleteProgram(self.program_id)
-      [shader.delete() for shader in shaders] 
-
-      raise RuntimeError('Error linking program: %s' % (info))
-    
-    [shader.delete() for shader in shaders] 
+    self.link(shader_names)
 
     self.get_uniforms()
+
+  def __del__(self):
+    glDeleteProgram(self.id)
 
   def __getattr__(self, attribute):
     if attribute != 'uniforms' and attribute not in self.uniforms: 
@@ -87,38 +80,57 @@ class ShaderProgram():
     else:
       self.uniforms[attribute].value = value
 
+  def link(self, shader_names):
+    self.create()
+
+    self.attach_shaders(shader_names)
+
+    glLinkProgram(self.id)
+
+    if glGetProgramiv(self.id, GL_LINK_STATUS) != GL_TRUE:
+      info = glGetProgramInfoLog(self.id)
+      raise RuntimeError('Error linking program: %s' % (info))
+
+  def create(self):
+    self.id = glCreateProgram()
+
+  def delete_shaders(self):
+    map(lambda shader: shader.delete(), self.shaders) 
+
   def get_uniforms(self):
     self.uniforms = {}
 
-    num_uniforms = glGetProgramInterfaceiv(self.program_id, GL_UNIFORM, GL_ACTIVE_RESOURCES)
+    num_uniforms = glGetProgramInterfaceiv(self.id, GL_UNIFORM, GL_ACTIVE_RESOURCES)
 
     for uniform_index in range(0, num_uniforms):
-      uniform = Uniform(self.program_id, uniform_index)
+      uniform = Uniform(self.id, uniform_index)
     
       self.uniforms[uniform.name] = uniform
 
     
 
   def get_attributes(self):
-    num_attributes = glGetProgramInterfaceiv(self.program_id, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES)
+    num_attributes = glGetProgramInterfaceiv(self.id, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES)
 
     for attribute_index in range(0, num_attributes):
       attribute_props = [GL_TYPE, GL_NAME_LENGTH, GL_LOCATION, GL_ARRAY_SIZE]
       props_length = len(attribute_props)
 
-      values = glGetProgramResourceiv(self.program_id, GL_PROGRAM_INPUT, attribute_index, props_length, attribute_props, props_length)
+      values = glGetProgramResourceiv(self.id, GL_PROGRAM_INPUT, attribute_index, props_length, attribute_props, props_length)
       gl_type = values[0]
-      name = glGetProgramResourceName(self.program_id, GL_PROGRAM_INPUT, attribute_index, values[1])
+      name = glGetProgramResourceName(self.id, GL_PROGRAM_INPUT, attribute_index, values[1])
       name = ''.join(list(map(chr, name))).strip('\x00').strip('[0]')
       location = values[2]
       array_size = values[3]
 
-  def create_shaders(self, shaders : dict):
+  def attach_shaders(self, shaders : dict):
     get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
 
     files = {k: get_path(name) for k, name in shaders.items()}
 
-    return (Shader(shader_type, file_path) for shader_type, file_path in files.items())
+    for shader_type, file_path in files.items():
+      shader = Shader(shader_type, file_path)
+      glAttachShader(self.id, shader.id)
 
   def attribute_location(self, name):
-    return glGetAttribLocation(self.program_id, name)
+    return glGetAttribLocation(self.id, name)
