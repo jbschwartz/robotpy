@@ -60,7 +60,7 @@ class TriangleEntity():
       target.x, target.y, target.z, 1
     ])
 
-    glUseProgram(self.shader_program.program_id)
+    glUseProgram(self.shader_program.id)
 
     self.shader_program.proj_matrix = camera.projection.matrix
     self.shader_program.view_matrix = camera.world_to_camera
