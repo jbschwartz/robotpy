@@ -18,6 +18,9 @@ class Shader():
 
     self.load()
 
+  def __del__(self):
+    glDeleteShader(self.id)
+
   def create(self):
     self.id = glCreateShader(self.shader_type.value)
 
@@ -38,11 +41,7 @@ class Shader():
 
     if glGetShaderiv(self.id, GL_COMPILE_STATUS) != GL_TRUE:
       msg = glGetShaderInfoLog(self.id).decode('unicode_escape')
-      self.delete()
       raise RuntimeError(f'Shader compilation failed: {msg}')
-
-  def delete(self):
-    glDeleteShader(self.id)
 
 class ShaderProgram():
   DEFAULT_FOLDER = './robot/visual/glsl/'
