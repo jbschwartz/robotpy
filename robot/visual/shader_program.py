@@ -86,11 +86,8 @@ class ShaderProgram():
     glLinkProgram(self.id)
 
     if glGetProgramiv(self.id, GL_LINK_STATUS) != GL_TRUE:
-      info = glGetProgramInfoLog(self.id)
-      raise RuntimeError('Error linking program: %s' % (info))
-
-  def delete_shaders(self):
-    map(lambda shader: shader.delete(), self.shaders) 
+      msg = glGetProgramInfoLog(self.id).decode('unicode_escape')
+      raise RuntimeError(f'Error linking program: {msg}')
 
   def get_uniforms(self):
     self.uniforms = {}
