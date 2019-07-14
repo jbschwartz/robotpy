@@ -76,6 +76,6 @@ class GridEntity(Entity):
 
     glBindVertexArray(self.vao)
 
-    glDrawArrays(GL_TRIANGLES, 0, 12)
+    glDrawArrays(GL_TRIANGLES, 0, 6)
   
     glBindVertexArray(0)
