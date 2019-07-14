@@ -52,7 +52,7 @@ class ShaderProgram():
     # TODO: Make this not so
     self.uniforms = [] 
 
-    self.id = None
+    self.id = glCreateProgram()
 
     # Use `name` for all shaders by default, replacing any specifically passed in
     # Also re-key the dictionary with ShaderType enum objects
@@ -81,8 +81,6 @@ class ShaderProgram():
       self.uniforms[attribute].value = value
 
   def link(self, shader_names):
-    self.create()
-
     self.attach_shaders(shader_names)
 
     glLinkProgram(self.id)
@@ -90,9 +88,6 @@ class ShaderProgram():
     if glGetProgramiv(self.id, GL_LINK_STATUS) != GL_TRUE:
       info = glGetProgramInfoLog(self.id)
       raise RuntimeError('Error linking program: %s' % (info))
-
-  def create(self):
-    self.id = glCreateProgram()
 
   def delete_shaders(self):
     map(lambda shader: shader.delete(), self.shaders) 
@@ -106,8 +101,6 @@ class ShaderProgram():
       uniform = Uniform(self.id, uniform_index)
     
       self.uniforms[uniform.name] = uniform
-
-    
 
   def get_attributes(self):
     num_attributes = glGetProgramInterfaceiv(self.id, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES)
