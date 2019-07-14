@@ -6,8 +6,12 @@ class ShaderProgram():
   def __init__(self, files):
     self.uniforms = []
     self.program_id = glCreateProgram()
-    vs_id = self.add_shader(files[0], GL_VERTEX_SHADER)
-    frag_id = self.add_shader(files[1], GL_FRAGMENT_SHADER)
+
+    if isinstance(files, str):
+      vs_id, frag_id = self.compile_one_file(files)
+    else:
+      vs_id = self.add_shader(files[0], GL_VERTEX_SHADER)
+      frag_id = self.add_shader(files[1], GL_FRAGMENT_SHADER)
 
     glAttachShader(self.program_id, vs_id)
     glAttachShader(self.program_id, frag_id)
@@ -23,6 +27,12 @@ class ShaderProgram():
     glDeleteShader(frag_id)
 
     self.get_uniforms()
+
+  def compile_one_file(self, file):
+    vs_id = self.add_shader(file, GL_VERTEX_SHADER)
+    frag_id = self.add_shader(file, GL_FRAGMENT_SHADER)
+
+    return vs_id, frag_id
 
   def __getattr__(self, attribute):
     if attribute != 'uniforms' and attribute not in self.uniforms: 
@@ -63,15 +73,17 @@ class ShaderProgram():
       array_size = values[3]
 
   def add_shader(self, filename, shader_type):
+    # TODO: Need to handle other types of shaders I'm sure.
+    shader_main = 'VERTEX' if shader_type == GL_VERTEX_SHADER else 'FRAGMENT'
     try:
       shader_id = glCreateShader(shader_type)
       with open(filename, 'r') as file:
         source = file.read()
-        glShaderSource(shader_id, '#version 330\n #define vertex_main main\n' + source)
+        glShaderSource(shader_id, f'#version 330\n#define {shader_main}\n' + source)
         glCompileShader(shader_id)
         if glGetShaderiv(shader_id, GL_COMPILE_STATUS) != GL_TRUE:
-          info = glGetShaderInfoLog(shader_id)
-          raise RuntimeError('Shader compilation failed: %s' % (info))
+          msg = glGetShaderInfoLog(shader_id).decode('unicode_escape')
+          raise RuntimeError(f'Shader compilation failed: {msg}')
         return shader_id
     except:
       glDeleteShader(shader_id)
