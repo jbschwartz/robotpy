@@ -27,7 +27,7 @@ if __name__ == "__main__":
     window = Window(1550, 900, "robotpy")
 
   with Timer('Initialize Shaders') as t:
-    program = ShaderProgram(['serial_v', 'serial_f'])
+    program = ShaderProgram(vertex='serial_v', fragment='serial_f')
     flat_program = ShaderProgram('flat')
     grid_program = ShaderProgram('grid')
     bill_program = ShaderProgram('billboard')
