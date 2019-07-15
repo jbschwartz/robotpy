@@ -14,10 +14,7 @@ class Link:
 
   @property
   def aabb(self):
-    aabb = AABB()
-    for corner in self.mesh.aabb.corners:
-      aabb.extend(self.frame.transform(corner))
-    return aabb
+    return AABB(*[self.frame.transform(corner) for corner in self.mesh.aabb.corners])
 
   def intersect(self, world_ray : Ray):
     if self.aabb.intersect(world_ray):

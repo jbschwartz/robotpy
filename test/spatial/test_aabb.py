@@ -12,14 +12,14 @@ class TestAABB(unittest.TestCase):
     self.v3 = Vector3(0, 1, 2)
     self.v4 = Vector3(4, 4, 4)
 
-    self.aabb = AABB(elements=[self.v1, self.v2, self.v3])
+    self.aabb = AABB(self.v1, self.v2, self.v3)
 
   def test_extend(self):
     self.assertAlmostEqual(self.v2, self.aabb.min)
     self.assertAlmostEqual(self.v1, self.aabb.max)
 
   def test_extend_aabb(self):
-    other_aabb = AABB(elements=[self.v3, self.v4])
+    other_aabb = AABB(self.v3, self.v4)
 
     self.aabb.extend(other_aabb)
     

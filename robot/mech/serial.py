@@ -43,11 +43,7 @@ class Serial:
 
   @property
   def aabb(self) -> AABB:
-    aabb = AABB()
-    for link in self.links:
-      aabb.extend(link.aabb)
-
-    return aabb
+    return AABB(*[link.aabb for link in self.links])
 
   def intersect(self, ray):
     if self.aabb.intersect(ray):

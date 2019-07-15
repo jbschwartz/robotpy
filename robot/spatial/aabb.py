@@ -3,10 +3,9 @@ import math
 from robot.spatial.vector3 import Vector3
 
 class AABB:
-  def __init__(self, corner_min = None, corner_max = None, elements = []):
-    # TODO: Handle the case where passsed parameters are out of order
-    self.min = corner_min if corner_min else Vector3(math.inf, math.inf, math.inf)
-    self.max = corner_max if corner_max else Vector3(-math.inf, -math.inf, -math.inf)
+  def __init__(self, *elements):
+    self.min = Vector3(math.inf, math.inf, math.inf)
+    self.max = Vector3(-math.inf, -math.inf, -math.inf)
 
     self.extend(*elements)
 
