@@ -102,20 +102,6 @@ class ShaderProgram():
     
       self.uniforms[uniform.name] = uniform
 
-  def get_attributes(self):
-    num_attributes = glGetProgramInterfaceiv(self.id, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES)
-
-    for attribute_index in range(0, num_attributes):
-      attribute_props = [GL_TYPE, GL_NAME_LENGTH, GL_LOCATION, GL_ARRAY_SIZE]
-      props_length = len(attribute_props)
-
-      values = glGetProgramResourceiv(self.id, GL_PROGRAM_INPUT, attribute_index, props_length, attribute_props, props_length)
-      gl_type = values[0]
-      name = glGetProgramResourceName(self.id, GL_PROGRAM_INPUT, attribute_index, values[1])
-      name = ''.join(list(map(chr, name))).strip('\x00').strip('[0]')
-      location = values[2]
-      array_size = values[3]
-
   def attach_shaders(self, shaders : dict):
     get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
 
