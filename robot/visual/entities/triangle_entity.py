@@ -17,6 +17,7 @@ class TriangleEntity():
     self.color = color
     self.shader_program = shader_program
     self.scale = 20
+    self.link = None
 
   def use_shader(self, shader_program):
     self.shader_program = shader_program
@@ -48,10 +49,13 @@ class TriangleEntity():
     pass
 
   def draw(self, camera, light):
-    try:
-      target = Vector3(*camera.target)
-    except:
-      return
+    if self.link:
+      target = self.link.frame.transform(self.link.com)
+    else:
+      try:
+        target = Vector3(*camera.target)
+      except:
+        return
 
     self.transform = Matrix4([
       1, 0, 0, 0,

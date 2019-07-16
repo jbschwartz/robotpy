@@ -77,6 +77,13 @@ if __name__ == "__main__":
   scene.entities.append(robot2)
   scene.entities.append(robot)
   scene.entities.append(triangle)
+
+  triangles = []
+  for link in robot.serial.links:
+    te = TriangleEntity(bill_program)
+    te.link = link
+    scene.entities.append(te)
+
   window.register_observer(scene)
 
   window.run()
