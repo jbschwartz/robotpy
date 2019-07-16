@@ -26,6 +26,30 @@ class Mesh:
       yield facet.vertices[1]
       yield facet.vertices[2]
 
+  def center_of_mass(self):
+    '''Calculate the center of mass (assuming uniform density) of the mesh.'''
+    def tetrahedron_volume(facet):
+      '''Volume of a tetrahedron created by the three facet vertices and origin.'''
+      a, b, c = facet.vertices
+      return (a * (c % b)) / 6
+
+    def tetrahedron_centroid(f):
+      '''Volume of a tetrahedron created by the three facet vertices and origin.'''
+      return sum(f.vertices, Vector3()) / 4
+
+    mesh_volume   = 0
+    mesh_centroid = Vector3()
+    # Find the contribution of all created tetrahedrons: com = sum(dv * r) / V where:
+    #   dv is the volume of the tetrahedron, 
+    #   r is the centroid of the tetrahedron, and 
+    #   V is the volume of the whole mesh
+    for facet in self.facets:
+        volume = tetrahedron_volume(facet)
+        mesh_volume   += volume
+        mesh_centroid += volume * tetrahedron_centroid(facet)
+        
+    return mesh_centroid / mesh_volume
+
   def append(self, facet):
     '''Add a facet to the mesh.'''
     self.aabb.extend(*facet.vertices)
