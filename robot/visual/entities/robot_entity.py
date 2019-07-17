@@ -34,8 +34,8 @@ def parse_mesh(file_path):
     # TODO: It's probably no longer appropriate for this to be a quit() here
     quit()
 
-  for index, mesh in enumerate(meshes):
-    with Timer(f'Construct KD Tree for mesh {index}') as t:
+  with Timer(f'Construct KD Trees') as t:
+    for mesh in meshes:
       mesh.accelerator = KDTree
 
   return meshes
