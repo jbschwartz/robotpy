@@ -1,4 +1,5 @@
 import numpy as np
+import glfw
 
 from OpenGL.GL import *
 
@@ -7,9 +8,10 @@ from ctypes import c_void_p
 from robot.spatial.frame         import Frame
 from robot.spatial.matrix4       import Matrix4
 from robot.spatial.vector3       import Vector3
+from robot.visual.observer       import Observer
 from robot.visual.shader_program import ShaderProgram
 
-class TriangleEntity():
+class TriangleEntity(Observer):
   def __init__(self, shader_program : ShaderProgram = None, color = (0, 0.5, 1)):
     self.vao = -1 if not bool(glGenVertexArrays) else glGenVertexArrays(1)
     self.vbo = -1 if not bool(glGenBuffers) else glGenBuffers(1)
@@ -18,6 +20,7 @@ class TriangleEntity():
     self.shader_program = shader_program
     self.scale = 20
     self.link = None
+    self.show = False
 
   def use_shader(self, shader_program):
     self.shader_program = shader_program
@@ -48,10 +51,17 @@ class TriangleEntity():
   def update(self, delta):
     pass
 
+  def click(self, button, action, cursor):
+    if button == glfw.MOUSE_BUTTON_MIDDLE:
+      self.show = action == glfw.PRESS
+
   def draw(self, camera, light):
     if self.link:
       target = self.link.frame.transform(self.link.com)
     else:
+      if not self.show:
+        return
+
       try:
         target = Vector3(*camera.target)
       except:

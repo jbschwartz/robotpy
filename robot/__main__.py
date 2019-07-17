@@ -74,6 +74,10 @@ if __name__ == "__main__":
     WindowEvent.WINDOW_RESIZE
   ])
 
+  window.register_observer(triangle, [ 
+    WindowEvent.CLICK
+  ])
+
   scene.entities.append(world_frame)
   scene.entities.append(grid)
   scene.entities.append(robot2)

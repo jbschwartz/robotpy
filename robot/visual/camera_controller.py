@@ -1,5 +1,6 @@
 import enum, json, math, glfw
 
+from robot.common.timer      import Timer
 from robot.spatial           import vector3
 from robot.spatial.ray       import Ray
 from robot.spatial.transform import Transform
@@ -77,18 +78,31 @@ class CameraController(Observer):
     self.scene = scene
     self.window = window
     self.target = self.scene.aabb.center
+    self.is_selecting = None
     self.orbit_type = OrbitType.CONSTRAINED
 
   def click(self, button, action, cursor):
+    if button == glfw.MOUSE_BUTTON_LEFT:
+      if action == glfw.PRESS:
+        self.is_selecting = self.window.ndc(cursor)
+      else:
+        end = self.window.ndc(cursor)
+        # print(f'Square from {self.is_selecting} to {end}')
+        # self.camera.fit_window(self.is_selecting, end)
+        self.is_selecting = None
+    
     if button == glfw.MOUSE_BUTTON_MIDDLE and action == glfw.PRESS:
       r = self.camera.cast_ray(self.window.ndc(cursor))
-      t = self.scene.intersect(r)
+      with Timer('Ray Intersection') as tim:
+        t = self.scene.intersect(r)
 
       if t is not None:
         self.target = r.evaluate(t)
       else:
         self.target = self.scene.aabb.center
 
+      self.camera.target = self.target
+      
   def drag(self, button, cursor, cursor_delta, modifiers):
     command = self.bindings.get_command((modifiers, button))
 
