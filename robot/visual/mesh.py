@@ -1,7 +1,8 @@
 import math
 
-from robot.spatial.aabb   import AABB 
-from robot.spatial.ray    import Ray 
+from robot.spatial.aabb       import AABB 
+from robot.spatial.ray        import Ray 
+from robot.spatial.vector3    import Vector3 
 
 class Mesh:
   def __init__(self, name = None):

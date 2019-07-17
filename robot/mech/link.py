@@ -6,10 +6,11 @@ from robot.spatial.ray   import Ray
 
 class Link:
   def __init__(self, name, mesh, color):
-    # TODO: Mass, COM, Moments of Inertia
+    # TODO: Mass, Moments of Inertia
     self.frame = Frame()
     self.name = name
     self.mesh = mesh
+    self.com = mesh.center_of_mass()
     self.color = color
 
   @property
