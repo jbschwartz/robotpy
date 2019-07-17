@@ -12,6 +12,7 @@ from robot.visual.camera                     import Camera
 from robot.visual.camera_controller          import CameraController, CameraSettings
 from robot.visual.entities                   import robot_entity
 from robot.visual.entities.triangle_entity   import TriangleEntity
+from robot.visual.entities.com_entity        import COMEntity
 from robot.visual.entities.frame_entity      import FrameEntity
 from robot.visual.entities.bounding_entity   import BoundingEntity
 from robot.visual.entities.grid_entity       import GridEntity
@@ -31,6 +32,7 @@ if __name__ == "__main__":
     flat_program = ShaderProgram('flat')
     grid_program = ShaderProgram('grid')
     bill_program = ShaderProgram('billboard')
+    com_program = ShaderProgram('com')
     
   ee_frame = FrameEntity(Frame(), flat_program)
   bb = BoundingEntity(flat_program)
@@ -78,11 +80,9 @@ if __name__ == "__main__":
   scene.entities.append(robot)
   scene.entities.append(triangle)
 
-  triangles = []
   for link in robot.serial.links:
-    te = TriangleEntity(bill_program)
-    te.link = link
-    scene.entities.append(te)
+    com = COMEntity(link, com_program)
+    scene.entities.append(com)
 
   window.register_observer(scene)
 
