@@ -25,7 +25,7 @@ class Serial:
 
     # Robots handled in this code _must_ have a shoulder that is perpendicular to the waist
     assert math.isclose(abs(self.joints[0].dh['alpha']), math.pi / 2), 'Robot does not have a recognized shoulder configuration'
-    
+
     # The elbow must be parallel to the shoulder joint (alpha dictates the angle between z-axes)
     correctElbow = math.isclose(self.joints[1].dh['alpha'], 0) or math.isclose(self.joints[1].dh['alpha'], math.pi)
     assert correctElbow, 'Robot does not have a recognized elbow configuration'
@@ -59,13 +59,13 @@ class Serial:
   def update_links(self):
     last_frame = self.links[0].frame
     for link, joint in zip(self.links[1:], self.joints):
-      link.frame = joint.transform * last_frame 
+      link.frame = joint.transform * last_frame
       last_frame = link.frame
 
-  def pose(self) -> Frame: 
+  def pose(self) -> Frame:
     return self.links[-1].frame
 
-  def poses(self) -> list: 
+  def poses(self) -> list:
     return [link.frame for link in self.links]
 
   def upper_arm_length(self):

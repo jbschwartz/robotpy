@@ -67,7 +67,7 @@ class TestQuaternion(unittest.TestCase):
     self.assertAlmostEqual(self.q / s, expected)
 
   def test_conjugate(self):
-    expected = Quaternion(self.q.r, -self.q.x, -self.q.y, -self.q.z) 
+    expected = Quaternion(self.q.r, -self.q.x, -self.q.y, -self.q.z)
     self.q.conjugate()
     self.assertEqual(self.q, expected)
 

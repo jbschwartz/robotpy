@@ -6,7 +6,7 @@ from robot.spatial.quaternion import Quaternion
 
 class TestEuler(unittest.TestCase):
   def setUp(self):
-    # Frame is constructed by rotating around Z 45 degrees, rotation around new Y 135 degrees 
+    # Frame is constructed by rotating around Z 45 degrees, rotation around new Y 135 degrees
     self.q = Quaternion(0.353553, -0.353553, 0.853553, 0.146447)
 
   def checkSolutions(self, results, solutions):

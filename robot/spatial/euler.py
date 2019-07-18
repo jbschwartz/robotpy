@@ -19,7 +19,7 @@ def zyz(r, x, y, z):
   results = []
   for yp in [beta, -beta]:
     sign = 1 if math.sin(yp) > 0 else -1
-    
+
     zpp = math.atan2((yz + rx) * sign, (-xz + ry) * sign)
     z = math.atan2((yz - rx) * sign, (xz + ry) * sign)
     results.append([ z, yp, zpp ])
@@ -43,7 +43,7 @@ def zyx(r, x, y, z):
   results = []
   for yp in [beta, math.pi + beta]:
     sign = 1 if math.cos(yp) > 0 else -1
-    
+
     xpp = math.atan2((yz + rx) * sign, (1 - 2 * (xSq + ySq)) * sign)
     z = math.atan2((xy + rz) * sign, (1 - 2 * (ySq + zSq)) * sign)
 

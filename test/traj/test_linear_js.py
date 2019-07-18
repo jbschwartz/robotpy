@@ -9,7 +9,7 @@ class TestLinearJS(unittest.TestCase):
     self.duration = 10
 
     self.traj = LinearJS(self.starts, self.ends, self.duration)
-    
+
   def test_advance(self):
     expecteds = [math.radians(4.5)] * 6
     results = self.traj.advance(1)

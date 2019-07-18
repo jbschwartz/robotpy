@@ -33,7 +33,7 @@ class GridEntity(Entity):
        0.5, -0.5,  0,
       -0.5, -0.5,  0,
     ]
-    
+
     self.buffer = np.array(data_list, dtype=np.float32)
 
   def load(self):
@@ -69,13 +69,13 @@ class GridEntity(Entity):
 
     self.shader_program.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,
-      0, self.scale, 0, 0, 
-      0, 0, self.scale, 0, 
+      0, self.scale, 0, 0,
+      0, 0, self.scale, 0,
       0, 0, 0, 1
     ])
 
     glBindVertexArray(self.vao)
 
     glDrawArrays(GL_TRIANGLES, 0, 6)
-  
+
     glBindVertexArray(0)

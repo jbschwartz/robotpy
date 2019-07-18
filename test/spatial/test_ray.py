@@ -9,7 +9,7 @@ class TestRay(unittest.TestCase):
   def setUp(self):
     self.direction = Vector3(-1, 4, 5)
     self.ray = Ray(Vector3(1, 2, 3), self.direction)
-    
+
   def test_init(self):
     result = self.ray.direction
     expected = vector3.normalize(self.direction)

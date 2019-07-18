@@ -8,8 +8,8 @@ from robot.spatial.vector3      import Vector3
 from robot.visual.facet         import Facet
 from robot.visual.mesh          import Mesh
 
-Quaternion = quaternion.Quaternion 
-Dual       = dual.Dual 
+Quaternion = quaternion.Quaternion
+Dual       = dual.Dual
 
 class Transform:
   '''
@@ -56,7 +56,7 @@ class Transform:
       return self.transform_ray(other)
     elif isinstance(other, list):
       return [self.__call__(item) for item in other]
-        
+
   def transform_vector(self, vector):
     d = Dual(Quaternion(0, *vector.xyz), Quaternion(0, 0, 0, 0))
     a = self.dual * d * dual.conjugate(self.dual)

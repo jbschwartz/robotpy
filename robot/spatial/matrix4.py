@@ -10,7 +10,7 @@ class Matrix4:
     That is: contiguous elements in the list form columns (e.g. self.elements[0:4] is the first column of the matrix)
     '''
     self.elements = [0.0] * 16
-    for diag_index in [0, 5, 10, 15]: 
+    for diag_index in [0, 5, 10, 15]:
       self.elements[diag_index]  = 1.0
 
     if isinstance(construct_from, Dual):
@@ -19,7 +19,7 @@ class Matrix4:
       self.construct_from_dual(construct_from.dual)
     elif isinstance(construct_from, list) and len(construct_from) == 16:
       self.elements = construct_from
-  
+
   def construct_from_dual(self, d : Dual):
     self.elements = []
 
@@ -34,11 +34,11 @@ class Matrix4:
   def __str__(self):
     # Get the width of "widest" floating point number
     longest = max(map(len, map('{:.4f}'.format, self.elements)))
-    # Pad the left of each element to the widest number found 
+    # Pad the left of each element to the widest number found
     padded = list(map(lambda elem: f'{elem:>{longest}.4f}', self.elements))
 
-    # Since the values are stored column-major, we need to "transpose" 
+    # Since the values are stored column-major, we need to "transpose"
     columns = [ padded[i:i+4] for i in range(0, 15, 4) ]
-  
-    # Join columns by commas and rows by new lines 
+
+    # Join columns by commas and rows by new lines
     return '\n'.join(map(', '.join, zip(*columns)))

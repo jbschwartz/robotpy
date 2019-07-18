@@ -15,7 +15,7 @@ class Vector3(Swizzler):
 
   def __abs__(self):
     return Vector3(abs(self.x), abs(self.y), abs(self.z))
-  
+
   def __round__(self, n):
     return Vector3(round(self.x, n), round(self.y, n), round(self.z, n))
 
@@ -76,7 +76,7 @@ class Vector3(Swizzler):
     # TODO: We really should a library global control over these tolerance values
     # They shouldn't be hardcoded here.
     return math.isclose(self.length_sq(), 1.0, abs_tol=0.00001)
-  
+
   def normalize(self):
     length = self.length()
     self.x /= length

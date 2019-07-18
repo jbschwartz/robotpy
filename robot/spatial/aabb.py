@@ -34,14 +34,14 @@ class AABB:
     for low, value, high in zip(self.min, point, self.max):
       if not low <= value <= high:
         return False
-    return True 
+    return True
 
   def sphere_radius(self):
     largest = 0
     for corner in self.corners:
       radius = self.center - corner
       largest = max(radius.length(), largest)
-    
+
     return largest
 
   def intersect(self, ray, min_t = 0, max_t = math.inf):
@@ -105,7 +105,7 @@ class AABB:
     size = self.size
     x = Vector3(x = size.x)
     y = Vector3(y = size.y)
-    
+
     return [
       self.max,
       self.max - x,

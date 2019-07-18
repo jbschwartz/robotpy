@@ -14,7 +14,7 @@ def scalar_decorator(gl_function):
 def vector_decorator(gl_function):
   def wrapper(location, vectors):
     # TODO: Better type/size checking
-    # This entire function is actually broken since there are glUniform[1,2,3,4]x functions 
+    # This entire function is actually broken since there are glUniform[1,2,3,4]x functions
     # This assumes it's always 3
     if isinstance(vectors, Vector3):
       return gl_function(location, 1, [*vectors])
@@ -34,7 +34,7 @@ def vector_decorator(gl_function):
 def matrix_decorator(gl_function):
   def wrapper(location, transforms):
     # TODO: Better type/size checking
-    # This entire function is actually broken since there are glUniformMatrix[1,2,3,4]x functions 
+    # This entire function is actually broken since there are glUniformMatrix[1,2,3,4]x functions
     # This assumes it's always 4
     if not isinstance(transforms, list):
       if isinstance(transforms, Transform):
@@ -50,7 +50,7 @@ def matrix_decorator(gl_function):
 
     # OpenGL expects a flat list of matrix elements
     elements = [elem for m in matrices for elem in m.elements]
-    # Matrix4 stores elements column-major so transposing is never necessary for OpenGL 
+    # Matrix4 stores elements column-major so transposing is never necessary for OpenGL
     return gl_function(location, len(matrices), False, elements)
 
   return wrapper
@@ -93,7 +93,7 @@ class Uniform:
   @property
   def value(self, ):
     return self._value
-  
+
   @value.setter
   def value(self, *args):
     self._value = args

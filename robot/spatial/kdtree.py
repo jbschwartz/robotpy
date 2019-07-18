@@ -7,7 +7,7 @@ class KDTreeNode():
     self.children = []
 
   def is_leaf(self):
-    '''Return True if the KDTreeNode is a leaf node.''' 
+    '''Return True if the KDTreeNode is a leaf node.'''
     return len(self.children) == 0
 
   def can_branch(self, depth):
@@ -34,7 +34,7 @@ class KDTreeNode():
         left.append(facet)
       if facet.aabb.max[axis] > plane_value:
         right.append(facet)
-    
+
     return left, right
 
   def candidate_children(self, splitting_plane):

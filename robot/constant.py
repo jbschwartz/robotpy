@@ -1,3 +1,3 @@
 import math
 
-SINGULAR = math.inf 
+SINGULAR = math.inf

@@ -12,6 +12,6 @@ class Timer:
   def __exit__(self, *args):
     self.end = time.clock()
     self.elapsed = self.end - self.start
-    
+
     if self.message and self.show_message:
       print(f'{self.message}: {self.elapsed}')

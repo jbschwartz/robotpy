@@ -8,7 +8,7 @@ class Mesh:
     self.name = name
     self.facets = []
     self.aabb = AABB()
-    
+
     self._accelerator = None
 
   @property
@@ -31,7 +31,7 @@ class Mesh:
     self.aabb.extend(*facet.vertices)
 
     self.facets.append(facet)
-    
+
     if self.accelerator:
       self.accelerator.update(self, facet)
 

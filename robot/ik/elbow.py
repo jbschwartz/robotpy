@@ -2,8 +2,8 @@ import math
 
 def solve_elbow(r, s, upper_arm_length, fore_arm_length):
   '''
-  Calculate one elbow (joint 2) angle. 
-  
+  Calculate one elbow (joint 2) angle.
+
   Callers will negate the returned value to get the other elbow configuration
   '''
 
@@ -17,4 +17,4 @@ def solve_elbow(r, s, upper_arm_length, fore_arm_length):
     result = math.atan2(math.sqrt(1 - cosTheta * cosTheta), cosTheta)
     return result
   except:
-    return math.nan 
+    return math.nan

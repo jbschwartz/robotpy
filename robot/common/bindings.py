@@ -2,7 +2,7 @@ import enum, glfw
 
 class Bindings():
   def __init__(self):
-    # TODO: We can eventually save and load this from disk for user settings 
+    # TODO: We can eventually save and load this from disk for user settings
     # TODO: Does glfw guarantee there is no overlap on their constants? (e.g. can MOUSE_BUTTON_MIDDLE be confused with a KEY_?)
     # Always place modifers before keys/buttons
     self.bindings = {
@@ -31,7 +31,7 @@ class Bindings():
       (0, glfw.KEY_O): 'orbit_toggle',
       (0, glfw.KEY_P): 'projection_toggle',
       (0, glfw.KEY_V): 'normal_to',
-      
+
       (glfw.MOD_CONTROL, glfw.KEY_1): 'view_front',
       (glfw.MOD_CONTROL, glfw.KEY_2): 'view_back',
       (glfw.MOD_CONTROL, glfw.KEY_3): 'view_right',

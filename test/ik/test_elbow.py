@@ -28,14 +28,14 @@ class TestElbow(unittest.TestCase):
     fullReach = self.upperArmLength + self.foreArmLength
     result = ik.solve_elbow(fullReach, 0, self.upperArmLength, self.foreArmLength)
     expected = 0
-    
+
     self.assertAlmostEqual(result, expected)
 
     # For points on internal workspace boundary
     internalBoundary = self.upperArmLength - self.foreArmLength
     result = ik.solve_elbow(internalBoundary, 0, self.upperArmLength, self.foreArmLength)
     expected = math.pi
-    
+
     self.assertAlmostEqual(result, expected)
 
     # For the origin (i.e. on the shoulder axis)
@@ -43,7 +43,7 @@ class TestElbow(unittest.TestCase):
     expected = math.pi
 
     self.assertAlmostEqual(result, expected)
-    
+
     # For a position in the workspace
 
     # Construct a 2R manipulator in the plane so the expected result is prescribed

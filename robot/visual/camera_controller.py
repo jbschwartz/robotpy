@@ -90,7 +90,7 @@ class CameraController(Observer):
         # print(f'Square from {self.is_selecting} to {end}')
         # self.camera.fit_window(self.is_selecting, end)
         self.is_selecting = None
-    
+
     if button == glfw.MOUSE_BUTTON_MIDDLE and action == glfw.PRESS:
       r = self.camera.cast_ray(self.window.ndc(cursor))
       with Timer('Ray Intersection') as tim:
@@ -102,7 +102,7 @@ class CameraController(Observer):
         self.target = self.scene.aabb.center
 
       self.camera.target = self.target
-      
+
   def drag(self, button, cursor, cursor_delta, modifiers):
     command = self.bindings.get_command((modifiers, button))
 
@@ -188,7 +188,7 @@ class CameraController(Observer):
 
     axis = vector3.cross(forward, direction)
     self.camera.camera_to_world = Transform(axis = axis, angle = minimum) * self.camera.camera_to_world
-    
+
     right = self.camera.camera_to_world(Vector3(1, 0, 0), type="vector")
 
     first_direction = direction
@@ -231,7 +231,7 @@ class CameraController(Observer):
       if self.scene.aabb.contains(self.camera.position):
         # This could cause clipping issues if the size of the scene is large
         # This could be circumvented by a more precise calculation of the distance to the edge of the scene
-        self.camera.dolly(2 * self.scene.aabb.sphere_radius()) 
+        self.camera.dolly(2 * self.scene.aabb.sphere_radius())
     else:
       width = self.camera.projection.width
 
@@ -321,12 +321,12 @@ class CameraController(Observer):
     else:
       at_minimum = self.camera.projection.width <= self.camera.projection.WIDTH_MIN
       at_maximum = self.camera.projection.width >= self.camera.projection.WIDTH_MAX
-      
+
       if (at_minimum and amount < 0) or (at_maximum and amount > 0):
         return False
-      
+
       self.camera.projection.zoom(amount)
-    
+
     return True
 
   def view(self, view_name):

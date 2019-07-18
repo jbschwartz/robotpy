@@ -6,7 +6,7 @@ from robot.spatial.frame import Frame
 
 def redundant_solutions(solutions, robot):
   # TODO: This can probably be more concise
-  # TODO: And this is actually wrong for robots which have more than one joint with multiple revolutions. 
+  # TODO: And this is actually wrong for robots which have more than one joint with multiple revolutions.
   #   The number of additional solutions should be multiplicative (but it's not)
   # TODO: Replace solutions lists with a tree structure. Lists can be generated with DFS
   additional_solutions = []
@@ -31,7 +31,7 @@ def solve_angles(target : Frame, robot):
   '''
   # Transform end-effector tip frame to wrist center frame
   wrist_center = robot.wrist_center(target)
-  
+
   solutions = solve_arm(
     wrist_center,
     robot.upper_arm_length(),
@@ -48,11 +48,11 @@ def solve_angles(target : Frame, robot):
   additional_solutions = redundant_solutions(solutions, robot)
 
   solutions.extend(additional_solutions)
-  
+
   # Remove solutions if beyond joint limits.
   # Doing this at the very end is not as efficient but does make the code more concise
   #   A more efficient way would be to check the limit at the time the joint angle is solved
   #   This prevents solutions from being calculated for infeasible joint angles
   solutions = list(filter(robot.within_limits, solutions))
-  
+
   return solutions

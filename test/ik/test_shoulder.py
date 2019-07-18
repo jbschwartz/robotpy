@@ -22,7 +22,7 @@ class TestShoulder(unittest.TestCase):
     elbow = ik.solve_elbow(fullReach, 0, self.upperArmLength, self.foreArmLength)
     result = ik.solve_shoulder(fullReach, 0, self.upperArmLength, self.foreArmLength, elbow)
     expected = 0
-    
+
     self.assertEqual(len(result), 1)
     self.assertAlmostEqual(result[0], expected)
 
@@ -52,5 +52,5 @@ class TestShoulder(unittest.TestCase):
 
     self.assertEqual(len(result), 1)
     self.assertEqual(result[0], expected)
-    
+
 

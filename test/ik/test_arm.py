@@ -1,6 +1,6 @@
 import math, unittest
 
-import robot.ik    as ik 
+import robot.ik    as ik
 import robot.utils as utils
 from robot.spatial.vector3 import Vector3
 
@@ -11,7 +11,7 @@ class TestArm(unittest.TestCase):
 
     self.upperArmLength = 15
     self.foreArmLength = 10
-    self.shoulderWristOffset = 10 
+    self.shoulderWristOffset = 10
     self.shoulderZ = 20
 
   def test_arm(self):
@@ -19,7 +19,7 @@ class TestArm(unittest.TestCase):
     expectedSets = [ [waistAngles[0], math.radians(0), 0], [waistAngles[1], math.radians(180), 0] ]
     resultSets = ik.solve_arm(self.target, self.upperArmLength, self.foreArmLength, self.shoulderWristOffset, self.shoulderZ)
 
-    for resultSet, expectedSet in zip(resultSets, expectedSets): 
-      with self.subTest(): 
+    for resultSet, expectedSet in zip(resultSets, expectedSets):
+      with self.subTest():
         for angle, expected in zip(resultSet, expectedSet):
           self.assertAlmostEqual(angle, expected)

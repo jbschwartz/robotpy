@@ -41,7 +41,7 @@ class Joint:
   def transform(self):
     '''
     Create transformation from Denavit-Hartenberg parameters
-    
+
     Transform = Translate_z(d) * Rotate_z(theta) * Translate_x(a) * Rotate_x(alpha)
     '''
 
@@ -49,7 +49,7 @@ class Joint:
     theta = Quaternion(axis = Vector3(0, 0, 1), angle = angle_sum)
     r = theta * self.alpha
     dual = Dual(r, 0.5 * (theta * self.a_alpha + self.d * r))
-  
+
     return Transform(dual = dual)
 
   def num_revolutions(self):

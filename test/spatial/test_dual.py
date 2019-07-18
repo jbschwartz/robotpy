@@ -37,7 +37,7 @@ class TestDual(unittest.TestCase):
     expected = Dual(self.s * self.r1, self.s * self.d1)
     self.assertEqual(self.s * self.dq1, expected)
     self.assertEqual(self.dq1 * self.s, expected)
-    
+
   def test_truediv(self):
     expected = Dual(self.r1 / self.s, self.d1 / self.s)
     self.assertEqual(self.dq1 / self.s, expected)

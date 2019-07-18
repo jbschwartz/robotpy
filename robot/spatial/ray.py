@@ -10,7 +10,7 @@ class Ray():
     for item in collection:
       try:
         t = item.intersect(self)
-        
+
         if t and (closest is None or t < closest):
           closest = t
       except AttributeError:

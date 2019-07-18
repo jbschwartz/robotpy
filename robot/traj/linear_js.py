@@ -20,7 +20,7 @@ class LinearJS(TrajectoryJS):
     self.direction = 1
 
   def is_done(self):
-    return self.position <= 0.0 or self.position >= 1.0 
+    return self.position <= 0.0 or self.position >= 1.0
 
   def restart(self):
     self.position = 0

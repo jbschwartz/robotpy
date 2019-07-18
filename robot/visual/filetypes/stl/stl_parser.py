@@ -62,7 +62,7 @@ class STLParser:
   def reset(self):
     self.meshes = []
     self.warnings = dict()
-    
+
     self.current = {
       'state': ParserState.PARSE_SOLID,
       'facet': Facet(),
@@ -110,7 +110,7 @@ class STLParser:
         break
 
       *facet_floats, mesh_id = struct.unpack(self.FACET_FORMAT, buffer)
-      
+
       normal = Vector3(*facet_floats[0:3])
       vertices = [
         Vector3(*facet_floats[3:6]),
@@ -120,7 +120,7 @@ class STLParser:
 
       # We use the attribute value to idenitfy which mesh a facet belongs to
       # This allows multiple meshes to be saved to one file
-      
+
       # This is non-standard binary STL behavior
       # Typically the attribute is 0 but can be used to store color information
       if mesh_id != current_mesh.name:
@@ -164,7 +164,7 @@ class STLParser:
     # For these keywords, convert string to list of floats
     if keyword in ['color', 'normal', 'vertex']:
       rest = self.parse_components(keyword, *rest)
-    
+
     fn(*rest)
 
   @check_state(ParserState.PARSE_SOLID)
@@ -181,7 +181,7 @@ class STLParser:
     self.current['mesh'].set_color(r, g, b)
 
   @check_state(ParserState.PARSE_FACET)
-  def facet(self, normal):  
+  def facet(self, normal):
     self.current['facet'] = Facet()
     self.stats['facets'] += 1
 
@@ -212,10 +212,10 @@ class STLParser:
     v = Vector3(x, y, z)
     self.current['facet'].append(v, recompute=False)
     self.stats['vertices'] += 1
-  
+
   @check_state(ParserState.PARSE_VERTEX)
   def endloop(self):
-    facet = self.current['facet'] 
+    facet = self.current['facet']
 
     if not facet.is_triangle():
       raise STLNotATriangle(self.current['line'], facet.size())
@@ -226,7 +226,7 @@ class STLParser:
   def endfacet(self):
     current_facet = self.current['facet']
 
-    # TODO: Switch how the ASCII parser constructs facets. 
+    # TODO: Switch how the ASCII parser constructs facets.
     # Instead of appending vertices into a constructed facet
     # Hold onto vertices and then construct the facet directly here (i.e. Facet(vertices, normal))
     self.current_facet.compute_aabb()
@@ -254,6 +254,6 @@ class STLParser:
       # Make sure the name of the endsolid call matches the opening solid call
       if name != self.current['mesh'].name:
         self.add_warning(WarningType.END_SOLID_NAME_MISMATCH)
-    
+
     self.meshes.append(self.current['mesh'])
     self.current['state'] = ParserState.PARSE_SOLID

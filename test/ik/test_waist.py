@@ -14,13 +14,13 @@ class TestWaist(unittest.TestCase):
     Solve for the waist angle with and without a shoulder offset
     '''
     for alpha in self.alphas:
-      with self.subTest(alpha=alpha): 
+      with self.subTest(alpha=alpha):
         # Prescribe the alpha angle and solve for shoulderOffset
         # This makes the expected results easy to reason about
         alpha = math.radians(alpha)
         shoulderOffset = self.armLength * math.sin(alpha)
 
-        for angle in self.angles: 
+        for angle in self.angles:
           angle = math.radians(angle)
           # Calculate target position
           y = self.armLength * math.sin(angle)
@@ -28,11 +28,11 @@ class TestWaist(unittest.TestCase):
 
           results = ik.solve_waist(x, y, shoulderOffset)
           expecteds = [ utils.clamp_angle(angle - alpha), utils.clamp_angle(angle + alpha + math.pi) ]
-          
+
           for result, expected in zip(results, expecteds):
             with self.subTest(angle=angle):
               self.assertAlmostEqual(result, expected)
-    
+
     # Determine the singular position
     expected = math.inf
     self.assertEqual(ik.solve_waist(0, 0)[0], expected)

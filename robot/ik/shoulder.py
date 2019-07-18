@@ -17,7 +17,7 @@ def solve_shoulder(r, s, upper_arm_length, fore_arm_length, elbow):
   Does not do any checking for points out of reach as there would be no valid elbow angle to pass in.
   '''
 
-  if is_singular(r, s, upper_arm_length, fore_arm_length): 
+  if is_singular(r, s, upper_arm_length, fore_arm_length):
     return [ constant.SINGULAR ]
 
   angles = []

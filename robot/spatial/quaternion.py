@@ -3,7 +3,7 @@ import math
 from robot.spatial.swizzler import Swizzler
 
 class Quaternion(Swizzler):
-  ''' 
+  '''
   Class for representing quaternions of the form r + xi + yj + dk
   '''
 
@@ -29,7 +29,7 @@ class Quaternion(Swizzler):
 
   def __abs__(self):
     return Quaternion(abs(self.r), abs(self.x), abs(self.y), abs(self.z))
-  
+
   def __round__(self, n):
     return Quaternion(round(self.r, n), round(self.x, n), round(self.y, n), round(self.z, n))
 

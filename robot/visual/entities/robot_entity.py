@@ -48,7 +48,7 @@ def get_joint_params(joint_json):
         value['high'] = math.radians(value['high'])
       elif param in ['alpha', 'theta']:
         joint_params[param] = math.radians(value)
-  
+
   return joint_json
 
 def load(file_path):
@@ -60,7 +60,7 @@ def load(file_path):
   links = []
 
   if not cached_result:
-    with open(file_path) as json_file:  
+    with open(file_path) as json_file:
       data = json.load(json_file)
 
     meshes = parse_mesh(f'robot/mech/robots/meshes/{data["mesh_file"]}')
@@ -130,7 +130,7 @@ class RobotEntity(Entity):
 
     glVertexAttribPointer(self.shader_program.attribute_location('vin_position'), 3, GL_FLOAT, GL_FALSE, 28, None)
     glEnableVertexAttribArray(self.shader_program.attribute_location('vin_position'))
-    
+
     glVertexAttribPointer(self.shader_program.attribute_location('vin_normal'), 3, GL_FLOAT, GL_FALSE, 28, c_void_p(12))
     glEnableVertexAttribArray(self.shader_program.attribute_location('vin_normal'))
 

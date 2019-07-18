@@ -71,7 +71,7 @@ class Facet:
     Returns `None` when the ray origin is in the triangle and the ray points away.
     Returns the ray origin when the ray origin is in the triangle and the ray points towards.
 
-    This function implements the Moller-Trumbore intersection algorithm. 
+    This function implements the Moller-Trumbore intersection algorithm.
     '''
 
     E1 = self.edges[0]
@@ -90,7 +90,7 @@ class Facet:
       # The ray is parallel to the triangle
       return None
 
-    T = ray.origin - self.vertices[0] 
+    T = ray.origin - self.vertices[0]
     Q = T % E1
 
     u = (P * T) * inv_det

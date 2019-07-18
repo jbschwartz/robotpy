@@ -13,13 +13,13 @@ def solve_waist(x, y, wristOffset = 0):
     #    A point is unreachable if x^2 + y^2 < d^2,
     #    i.e. if the point is "inside" the (circle produced by the) offset wrist
     delta = x ** 2 + y ** 2 - wristOffset ** 2
-    if delta < 0: 
+    if delta < 0:
       return [] # No solution
 
     alpha = math.atan2(wristOffset, math.sqrt(delta))
   else:
     shoulderIsSingular = math.isclose(x, 0) and math.isclose(y, 0)
-    if shoulderIsSingular: 
+    if shoulderIsSingular:
       return [ constant.SINGULAR ] # Infinite possible solutions
 
   phi = math.atan2(y, x)

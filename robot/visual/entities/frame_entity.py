@@ -29,7 +29,7 @@ class FrameEntity(Entity):
        0.25, -0.25, -0.25,
        8.00, -0.25, -0.25,
        8.00, -0.25,  0.25,
-       
+
        0.25,  0.25, -0.25,
        0.25,  0.25,  0.25,
        8.00,  0.25,  0.25,
@@ -93,14 +93,14 @@ class FrameEntity(Entity):
       -0.25,  0.25,  0.25,
       -0.25,  8.00,  0.25,
       -0.25,  8.00, -0.25,
-       
+
       -0.25,  0.25, -0.25,
        0.25,  0.25,  0.25,
       -0.25,  0.25,  0.25,
       -0.25,  0.25, -0.25,
        0.25,  0.25, -0.25,
        0.25,  0.25,  0.25,
-        
+
       -0.25,  8.00, -0.25,
       -0.25,  8.00,  0.25,
        0.25,  8.00,  0.25,
@@ -173,7 +173,7 @@ class FrameEntity(Entity):
       -0.25,  0.25,  0.25,
       -0.25,  0.25, -0.25
     ]
-    
+
     self.buffer = np.array(data_list, dtype=np.float32)
 
   def load(self):
@@ -196,7 +196,7 @@ class FrameEntity(Entity):
   def draw(self, camera, light, transform = None):
     if not transform:
       transform = self.frame.transform
-      
+
     self.shader_program.use()
 
     self.shader_program.proj_matrix = camera.projection.matrix
@@ -205,12 +205,12 @@ class FrameEntity(Entity):
     self.shader_program.light_position  = light.position
     self.shader_program.light_color     = light.color
     self.shader_program.light_intensity = light.intensity
-    
+
     self.shader_program.model_matrix = transform
     self.shader_program.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,
-      0, self.scale, 0, 0, 
-      0, 0, self.scale, 0, 
+      0, self.scale, 0, 0,
+      0, 0, self.scale, 0,
       0, 0, 0, 1
     ])
     self.shader_program.in_opacity = 1

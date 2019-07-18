@@ -36,7 +36,7 @@ class BoundingEntity(Entity):
       -0.5, -0.5,  0.5,
       -0.5,  0.5, -0.5,
       -0.5, -0.5, -0.5,
-      
+
       # Front
        0.5, -0.5, -0.5,
        0.5, -0.5,  0.5,
@@ -69,7 +69,7 @@ class BoundingEntity(Entity):
        0.5, -0.5, -0.5,
       -0.5, -0.5, -0.5
     ]
-    
+
     self.buffer = np.array(data_list, dtype=np.float32)
 
   def load(self):
@@ -100,14 +100,14 @@ class BoundingEntity(Entity):
     self.shader_program.light_position  = light.position
     self.shader_program.light_color     = light.color
     self.shader_program.light_intensity = light.intensity
-    
+
     self.shader_program.model_matrix = transform
-    
+
     size = self.aabb.size
     self.shader_program.scale_matrix = Matrix4([
       size.x, 0, 0, 0,
-      0, size.y, 0, 0, 
-      0, 0, size.z, 0, 
+      0, size.y, 0, 0,
+      0, 0, size.z, 0,
       0, 0, 0, 1
     ])
     self.shader_program.in_opacity = 0.25

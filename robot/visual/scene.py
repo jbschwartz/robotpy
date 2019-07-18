@@ -53,8 +53,8 @@ class Scene(Observer):
     for entity in self.entities:
       entity.update(delta)
 
-    self.light.position = self.camera.position 
-  
+    self.light.position = self.camera.position
+
   def draw(self):
     for entity in self.entities:
       entity.draw(self.camera, self.light)

@@ -81,7 +81,7 @@ class OrthoProjection(Projection):
                            0.0, m22, 0.0, 0.0,
                            0.0, 0.0, m33, 0.0,
                            0.0, 0.0, m34, 1.0])
-                                        
+
   def calculate_inverse(self):
     p11 = self.matrix.elements[0]
     p22 = self.matrix.elements[5]
@@ -90,13 +90,13 @@ class OrthoProjection(Projection):
 
     m11 = 1 / p11
     m22 = 1 / p22
-    m33 = 1 / p33 
+    m33 = 1 / p33
     m43 = -m33 * p34
 
-    # Remember: the elements of the matrix look transposed 
-    self.inverse = Matrix4([m11, 0.0, 0.0, 0.0, 
-                            0.0, m22, 0.0, 0.0, 
-                            0.0, 0.0, m33, m43, 
+    # Remember: the elements of the matrix look transposed
+    self.inverse = Matrix4([m11, 0.0, 0.0, 0.0,
+                            0.0, m22, 0.0, 0.0,
+                            0.0, 0.0, m33, m43,
                             0.0, 0.0, 0.0, 1.0])
 
   def project(self, v):
@@ -118,7 +118,7 @@ class PerspectiveProjection(Projection):
     self.matrix      = Matrix4()
 
     super().__init__(near_clip, far_clip)
-  
+
   def __setattr__(self, attribute, value):
     super().__setattr__(attribute, value, ['aspect', 'fov'])
 
@@ -131,10 +131,10 @@ class PerspectiveProjection(Projection):
     m33 = (self.far_clip + self.near_clip) / (-z_width)
     m34 = 2 * self.far_clip * self.near_clip / (-z_width)
 
-    # Remember: the elements of the matrix look transposed 
-    self.matrix = Matrix4([m11,  0.0,  0.0,  0.0, 
-                           0.0,  m22,  0.0,  0.0, 
-                           0.0,  0.0,  m33, -1.0, 
+    # Remember: the elements of the matrix look transposed
+    self.matrix = Matrix4([m11,  0.0,  0.0,  0.0,
+                           0.0,  m22,  0.0,  0.0,
+                           0.0,  0.0,  m33, -1.0,
                            0.0,  0.0,  m34,  0.0])
 
   def calculate_inverse(self):
@@ -145,13 +145,13 @@ class PerspectiveProjection(Projection):
 
     m11 = 1 / p11
     m22 = 1 / p22
-    m43 = 1 / p34 
+    m43 = 1 / p34
     m44 = p33 / p34
 
-    # Remember: the elements of the matrix look transposed 
-    self.inverse = Matrix4([m11, 0.0,  0.0, 0.0, 
-                            0.0, m22,  0.0, 0.0, 
-                            0.0, 0.0,  0.0, m43, 
+    # Remember: the elements of the matrix look transposed
+    self.inverse = Matrix4([m11, 0.0,  0.0, 0.0,
+                            0.0, m22,  0.0, 0.0,
+                            0.0, 0.0,  0.0, m43,
                             0.0, 0.0, -1.0, m44])
 
   def project(self, v):

@@ -17,7 +17,7 @@ class STLWriter():
       file.write(self.header())
       # Placeholder bytes for number of facets
       file.write(bytes(4))
-      
+
       num_facets = 0
       mesh_id = 0
       for mesh in meshes:

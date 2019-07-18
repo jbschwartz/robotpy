@@ -18,12 +18,12 @@ class Window():
 
     if not glfw.init():
       sys.exit('GLFW initialization failed')
-    
+
     self.window_hints()
 
     with Timer('Create Window') as t:
       self.window = glfw.create_window(self.width, self.height, title, None, None)
-    
+
     if not self.window:
       glfw.terminate()
       sys.exit('GLFW create window failed')
@@ -70,7 +70,7 @@ class Window():
 
     if self.last_cursor_position:
       cursor_delta = (self.last_cursor_position - cursor)
-      
+
     self.last_cursor_position = cursor
 
     event = WindowEvent.DRAG if self.dragging is not None else WindowEvent.CURSOR
@@ -98,7 +98,7 @@ class Window():
         observer.notify(event_type, *args, **kwargs)
 
   def run(self, fps_limit = None):
-    # Send a window resize event so observers are provided the initial window size 
+    # Send a window resize event so observers are provided the initial window size
     self.window_callback(self.window, *glfw.get_window_size(self.window))
 
     with Timer('START_RENDERER') as t:
@@ -108,7 +108,7 @@ class Window():
     last_frame = now
     last_update = now
 
-    frame_time = 0 if not fps_limit else 1 / fps_limit 
+    frame_time = 0 if not fps_limit else 1 / fps_limit
 
     while not glfw.window_should_close(self.window):
       now = glfw.get_time()
@@ -119,12 +119,12 @@ class Window():
         self.emit(WindowEvent.UPDATE, delta = delta_update)
 
       self.emit(WindowEvent.START_FRAME)
-      
+
       delta_frame = now - last_frame
       if not fps_limit or (fps_limit and delta_frame >= frame_time):
         self.emit(WindowEvent.DRAW)
         last_frame = now
-      
+
       self.emit(WindowEvent.END_FRAME)
 
       glfw.swap_buffers(self.window)

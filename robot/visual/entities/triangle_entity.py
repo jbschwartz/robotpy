@@ -31,7 +31,7 @@ class TriangleEntity(Observer):
        0.0,  0.66, 0,
       -0.5, -0.33, 0
     ]
-    
+
     self.buffer = np.array(data_list, dtype=np.float32)
 
   def load(self):
@@ -87,8 +87,8 @@ class TriangleEntity(Observer):
     self.shader_program.model_matrix  = self.transform
     self.shader_program.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,
-      0, self.scale, 0, 0, 
-      0, 0, self.scale, 0, 
+      0, self.scale, 0, 0,
+      0, 0, self.scale, 0,
       0, 0, 0, 1
     ])
     self.shader_program.color_in     = self.color

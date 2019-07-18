@@ -22,7 +22,7 @@ class TestAABB(unittest.TestCase):
     other_aabb = AABB(self.v3, self.v4)
 
     self.aabb.extend(other_aabb)
-    
+
     self.assertAlmostEqual(self.v2, self.aabb.min)
     self.assertAlmostEqual(self.v4, self.aabb.max)
 
@@ -39,13 +39,13 @@ class TestAABB(unittest.TestCase):
 
         left_max  = Vector3(*self.v1)
         left_max[index] = value
-      
+
         right_min = Vector3(*self.v2)
         right_min[index] = value
 
         self.assertAlmostEqual(left.min, self.aabb.min, msg='Left split incorrect minimum')
         self.assertAlmostEqual(left.max, left_max, msg='Left split incorrect maximum')
-        
+
         self.assertAlmostEqual(right.min, right_min, msg='Right split incorrect minimum')
         self.assertAlmostEqual(right.max, self.aabb.max, msg='Right split incorrect maximum')
 

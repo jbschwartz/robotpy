@@ -31,7 +31,7 @@ class Camera():
       1.  Start with the base coordinate frame
       2.  We calculate our desired z axis (called forward)
       3.  We calculate the difference between our existing z axis and desired
-      4.  We rotate around our desired x axis (called right) 
+      4.  We rotate around our desired x axis (called right)
           to align our existing z axis with our desired z axis
       5.  In the process, we move our existing x axis out of alignment with our desired x axis into an intermediate
       6.  We aim to rotate around our desired z axis (mostly so we don't move our desired z axis)
@@ -60,7 +60,7 @@ class Camera():
       # Check which direction we need to rotate by angle_x (dot product tells us how much, but not which way)
       # See if the calculated normal vector is parallel or anti-parallel with the z vector
       calculated_normal = (right % intermediate_x)
-      rotation_direction = -1 if calculated_normal * forward > 0 else 1 
+      rotation_direction = -1 if calculated_normal * forward > 0 else 1
       align_x = Transform(axis=(rotation_direction * forward), angle=angle_x, translation=position) # Step 9
 
     self.camera_to_world = align_x * align_z # Step 10
@@ -96,14 +96,14 @@ class Camera():
 
   def dolly(self, z):
     '''
-    Move the camera in and out along the line of sight (z axis). 
+    Move the camera in and out along the line of sight (z axis).
     '''
     self.camera_to_world *= Transform(translation = Vector3(0, 0, z))
 
   def track(self, x = 0, y = 0, v = None):
     '''
     Move the camera vertically and horizontally.
-    
+
     x, y, and v are in camera space.
     '''
     # Accept vector input if it is provided. Makes calls a bit cleaner if the caller is using a vector already.
@@ -116,7 +116,7 @@ class Camera():
 
   def fit(self, world_aabb, scale = 1):
     '''
-    Dolly and track the camera to fit the provided bounding box in world space. 
+    Dolly and track the camera to fit the provided bounding box in world space.
 
     Scale [0, 1] represents the percentage of the frame used (with 1 being full frame).
 
@@ -125,12 +125,12 @@ class Camera():
 
     # Check to see if the camera is in the scene bounding box
     # This function generally doesn't behave well with the camera inside the box
-    # This is a bit of a cop-out since there are probably ways to handle those edge cases 
+    # This is a bit of a cop-out since there are probably ways to handle those edge cases
     #   but those are hard to think about... and this works.
     if world_aabb.contains(self.position):
       self.camera_to_world *= Transform(translation = Vector3(0, 0, world_aabb.sphere_radius()))
 
-    # Centering the camera on the world bounding box first helps removes issues caused by 
+    # Centering the camera on the world bounding box first helps removes issues caused by
     # a major point skipping to a different corner as a result of the camera's zoom in movement.
     self.track(v = self.world_to_camera(world_aabb.center))
 
@@ -140,7 +140,7 @@ class Camera():
     # Generate NDCs for a point in coordinate (z = 0, y = 1, z = 2)
     def ndc_coordinate(point, coordinate):
       clip = self.projection.project(point)
-      return clip[coordinate] 
+      return clip[coordinate]
 
     sorted_points = {}
     sizes = {}
@@ -150,17 +150,17 @@ class Camera():
       # Calculate the distance between the two extreme points vertically and horizontally
       sizes[coord] = ndc_coordinate(sorted_points[coord][0], coord) - ndc_coordinate(sorted_points[coord][-1], coord)
 
-    # We now want to make the NDC coordinates of the two extreme point (in x or y) equal to 1 and -1 
+    # We now want to make the NDC coordinates of the two extreme point (in x or y) equal to 1 and -1
     # This will mean the bounding box is as big as we can make it on screen without clipping it
     #
-    # To do this, both points are shifted equally to center them on the screen. Then both points are made to 1 and -1 by adjusting z 
+    # To do this, both points are shifted equally to center them on the screen. Then both points are made to 1 and -1 by adjusting z
     # (since NDC.x = x / z and NDC.y = y / z).
     #
     # For the case of y being the limiting direction (but it is analogous for x) we use a system of equations:
     # Two equations and two unknowns (delta_y, delta_z), taken from the projection matrix:
     #   aspect * (y_1 + delta_y) / (z_1 + delta_z) = -1
     #   aspect * (y_2 + delta_y) / (z_2 + delta_z) =  1
-    # 
+    #
     # Note the coordinates (y and z) are given in camera space
     def solve_deltas(major, v1, v2, v3, v4, projection_factor):
       '''
@@ -187,7 +187,7 @@ class Camera():
 
     if sizes[vector3.VECTOR_Y] > sizes[vector3.VECTOR_X]:
       # Height is the constraint: Y is the major axis
-      if isinstance(self.projection, PerspectiveProjection): 
+      if isinstance(self.projection, PerspectiveProjection):
         projection_factor = self.projection.matrix.elements[5] / scale
         delta_y, delta_x, delta_z = solve_deltas(vector3.VECTOR_Y, y_max, y_min, x_max, x_min, projection_factor)
       elif isinstance(self.projection, OrthoProjection):
@@ -198,7 +198,7 @@ class Camera():
         self.projection.height = (y_max.y - y_min.y) / scale
     else:
       # Width is the constraint: X is the major axis
-      if isinstance(self.projection, PerspectiveProjection): 
+      if isinstance(self.projection, PerspectiveProjection):
         projection_factor = self.projection.matrix.elements[0] / scale
         delta_x, delta_y, delta_z = solve_deltas(vector3.VECTOR_X, x_max, x_min, y_max, y_min, projection_factor)
       elif isinstance(self.projection, OrthoProjection):
@@ -227,7 +227,7 @@ class Camera():
   def cast_ray(self, ndc):
     point_camera_space = self.camera_space(ndc)
 
-    if isinstance(self.projection, PerspectiveProjection): 
+    if isinstance(self.projection, PerspectiveProjection):
       origin = self.position
 
       direction = point_camera_space

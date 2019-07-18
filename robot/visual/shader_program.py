@@ -50,14 +50,14 @@ class ShaderProgram():
   def __init__(self, name=None, **names):
     # self.uniforms must be declared before any other properties
     # TODO: Make this not so
-    self.uniforms = [] 
+    self.uniforms = []
 
     self.id = glCreateProgram()
 
     # Use `name` for all shaders by default, replacing any specifically passed in
     # Also re-key the dictionary with ShaderType enum objects
     shader_names = {
-      **{k: name for k in ShaderTypes}, 
+      **{k: name for k in ShaderTypes},
       **{ShaderTypes[k.upper()]: name for k, name in names.items()}
     }
 
@@ -69,13 +69,13 @@ class ShaderProgram():
     glDeleteProgram(self.id)
 
   def __getattr__(self, attribute):
-    if attribute != 'uniforms' and attribute not in self.uniforms: 
+    if attribute != 'uniforms' and attribute not in self.uniforms:
       raise AttributeError
 
     return self.uniforms[attribute]
 
   def __setattr__(self, attribute, value):
-    if attribute == 'uniforms' or attribute not in self.uniforms: 
+    if attribute == 'uniforms' or attribute not in self.uniforms:
       super(ShaderProgram, self).__setattr__(attribute, value)
     else:
       self.uniforms[attribute].value = value
@@ -99,7 +99,7 @@ class ShaderProgram():
 
     for uniform_index in range(0, num_uniforms):
       uniform = Uniform(self.id, uniform_index)
-    
+
       self.uniforms[uniform.name] = uniform
 
   def attach_shaders(self, shaders : dict):

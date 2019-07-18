@@ -57,7 +57,7 @@ class Link:
 
     mesh_volume   = 0
     mesh_centroid = Vector3()
-    
+
     moments = {
       'ixx': 0,
       'iyy': 0,

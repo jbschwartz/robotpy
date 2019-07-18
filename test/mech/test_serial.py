@@ -8,12 +8,12 @@ from robot.spatial.vector3 import Vector3
 class TestSerial(unittest.TestCase):
   def setUp(self):
     self.robot = ABB_IRB_120.serial
-    
+
   def test_pose(self):
     angles = [ math.radians(45) ] * 6
     self.robot.angles = angles
     frame = self.robot.pose()
-    
+
     result = frame.position()
     expected = Vector3(133.58578643, 184.49747468, 128.00714267)
 
@@ -32,7 +32,7 @@ class TestSerial(unittest.TestCase):
       Vector3(302, 0, 630),
       Vector3(374, 0, 630)
     ]
-    
+
     for index, (frame, expected) in enumerate(zip(frames, expecteds)):
       with self.subTest(f"Frame #{index + 1}"):
         result = frame.position()
@@ -42,7 +42,7 @@ class TestSerial(unittest.TestCase):
     # The last argument accounts for the elbow offset to the wrist
     results = [[ math.radians(45), 0, math.atan(70 / 302) ]]
     solutions = [[ math.radians(45), math.radians(90), math.radians(-90) ]]
-    
+
     self.robot.transform_to_robot(results)
 
     for result, expecteds in zip(results, solutions):
@@ -56,7 +56,7 @@ class TestSerial(unittest.TestCase):
 
     result = self.robot.wrist_center(frame)
     expected = Vector3(184.49747468, 184.49747468, 178.91883092)
-    
+
     self.assertAlmostEqual(result, expected)
 
 

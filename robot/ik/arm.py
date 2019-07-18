@@ -8,7 +8,7 @@ from robot.spatial.vector3 import Vector3
 def rs_coordinates(wrist_center : Vector3, shoulder_wrist_offset, shoulder_z_offset):
   '''
   Project a point (usually wrist center) in three dimension space onto the two dimension RS plane
-  
+
   This turns the problem into solving a 2R manipulator.
   '''
 
@@ -21,7 +21,7 @@ def rs_coordinates(wrist_center : Vector3, shoulder_wrist_offset, shoulder_z_off
   #    --^---    (O)-----------> R                |    ||       _ /
   #   offset    =====                           offset ||   _ /   \
   #      |      || ||                             |    || /        sqrt(x^2 + y^2)
-  #   ---V--- ----|---------> X                ---V--- (O)-----------> X 
+  #   ---V--- ----|---------> X                ---V--- (O)-----------> X
 
   r = math.sqrt(wrist_center.x ** 2 + wrist_center.y ** 2 - shoulder_wrist_offset ** 2)
   s = wrist_center.z - shoulder_z_offset
@@ -34,17 +34,17 @@ def solve_arm(wrist_center : Vector3, upper_arm_length, fore_arm_length, shoulde
   '''
 
   waist = solve_waist(wrist_center.x, wrist_center.y, shoulder_wrist_offset)
-  if not waist: 
+  if not waist:
     return []
 
   r, s = rs_coordinates(wrist_center, shoulder_wrist_offset, shoulder_z_offset)
 
   elbow = solve_elbow(r, s, upper_arm_length, fore_arm_length)
-  if math.isnan(elbow): 
+  if math.isnan(elbow):
     return []
 
   shoulder = solve_shoulder(r, s, upper_arm_length, fore_arm_length, elbow)
-  if not shoulder: 
+  if not shoulder:
     return []
 
   if len(shoulder) == 1:

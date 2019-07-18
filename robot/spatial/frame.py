@@ -22,7 +22,7 @@ class Frame:
     Location of frame origin
     '''
     return self.transform.translation()
-  
+
   def orientation(self):
     '''
     Frame orientation quaternion
@@ -41,7 +41,7 @@ class Frame:
     if method == 'intrinsic':
       try:
         eulerFunc = getattr(euler, order)
-        
+
         orientation = self.transform.rotation()
         return eulerFunc(*orientation)
       except AttributeError:

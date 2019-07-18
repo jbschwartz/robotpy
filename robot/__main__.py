@@ -33,7 +33,7 @@ if __name__ == "__main__":
     grid_program = ShaderProgram('grid')
     bill_program = ShaderProgram('billboard')
     com_program = ShaderProgram('com')
-    
+
   ee_frame = FrameEntity(Frame(), flat_program)
   bb = BoundingEntity(flat_program)
   grid = GridEntity(grid_program)
@@ -64,8 +64,8 @@ if __name__ == "__main__":
   bindings = Bindings()
   settings = CameraSettings()
   camera_controller = CameraController(camera, settings, bindings, scene, window)
-  
-  window.register_observer(camera_controller, [ 
+
+  window.register_observer(camera_controller, [
     WindowEvent.CLICK,
     WindowEvent.DRAG,
     WindowEvent.KEY,
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     WindowEvent.WINDOW_RESIZE
   ])
 
-  window.register_observer(triangle, [ 
+  window.register_observer(triangle, [
     WindowEvent.CLICK
   ])
 

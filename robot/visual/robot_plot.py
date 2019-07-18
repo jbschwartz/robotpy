@@ -27,11 +27,11 @@ class RobotPlot:
 
   def setup_plot_lib(self):
     self.fig = plt.figure(figsize=(12, 10))
-  
+
     self.ax = []
     grid_size = (1, 1)
     if self.show_flags['joint_angles']:
-      grid_size = (6, 2) 
+      grid_size = (6, 2)
 
       for i in range(0, 6):
         p = plt.subplot2grid(grid_size, (i, 1))
@@ -62,7 +62,7 @@ class RobotPlot:
         p.scatter(0,joint[0])
 
     self.generate_robot_points()
-    
+
     first_frame_index = 0
 
     # Get initial robot position

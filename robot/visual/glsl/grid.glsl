@@ -21,8 +21,8 @@ out vec4 gl_FragColor;
 
 uniform float step_size;
 uniform float minor_step_size;
-uniform vec3 in_grid_color; 
-uniform vec3 in_minor_grid_color; 
+uniform vec3 in_grid_color;
+uniform vec3 in_minor_grid_color;
 
 void main(void)
 {

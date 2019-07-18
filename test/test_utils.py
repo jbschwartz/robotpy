@@ -1,6 +1,6 @@
 import math, unittest
 
-from robot import utils 
+from robot import utils
 
 class TestUtils(unittest.TestCase):
   def setUp(self):

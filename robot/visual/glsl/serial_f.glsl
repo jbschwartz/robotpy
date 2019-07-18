@@ -13,7 +13,7 @@ void main(void)
   vec3 ambient = light_intensity * light_color;
 
   vec3 norm = normalize(vout_normal);
-  vec3 lightDir = normalize(light_position - frag_pos); 
+  vec3 lightDir = normalize(light_position - frag_pos);
 
   float diff = max(dot(norm, lightDir), 0.1);
   vec3 diffuse = diff * light_color;
