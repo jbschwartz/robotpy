@@ -10,7 +10,8 @@ class Link:
     self.frame = Frame()
     self.name = name
     self.mesh = mesh
-    self.com = mesh.center_of_mass()
+    self.com = mesh.center_of_mass
+    self.volume = mesh.volume
     self.color = color
 
   @property

@@ -12,6 +12,12 @@ class Mesh:
     
     self._accelerator = None
 
+    self.properties = {
+      'com':     None,
+      'moments': None,
+      'volume':  None
+    }
+
   @property
   def accelerator(self):
     return self._accelerator
@@ -27,8 +33,22 @@ class Mesh:
       yield facet.vertices[1]
       yield facet.vertices[2]
 
+  @property
   def center_of_mass(self):
-    '''Calculate the center of mass (assuming uniform density) of the mesh.'''
+    if not self.properties['com']:
+      self.calculate_properties()
+
+    return self.properties['com']
+
+  @property
+  def volume(self):
+    if not self.properties['volume']:
+      self.calculate_properties()
+
+    return self.properties['volume']
+
+  def calculate_properties(self):
+    '''Calculate the volume and center of mass (assuming uniform density) of the mesh.'''
     def tetrahedron_volume(facet):
       '''Volume of a tetrahedron created by the three facet vertices and origin.'''
       a, b, c = facet.vertices
@@ -48,8 +68,9 @@ class Mesh:
         volume = tetrahedron_volume(facet)
         mesh_volume   += volume
         mesh_centroid += volume * tetrahedron_centroid(facet)
-        
-    return mesh_centroid / mesh_volume
+
+    self.properties['com'] = mesh_centroid / mesh_volume
+    self.properties['volume'] = mesh_volume
 
   def append(self, facet):
     '''Add a facet to the mesh.'''
