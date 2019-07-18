@@ -32,7 +32,7 @@ class Mesh:
     def tetrahedron_volume(facet):
       '''Volume of a tetrahedron created by the three facet vertices and origin.'''
       a, b, c = facet.vertices
-      return (a * (c % b)) / 6
+      return (a * (b % c)) / 6
 
     def tetrahedron_centroid(f):
       '''Volume of a tetrahedron created by the three facet vertices and origin.'''
