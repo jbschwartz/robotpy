@@ -12,6 +12,7 @@ class Link:
     self.mesh = mesh
     self.com = mesh.center_of_mass
     self.volume = mesh.volume
+    self.moments = mesh.moments
     self.color = color
 
   @property
