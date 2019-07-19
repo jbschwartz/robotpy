@@ -1,5 +1,7 @@
-import json, math
+import json, math, os
 import numpy as np
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 from OpenGL.GL import *
 
@@ -63,7 +65,7 @@ def load(file_path):
     with open(file_path) as json_file:
       data = json.load(json_file)
 
-    meshes = parse_mesh(f'robot/mech/robots/meshes/{data["mesh_file"]}')
+    meshes = parse_mesh(f'{dir_path}/../../mech/robots/meshes/{data["mesh_file"]}')
     joint_params = get_joint_params(data['joints'])
     link_params = data['links']
 
