@@ -9,19 +9,15 @@ class Frame:
     self.frame_to_world = frame_to_world or Transform()
 
   def transform(self, transform):
-    '''Return transformed frame.'''
+    '''Return new transformed frame.'''
     return Frame(self.frame_to_world * transform)
 
   def position(self) -> Vector3:
-    '''
-    Location of frame origin
-    '''
+    '''Frame origin.'''
     return self.frame_to_world.translation()
 
   def orientation(self):
-    '''
-    Frame orientation quaternion
-    '''
+    '''Frame orientation quaternion.'''
     return self.frame_to_world.rotation()
 
   def euler(self, **kwargs):
@@ -47,26 +43,20 @@ class Frame:
     elif method == 'extrinsic':
       # Take advantage of extrinsic being the reverse order intrinsic solution
       order = order[::-1]
-      intrinsic = self.euler(method = "intrinsic", order = order)
+      intrinsic = self.euler(method="intrinsic", order=order)
       intrinsic.reverse()
       return intrinsic
     else:
       raise KeyError()
 
   def x(self):
-    '''
-    Frame x-axis vector
-    '''
-    return self.frame_to_world(Vector3( 1, 0, 0 ), as_type="vector")
+    '''Frame x-axis vector.'''
+    return self.frame_to_world(Vector3(1,0,0), as_type="vector")
 
   def y(self):
-    '''
-    Frame y-axis vector
-    '''
-    return self.frame_to_world(Vector3( 0, 1, 0 ), as_type="vector")
+    '''Frame y-axis vector.'''
+    return self.frame_to_world(Vector3(0,1,0), as_type="vector")
 
   def z(self):
-    '''
-    Frame z-axis vector
-    '''
-    return self.frame_to_world(Vector3( 0, 0, 1 ), as_type="vector")
+    '''Frame z-axis vector.'''
+    return self.frame_to_world(Vector3(0,0,1), as_type="vector")
