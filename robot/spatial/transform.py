@@ -2,7 +2,6 @@ import math
 
 import robot.spatial.dual       as     dual
 import robot.spatial.quaternion as     quaternion
-from robot.spatial.aabb         import AABB
 from robot.spatial.vector3      import Vector3
 
 Quaternion = quaternion.Quaternion
@@ -39,8 +38,6 @@ class Transform:
         return self.transform_vector(other)
       else:
         return self.transform_point(other)
-    elif isinstance(other, AABB):
-      return self.transform_aabb(other)
     elif isinstance(other, list):
       return [self.__call__(item) for item in other]
 
@@ -53,13 +50,6 @@ class Transform:
     d = Dual(Quaternion(), Quaternion(0, *point.xyz))
     a = self.dual * d * dual.conjugate(self.dual)
     return Vector3(*a.d.xyz)
-
-  def transform_aabb(self, aabb):
-    new_aabb = AABB()
-    for corner in aabb.corners:
-      new_aabb.extend(self.transform_point(corner))
-
-    return new_aabb
 
   def translation(self) -> Vector3:
     # "Undo" what was done in the __init__ function by working backwards

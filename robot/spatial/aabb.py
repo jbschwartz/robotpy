@@ -9,6 +9,10 @@ class AABB:
 
     self.extend(*elements)
 
+  def transform(self, transform: 'Transform') -> 'AABB':
+    '''Return an AABB (in the new transformed space) of the transformed AABB.'''
+    return AABB(*[point.transform(transform, as_type="point") for point in self.corners])
+
   def extend(self, *args):
     for other in args:
       if isinstance(other, Vector3):
