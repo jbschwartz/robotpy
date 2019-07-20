@@ -20,7 +20,7 @@ class Transform:
     t = Quaternion(0, *translation)
     if all(params in kwargs for params in ['axis', 'angle']):
       kwargs['axis'].normalize()
-      r = Quaternion(axis = kwargs['axis'], angle = kwargs['angle'])
+      r = Quaternion.from_axis_angle(kwargs['axis'], kwargs['angle'])
 
       self.dual = Dual(r, 0.5 * t * r)
     elif 'translation' in kwargs:

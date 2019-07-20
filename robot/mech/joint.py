@@ -32,7 +32,7 @@ class Joint:
       raise KeyError()
 
     # Precompute quaternions for the joint transform
-    self.alpha = Quaternion(axis = Vector3(1, 0, 0), angle = self.dh['alpha'])
+    self.alpha = Quaternion.from_axis_angle(Vector3(1, 0, 0), self.dh['alpha'])
     self.a = Quaternion(0, self.dh['a'], 0, 0)
     self.a_alpha = self.a * self.alpha
     self.d = Quaternion(0, 0, 0, self.dh['d'])
@@ -46,7 +46,7 @@ class Joint:
     '''
 
     angle_sum = self.dh['theta'] + self.angle
-    theta = Quaternion(axis = Vector3(0, 0, 1), angle = angle_sum)
+    theta = Quaternion.from_axis_angle(Vector3(0, 0, 1), angle_sum)
     r = theta * self.alpha
     dual = Dual(r, 0.5 * (theta * self.a_alpha + self.d * r))
 

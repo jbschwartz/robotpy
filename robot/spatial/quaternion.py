@@ -3,29 +3,20 @@ import math
 from robot.spatial.swizzler import Swizzler
 
 class Quaternion(Swizzler):
-  '''
-  Class for representing quaternions of the form r + xi + yj + dk
-  '''
+  '''Quaternion of the form r + xi + yj + zk.'''
+  def __init__(self, r = 1, x = 0, y = 0, z = 0):
+    '''Construct a quaternion from four components.'''
+    self.r = r
+    self.x = x
+    self.y = y
+    self.z = z
 
-  def __init__(self, r = 1, x = 0, y = 0, z = 0, **kwargs):
-    '''
-    Quaternion accepts four parameters or converts an 'axis-angle' input
-    '''
-    if all(params in kwargs for params in ['axis', 'angle']):
-      # Angle expected in radians
-      angle = kwargs['angle'] / 2
-
-      axis = math.sin(angle) * kwargs['axis']
-
-      self.r = math.cos(angle)
-      self.x = axis.x
-      self.y = axis.y
-      self.z = axis.z
-    else:
-      self.r = r
-      self.x = x
-      self.y = y
-      self.z = z
+  @classmethod
+  def from_axis_angle(cls, axis, angle):
+    '''Construct a quaternion from an axis and angle (in radians).'''
+    half_angle = angle / 2
+    axis = math.sin(half_angle) * axis
+    return cls(math.cos(half_angle), axis.x, axis.y, axis.z)
 
   def __abs__(self):
     return Quaternion(abs(self.r), abs(self.x), abs(self.y), abs(self.z))
