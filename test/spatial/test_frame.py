@@ -34,7 +34,7 @@ class TestFrame(unittest.TestCase):
   def test_rmul(self):
     transform = Transform.from_axis_angle_translation(axis = Vector3(1, 0, 0), angle = math.radians(90), translation = Vector3(0, 0, 100))
 
-    new_frame = transform * self.f0
+    new_frame = self.f0.transform(transform)
 
     expected = Vector3(1, 0, 0)
     self.assertAlmostEqual(new_frame.x(), expected)
