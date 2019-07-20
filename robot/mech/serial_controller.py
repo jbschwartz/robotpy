@@ -51,7 +51,7 @@ class SerialController(Observer):
     print(ee_position)
 
     translation = Quaternion(0, *ee_position)
-    rotation = self.frame_orientation.transform.rotation()
+    rotation = self.frame_orientation.frame_to_world.rotation()
 
     dual = Dual(rotation, 0.5 * translation * rotation)
 

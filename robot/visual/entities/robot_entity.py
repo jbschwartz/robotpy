@@ -164,7 +164,7 @@ class RobotEntity(Entity):
     self.shader_program.light_intensity = light.intensity
 
 
-    self.shader_program.model_matrices  = [frame.transform for frame in self.serial.poses()]
+    self.shader_program.model_matrices  = [frame.frame_to_world for frame in self.serial.poses()]
     self.shader_program.use_link_colors = False
     self.shader_program.link_colors     = [link.color for link in self.serial.links]
     self.shader_program.robot_color     = self.color
@@ -177,7 +177,7 @@ class RobotEntity(Entity):
 
     if self.frame_entity:
       # for link in self.serial.links:
-      self.frame_entity.draw(camera, light, Matrix4(self.serial.links[-1].frame.transform))
+      self.frame_entity.draw(camera, light, Matrix4(self.serial.links[-1].frame.frame_to_world))
 
     if self.bounding_entity:
       for mesh, link in zip(self.meshes, self.serial.links):

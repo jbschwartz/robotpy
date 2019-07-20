@@ -195,7 +195,7 @@ class FrameEntity(Entity):
 
   def draw(self, camera, light, transform = None):
     if not transform:
-      transform = self.frame.transform
+      transform = self.frame.frame_to_world
 
     self.shader_program.use()
 

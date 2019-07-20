@@ -19,8 +19,8 @@ def solve_wrist(target : Frame, arm_angles : list, robot : Serial):
 
     # Get "difference" between current end effector pose and the target pose
     # TODO: Operate on quaternions here directly instead of going in and out of transforms/frames.
-    inverse = end_effector.transform.inverse()
-    result = inverse.dual.r * target.transform.dual.r
+    inverse = end_effector.frame_to_world.inverse()
+    result = inverse.dual.r * target.frame_to_world.dual.r
     wrist = Frame(Transform(Dual(result, 0)))
 
     # Must be intrinsic ZYZ based on mechanical configuration of spherical wrist

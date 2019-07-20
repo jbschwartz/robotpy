@@ -21,7 +21,7 @@ class Link:
 
   @property
   def aabb(self):
-    return AABB(*[self.frame.transform(corner) for corner in self.mesh.aabb.corners])
+    return AABB(*[self.frame.frame_to_world(corner) for corner in self.mesh.aabb.corners])
 
   @property
   def center_of_mass(self):
@@ -93,7 +93,7 @@ class Link:
 
   def intersect(self, world_ray : Ray):
     if self.aabb.intersect(world_ray):
-      world_to_link = self.frame.transform.inverse()
+      world_to_link = self.frame_to_world.transform.inverse()
 
       return self.mesh.intersect(world_ray.transform(world_to_link))
 

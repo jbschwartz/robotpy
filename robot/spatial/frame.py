@@ -5,29 +5,24 @@ from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
 
 class Frame:
-  def __init__(self, transform : Transform = Transform()):
-    self.transform = transform
+  def __init__(self, frame_to_world : Transform = None):
+    self.frame_to_world = frame_to_world or Transform()
 
-  def __rmul__(self, other):
-    '''
-    Transformation of a frame
-    '''
-    if isinstance(other, Transform):
-      # TODO: Why does this work?
-      #   This behaves intrinsically-- which is what we want
-      return Frame(self.transform * other)
+  def transform(self, transform):
+    '''Return transformed frame.'''
+    return Frame(self.frame_to_world * transform)
 
   def position(self) -> Vector3:
     '''
     Location of frame origin
     '''
-    return self.transform.translation()
+    return self.frame_to_world.translation()
 
   def orientation(self):
     '''
     Frame orientation quaternion
     '''
-    return self.transform.rotation()
+    return self.frame_to_world.rotation()
 
   def euler(self, **kwargs):
     '''
@@ -42,7 +37,7 @@ class Frame:
       try:
         eulerFunc = getattr(euler, order)
 
-        orientation = self.transform.rotation()
+        orientation = self.frame_to_world.rotation()
         return eulerFunc(*orientation)
       except AttributeError:
         if order not in euler.allSequences:
@@ -62,16 +57,16 @@ class Frame:
     '''
     Frame x-axis vector
     '''
-    return self.transform(Vector3( 1, 0, 0 ), as_type="vector")
+    return self.frame_to_world(Vector3( 1, 0, 0 ), as_type="vector")
 
   def y(self):
     '''
     Frame y-axis vector
     '''
-    return self.transform(Vector3( 0, 1, 0 ), as_type="vector")
+    return self.frame_to_world(Vector3( 0, 1, 0 ), as_type="vector")
 
   def z(self):
     '''
     Frame z-axis vector
     '''
-    return self.transform(Vector3( 0, 0, 1 ), as_type="vector")
+    return self.frame_to_world(Vector3( 0, 0, 1 ), as_type="vector")
