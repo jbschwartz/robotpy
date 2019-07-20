@@ -19,6 +19,11 @@ class Mesh:
   def accelerator(self, accelerator):
     self._accelerator = accelerator(self)
 
+  def transform(self, transform: 'Transform') -> 'Mesh':
+    transformed_facets = [f.transform(transform) for f in self.facets]
+
+    return Mesh(self.name, transformed_facets)
+
   def vertices(self):
     '''Iterable list of mesh vertices returned grouped by facet.'''
     for facet in self.facets:
