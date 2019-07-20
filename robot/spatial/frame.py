@@ -62,16 +62,16 @@ class Frame:
     '''
     Frame x-axis vector
     '''
-    return self.transform(Vector3( 1, 0, 0 ), type='vector')
+    return self.transform(Vector3( 1, 0, 0 ), as_type="vector")
 
   def y(self):
     '''
     Frame y-axis vector
     '''
-    return self.transform(Vector3( 0, 1, 0 ), type='vector')
+    return self.transform(Vector3( 0, 1, 0 ), as_type="vector")
 
   def z(self):
     '''
     Frame z-axis vector
     '''
-    return self.transform(Vector3( 0, 0, 1 ), type='vector')
+    return self.transform(Vector3( 0, 0, 1 ), as_type="vector")

@@ -32,14 +32,14 @@ class Transform:
 
   __rmul__ = __mul__
 
-  def __call__(self, other, **kwargs):
+  def __call__(self, other, as_type="point"):
     if isinstance(other, (list, tuple)):
       return [self.__call__(item) for item in other]
 
     if not isinstance(other, Vector3):
       raise NotImplementedError
 
-    return self.transform(other, as_type=str.lower(kwargs.get('type', 'point')))
+    return self.transform(other, as_type)
 
   def transform(self, vector, as_type):
     q = Quaternion(0, *vector.xyz)

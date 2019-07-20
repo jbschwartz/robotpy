@@ -48,7 +48,7 @@ class Camera():
     right = (up % forward).normalize()
     align_z = Transform.from_axis_angle_translation(axis=right, angle=angle_z)  # Step 4
 
-    intermediate_x = align_z(Vector3(1, 0, 0), type="vector") # Step 5
+    intermediate_x = align_z(Vector3(1, 0, 0), as_type="vector") # Step 5
 
     dot = right * intermediate_x
     angle_x = utils.safe_acos(dot)
@@ -79,12 +79,12 @@ class Camera():
 
     if pitch != 0:
       # Rotation around camera x axis in world coordinates
-      pitch_axis = self.camera_to_world(Vector3(1, 0, 0), type="vector")
+      pitch_axis = self.camera_to_world(Vector3(1, 0, 0), as_type="vector")
       self.camera_to_world = Transform.from_axis_angle_translation(axis = pitch_axis, angle = pitch) * self.camera_to_world
     if yaw != 0:
       if orbit_type is OrbitType.FREE:
         # Rotation around camera y axis in world coordinates
-        yaw_axis = self.camera_to_world(Vector3(0, 1, 0), type="vector")
+        yaw_axis = self.camera_to_world(Vector3(0, 1, 0), as_type="vector")
       elif orbit_type is OrbitType.CONSTRAINED:
         # Rotation around world z axis
         yaw_axis = Vector3(0, 0, 1)
@@ -234,11 +234,11 @@ class Camera():
       direction.z = -1
       direction.normalize()
     elif isinstance(self.projection, OrthoProjection):
-      origin = self.camera_to_world(self.camera_space(ndc), type="point")
+      origin = self.camera_to_world(self.camera_space(ndc), as_type="point")
 
       direction = Vector3(0, 0, -1)
 
-    return Ray(origin, self.camera_to_world(direction, type="vector"))
+    return Ray(origin, self.camera_to_world(direction, as_type="vector"))
 
   @property
   def world_to_camera(self):
