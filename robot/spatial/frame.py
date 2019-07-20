@@ -1,6 +1,6 @@
 import math
 
-import robot.spatial.euler as euler
+from robot.spatial           import euler
 from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
 
@@ -20,34 +20,17 @@ class Frame:
     '''Frame orientation quaternion.'''
     return self.frame_to_world.rotation()
 
-  def euler(self, **kwargs):
+  def euler_angles(self, axes=None, order=None):
     '''
-    Return euler angle representation of frame orientation.
+    Return frame orientation euler angles.
 
-    Defaults to intrinsic ZYX if method and order are not provided
+    Default to intrinsic ZYX.
     '''
-    method = 'intrinsic' if 'method' not in kwargs else str.lower(kwargs['method'])
-    order = 'zyx' if 'order' not in kwargs else str.lower(kwargs['order'])
+    axes  = axes  or euler.Axes.ZYX
+    order = order or euler.Order.INTRINSIC
 
-    if method == 'intrinsic':
-      try:
-        eulerFunc = getattr(euler, order)
-
-        orientation = self.frame_to_world.rotation()
-        return eulerFunc(*orientation)
-      except AttributeError:
-        if order not in euler.allSequences:
-          raise KeyError()
-        else:
-          raise NotImplementedError()
-    elif method == 'extrinsic':
-      # Take advantage of extrinsic being the reverse order intrinsic solution
-      order = order[::-1]
-      intrinsic = self.euler(method="intrinsic", order=order)
-      intrinsic.reverse()
-      return intrinsic
-    else:
-      raise KeyError()
+    frame_orientation = self.frame_to_world.rotation()
+    return euler.angles(frame_orientation, axes, order)
 
   def x(self):
     '''Frame x-axis vector.'''
