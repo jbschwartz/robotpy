@@ -4,9 +4,9 @@ from robot.spatial.aabb import AABB
 from robot.spatial.ray  import Ray
 
 class Mesh:
-  def __init__(self, name = None):
+  def __init__(self, name = None, facets = None):
     self.name = name
-    self.facets = []
+    self.facets = facets or []
     self.aabb = AABB()
 
     self._accelerator = None
