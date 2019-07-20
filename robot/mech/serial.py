@@ -52,7 +52,7 @@ class Serial:
       return None
 
   def position(self, v):
-    transform = Transform(translation = v)
+    transform = Transform.from_axis_angle_translation(translation = v)
     self.links[0].frame = transform * self.links[0].frame
     self.update_links()
 

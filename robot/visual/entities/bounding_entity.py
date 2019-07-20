@@ -90,7 +90,7 @@ class BoundingEntity(Entity):
     pass
 
   def draw(self, camera, light, transform = Transform()):
-    transform *= Transform(translation = self.aabb.center)
+    transform *= Transform.from_axis_angle_translation(translation = self.aabb.center)
 
     self.shader_program.use()
 

@@ -21,7 +21,7 @@ def solve_wrist(target : Frame, arm_angles : list, robot : Serial):
     # TODO: Operate on quaternions here directly instead of going in and out of transforms/frames.
     inverse = end_effector.transform.inverse()
     result = inverse.dual.r * target.transform.dual.r
-    wrist = Frame(Transform(dual = Dual(result, 0)))
+    wrist = Frame(Transform(Dual(result, 0)))
 
     # Must be intrinsic ZYZ based on mechanical configuration of spherical wrist
     #   Axis 4 rotates about Z, Axis 5 rotates about Y, Axis 6 rotates about Z

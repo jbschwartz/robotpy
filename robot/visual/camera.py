@@ -46,7 +46,7 @@ class Camera():
     angle_z = math.acos(Vector3(0, 0, 1) * forward) # Step 3
 
     right = (up % forward).normalize()
-    align_z = Transform(axis=right, angle=angle_z)  # Step 4
+    align_z = Transform.from_axis_angle_translation(axis=right, angle=angle_z)  # Step 4
 
     intermediate_x = align_z(Vector3(1, 0, 0), type="vector") # Step 5
 
@@ -55,13 +55,13 @@ class Camera():
 
     if math.isclose(angle_x, 0):
       # Our intermediate x axis is already where it should be. We do no further rotation.
-      align_x = Transform(translation=position) # Step 8
+      align_x = Transform.from_axis_angle_translation(translation=position) # Step 8
     else:
       # Check which direction we need to rotate by angle_x (dot product tells us how much, but not which way)
       # See if the calculated normal vector is parallel or anti-parallel with the z vector
       calculated_normal = (right % intermediate_x)
       rotation_direction = -1 if calculated_normal * forward > 0 else 1
-      align_x = Transform(axis=(rotation_direction * forward), angle=angle_x, translation=position) # Step 9
+      align_x = Transform.from_axis_angle_translation(axis=(rotation_direction * forward), angle=angle_x, translation=position) # Step 9
 
     self.camera_to_world = align_x * align_z # Step 10
 
@@ -75,12 +75,12 @@ class Camera():
     '''
 
     # Move target to the origin
-    self.camera_to_world = Transform(translation = -target) * self.camera_to_world
+    self.camera_to_world = Transform.from_axis_angle_translation(translation = -target) * self.camera_to_world
 
     if pitch != 0:
       # Rotation around camera x axis in world coordinates
       pitch_axis = self.camera_to_world(Vector3(1, 0, 0), type="vector")
-      self.camera_to_world = Transform(axis = pitch_axis, angle = pitch) * self.camera_to_world
+      self.camera_to_world = Transform.from_axis_angle_translation(axis = pitch_axis, angle = pitch) * self.camera_to_world
     if yaw != 0:
       if orbit_type is OrbitType.FREE:
         # Rotation around camera y axis in world coordinates
@@ -89,16 +89,16 @@ class Camera():
         # Rotation around world z axis
         yaw_axis = Vector3(0, 0, 1)
 
-      self.camera_to_world = Transform(axis = yaw_axis, angle = yaw) * self.camera_to_world
+      self.camera_to_world = Transform.from_axis_angle_translation(axis = yaw_axis, angle = yaw) * self.camera_to_world
 
     # Move target back to position
-    self.camera_to_world = Transform(translation = target) * self.camera_to_world
+    self.camera_to_world = Transform.from_axis_angle_translation(translation = target) * self.camera_to_world
 
   def dolly(self, z):
     '''
     Move the camera in and out along the line of sight (z axis).
     '''
-    self.camera_to_world *= Transform(translation = Vector3(0, 0, z))
+    self.camera_to_world *= Transform.from_axis_angle_translation(translation = Vector3(0, 0, z))
 
   def track(self, x = 0, y = 0, v = None):
     '''
@@ -109,10 +109,10 @@ class Camera():
     # Accept vector input if it is provided. Makes calls a bit cleaner if the caller is using a vector already.
     v = Vector3(*v.xy) if v else Vector3(x, y)
 
-    self.camera_to_world *= Transform(translation = v)
+    self.camera_to_world *= Transform.from_axis_angle_translation(translation = v)
 
   def roll(self, angle):
-    self.camera_to_world *= Transform(axis = Vector3(0, 0, 1), angle = angle)
+    self.camera_to_world *= Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = angle)
 
   def fit(self, world_aabb, scale = 1):
     '''
@@ -128,7 +128,7 @@ class Camera():
     # This is a bit of a cop-out since there are probably ways to handle those edge cases
     #   but those are hard to think about... and this works.
     if world_aabb.contains(self.position):
-      self.camera_to_world *= Transform(translation = Vector3(0, 0, world_aabb.sphere_radius()))
+      self.camera_to_world *= Transform.from_axis_angle_translation(translation = Vector3(0, 0, world_aabb.sphere_radius()))
 
     # Centering the camera on the world bounding box first helps removes issues caused by
     # a major point skipping to a different corner as a result of the camera's zoom in movement.
@@ -209,7 +209,7 @@ class Camera():
         self.projection.width = (x_max.x - x_min.x) / scale
 
     # Move the camera, remembering to adjust for the box being shifted off center
-    self.camera_to_world *= Transform(translation = Vector3(-delta_x, -delta_y, -delta_z))
+    self.camera_to_world *= Transform.from_axis_angle_translation(translation = Vector3(-delta_x, -delta_y, -delta_z))
 
   def camera_space(self, ndc):
     '''

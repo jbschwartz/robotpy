@@ -187,7 +187,7 @@ class CameraController(Observer):
         direction = coordinate
 
     axis = vector3.cross(forward, direction)
-    self.camera.camera_to_world = Transform(axis = axis, angle = minimum) * self.camera.camera_to_world
+    self.camera.camera_to_world = Transform.from_axis_angle_translation(axis = axis, angle = minimum) * self.camera.camera_to_world
 
     right = self.camera.camera_to_world(Vector3(1, 0, 0), type="vector")
 
@@ -203,7 +203,7 @@ class CameraController(Observer):
         direction = coordinate
 
     axis = vector3.cross(right, direction)
-    self.camera.camera_to_world = Transform(axis = axis, angle = minimum) * self.camera.camera_to_world
+    self.camera.camera_to_world = Transform.from_axis_angle_translation(axis = axis, angle = minimum) * self.camera.camera_to_world
 
   def toggle_projection(self):
     '''

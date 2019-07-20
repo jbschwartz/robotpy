@@ -50,7 +50,7 @@ class Joint:
     r = theta * self.alpha
     dual = Dual(r, 0.5 * (theta * self.a_alpha + self.d * r))
 
-    return Transform(dual = dual)
+    return Transform(dual)
 
   def num_revolutions(self):
     return math.floor((self.limits['high'] - self.limits['low']) / (2 * math.pi))

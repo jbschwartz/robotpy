@@ -5,9 +5,9 @@ from robot.spatial.vector3   import Vector3
 
 class TestTransform(unittest.TestCase):
   def setUp(self):
-    self.pureTranslate = Transform(translation = Vector3(4, 2, 6))
-    self.pureRotate = Transform(axis = Vector3(1, 0, 0), angle = math.radians(180))
-    self.both = Transform(axis = Vector3(1, 0, 0), angle = math.radians(180), translation = Vector3(4, 2, 6))
+    self.pureTranslate = Transform.from_axis_angle_translation(translation = Vector3(4, 2, 6))
+    self.pureRotate = Transform.from_axis_angle_translation(axis = Vector3(1, 0, 0), angle = math.radians(180))
+    self.both = Transform.from_axis_angle_translation(axis = Vector3(1, 0, 0), angle = math.radians(180), translation = Vector3(4, 2, 6))
     self.point = Vector3(3, 4, 5)
 
   def test_init(self):

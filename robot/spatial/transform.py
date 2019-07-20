@@ -15,27 +15,21 @@ class Transform:
   '''
   Class representing spatial rigid body transformation in three dimensions
   '''
-  def __init__(self, **kwargs):
-    translation = Vector3() if 'translation' not in kwargs else kwargs['translation']
-    t = Quaternion(0, *translation)
-    if all(params in kwargs for params in ['axis', 'angle']):
-      kwargs['axis'].normalize()
-      r = Quaternion.from_axis_angle(kwargs['axis'], kwargs['angle'])
+  def __init__(self, dual: Dual = None):
+    self.dual = dual or Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))
 
-      self.dual = Dual(r, 0.5 * t * r)
-    elif 'translation' in kwargs:
-      self.dual = Dual(Quaternion(), 0.5 * t)
-    elif 'dual' in kwargs:
-      self.dual = kwargs['dual']
-    else:
-      self.dual = Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))
+  @classmethod
+  def from_axis_angle_translation(cls, axis = Vector3(), angle = 0, translation = Vector3()):
+    r = Quaternion.from_axis_angle(axis, angle)
+    t = Quaternion(0, *translation)
+    return cls(Dual(r, 0.5 * t * r))
 
   def __mul__(self, other):
     '''
     Composition of transformations
     '''
     if isinstance(other, Transform):
-      return Transform(dual = self.dual * other.dual)
+      return Transform(self.dual * other.dual)
     else:
       # This specifically allows Transform * Frame to find Frame.__rmul__, for example
       return NotImplemented
@@ -107,4 +101,4 @@ class Transform:
     rstar = quaternion.conjugate(self.dual.r)
     dstar = quaternion.conjugate(self.dual.d)
 
-    return Transform(dual = Dual(rstar, dstar))
+    return Transform(Dual(rstar, dstar))

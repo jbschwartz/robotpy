@@ -22,10 +22,10 @@ class TestJoint(unittest.TestCase):
   def test_transform(self):
     q = math.radians(30)
 
-    d = Transform(translation = Vector3(0, 0, self.joint.dh['d']))
-    theta = Transform(axis = Vector3(0, 0, 1), angle = self.joint.dh['theta'] + q)
-    a = Transform(translation = Vector3(self.joint.dh['a'], 0, 0))
-    alpha = Transform(axis = Vector3(1, 0, 0), angle = self.joint.dh['alpha'])
+    d = Transform.from_axis_angle_translation(translation = Vector3(0, 0, self.joint.dh['d']))
+    theta = Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = self.joint.dh['theta'] + q)
+    a = Transform.from_axis_angle_translation(translation = Vector3(self.joint.dh['a'], 0, 0))
+    alpha = Transform.from_axis_angle_translation(axis = Vector3(1, 0, 0), angle = self.joint.dh['alpha'])
 
     expected = d * theta * a * alpha
     self.joint.angle = q
