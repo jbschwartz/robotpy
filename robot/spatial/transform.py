@@ -13,8 +13,11 @@ class Transform:
     self.dual = dual or Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))
 
   @classmethod
-  def from_axis_angle_translation(cls, axis = Vector3(), angle = 0, translation = Vector3()):
+  def from_axis_angle_translation(cls, axis = None, angle = 0, translation = None):
     '''Create a Transformation from axis, angle, and translation components.'''
+    axis        = axis        or Vector3()
+    translation = translation or Vector3()
+
     r = Quaternion.from_axis_angle(axis, angle)
     t = Quaternion(0, *translation)
     return cls(Dual(r, 0.5 * t * r))
