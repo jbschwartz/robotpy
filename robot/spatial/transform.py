@@ -33,23 +33,26 @@ class Transform:
   __rmul__ = __mul__
 
   def __call__(self, other, **kwargs):
-    if isinstance(other, Vector3):
-      if 'type' in kwargs and str.lower(kwargs['type']) == 'vector':
-        return self.transform_vector(other)
-      else:
-        return self.transform_point(other)
-    elif isinstance(other, list):
+    if isinstance(other, (list, tuple)):
       return [self.__call__(item) for item in other]
 
-  def transform_vector(self, vector):
-    d = Dual(Quaternion(0, *vector.xyz), Quaternion(0, 0, 0, 0))
-    a = self.dual * d * dual.conjugate(self.dual)
-    return Vector3(*a.r.xyz)
+    if not isinstance(other, Vector3):
+      raise NotImplementedError
 
-  def transform_point(self, point):
-    d = Dual(Quaternion(), Quaternion(0, *point.xyz))
-    a = self.dual * d * dual.conjugate(self.dual)
-    return Vector3(*a.d.xyz)
+    return self.transform(other, as_type=str.lower(kwargs.get('type', 'point')))
+
+  def transform(self, vector, as_type):
+    q = Quaternion(0, *vector.xyz)
+    if as_type == 'vector':
+      d = Dual(q, Quaternion(0, 0, 0, 0))
+      a = self.dual * d * dual.conjugate(self.dual)
+      return Vector3(*a.r.xyz)
+    elif as_type == 'point':
+      d = Dual(Quaternion(), q)
+      a = self.dual * d * dual.conjugate(self.dual)
+      return Vector3(*a.d.xyz)
+    else:
+      raise KeyError
 
   def translation(self) -> Vector3:
     # "Undo" what was done in the __init__ function by working backwards
