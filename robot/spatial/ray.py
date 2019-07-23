@@ -15,14 +15,12 @@ class Ray():
     closest = None
 
     for item in collection:
-      try:
+      # See if the item is intersectable, otherwise ignore it
+      if callable(getattr(item, 'intersect', None)):
         t = item.intersect(self)
 
         if t and (closest is None or t < closest):
           closest = t
-      except AttributeError:
-        # Ignore any items in the collection that cannot be intersected
-        continue
 
     return closest
 
