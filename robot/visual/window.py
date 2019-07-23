@@ -16,6 +16,8 @@ class Window():
     self.dragging = None
     self.modifiers = 0
 
+    self.show_fps = False
+
     if not glfw.init():
       sys.exit('GLFW initialization failed')
 
@@ -56,6 +58,8 @@ class Window():
     # This may be better suited in some sort of simulation controller class
     if key == glfw.KEY_SPACE and action == glfw.PRESS:
       self.pause = not self.pause
+    if key == glfw.KEY_Q and action == glfw.PRESS:
+      self.show_fps = not self.show_fps
 
   def scroll_callback(self, window, x_direction, y_direction):
     self.emit(WindowEvent.SCROLL, numpy.sign(x_direction), numpy.sign(y_direction))
@@ -120,7 +124,8 @@ class Window():
       if len(FPS) < 20:
         FPS.append(1 / delta_update)
       else:
-        print('FPS: ', math.floor(statistics.mean(FPS)))
+        if self.show_fps:
+          print('FPS: ', math.floor(statistics.mean(FPS)))
         FPS = []
 
       last_update = now
