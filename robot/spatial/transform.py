@@ -18,9 +18,12 @@ class Transform:
     axis        = axis        or Vector3()
     translation = translation or Vector3()
 
-    r = Quaternion.from_axis_angle(axis, angle)
-    t = Quaternion(0, *translation)
-    return cls(Dual(r, 0.5 * t * r))
+    return cls.from_orientation_translation(Quaternion.from_axis_angle(axis, angle), translation)
+
+  @classmethod
+  def from_orientation_translation(cls, orientation: Quaternion, translation: Vector3):
+    '''Create a Transformation from orientation and translation.'''
+    return cls(Dual(orientation, 0.5 * Quaternion(0, *translation) * orientation))
 
   def __mul__(self, other):
     '''Compose this Transformation with another Transformation.'''

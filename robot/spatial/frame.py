@@ -8,6 +8,11 @@ class Frame:
   def __init__(self, frame_to_world : Transform = None):
     self.frame_to_world = frame_to_world or Transform()
 
+  @classmethod
+  def from_position_orientation(cls, position: Vector3, orientation: 'Quaternion'):
+    frame_to_world = Transform.from_orientation_translation(orientation, position)
+    return cls(frame_to_world)
+
   def transform(self, transform):
     '''Return new transformed frame.'''
     return Frame(self.frame_to_world * transform)
