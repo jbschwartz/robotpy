@@ -93,7 +93,7 @@ class Link:
 
   def intersect(self, world_ray : Ray):
     if self.aabb.intersect(world_ray):
-      world_to_link = self.frame_to_world.transform.inverse()
+      world_to_link = self.frame.frame_to_world.inverse()
 
       return self.mesh.intersect(world_ray.transform(world_to_link))
 
