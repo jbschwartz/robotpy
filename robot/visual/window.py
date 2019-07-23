@@ -1,4 +1,4 @@
-import numpy, glfw, sys
+import math, numpy, glfw, statistics, sys
 
 from OpenGL.GL import GL_TRUE
 
@@ -31,6 +31,7 @@ class Window():
     self.set_callbacks()
 
     glfw.make_context_current(self.window)
+    glfw.swap_interval(0)
 
     self.last_cursor_position = self.get_cursor()
 
@@ -110,9 +111,18 @@ class Window():
 
     frame_time = 0 if not fps_limit else 1 / fps_limit
 
+    FPS = []
+
     while not glfw.window_should_close(self.window):
       now = glfw.get_time()
       delta_update =  now - last_update
+
+      if len(FPS) < 20:
+        FPS.append(1 / delta_update)
+      else:
+        print('FPS: ', math.floor(statistics.mean(FPS)))
+        FPS = []
+
       last_update = now
 
       if not self.pause:
