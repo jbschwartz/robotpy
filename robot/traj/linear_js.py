@@ -1,16 +1,8 @@
 from robot.traj.trajectory_js import TrajectoryJS
-
-def interpolate(start, end, t):
-  '''
-  Interpolate between start and end with 0 <= t <= 1
-  '''
-  slope = end - start
-  return slope * t + start
+from robot.traj.utils         import interpolate
 
 class LinearJS(TrajectoryJS):
-  '''
-  Linear trajectory in robot joint space
-  '''
+  '''Linear trajectory in robot joint space.'''
   def __init__(self, starts, ends, duration = 1):
     self.starts = starts
     self.ends = ends

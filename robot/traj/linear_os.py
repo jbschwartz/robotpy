@@ -1,17 +1,12 @@
 import math
 
-from robot.ik.angles        import solve_angles
-from robot.spatial.frame import Frame
+from robot.ik.angles          import solve_angles
+from robot.spatial.frame      import Frame
 from robot.spatial.quaternion import Quaternion
-from robot.spatial.transform import Transform
-from robot.spatial.dual import Dual
-
-def interpolate(start, end, t, t_start, interval):
-  '''
-  Interpolate between start and end with 0 <= t <= 1
-  '''
-  slope = end - start
-  return slope * (t - t_start) / interval + start
+from robot.spatial.transform  import Transform
+from robot.spatial.dual       import Dual
+from robot.traj.trajectory_js import TrajectoryJS
+from robot.traj.utils         import interpolate
 
 class LinearOS():
   '''
@@ -53,7 +48,9 @@ class LinearOS():
     if index == len(self.starts):
       os_position = self.ends[-1]
     else:
-      os_position = interpolate(self.starts[index], self.ends[index], self.t, index * self.interval, self.interval)
+      transformed_t = (self.t - index * self.interval) / self.interval
+
+      os_position = interpolate(self.starts[index], self.ends[index], transformed_t)
 
     t = Quaternion(0, *os_position)
     r = self.f.transform.rotation()
