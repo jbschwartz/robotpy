@@ -168,7 +168,7 @@ class CameraController(Observer):
 
   def scroll(self, horizontal, vertical):
     if horizontal:
-      self.camera.orbit(self.target, 0, self.settings.ORBIT_STEP * horizontal)
+      self.camera.orbit(self.target, 0, self.settings.ORBIT_STEP * horizontal, self.orbit_type)
     if vertical:
       self.scale_to_cursor(self.window.get_cursor(), vertical * self.settings.SCALE_IN)
 
