@@ -10,30 +10,64 @@ from robot.traj.utils         import interpolate
 
 class LinearOS():
   '''Linear trajectory in operational space.'''
-  def __init__(self, robot, starts, ends, duration = 1):
-    self.starts = starts
-    self.ends = ends
-    self.duration = duration
+  def __init__(self, robot, waypoints, duration = 1):
+    self.segments = self.create_segments(waypoints)
 
-    self.interval = 1 / len(self.starts)
+    self.segment_duration = duration / self.number_of_segments
+    self._segment_index = 0
 
-    self.t = 0
+    self._is_done = False
+
+    self._t = 0
     self.direction = 1
 
     self.robot = robot
     self.robot.angles = [0] * 6
 
-    self.f = self.robot.pose()
+  def create_segments(self, waypoints):
+    segments = [(start, end) for start, end in zip(waypoints[0:-1], waypoints[1:])]
+    segments.append((waypoints[-1], waypoints[0]))
+
+    return segments
+
+  @property
+  def t(self):
+    return self._t
+
+  @t.setter
+  def t(self, value):
+    self._t = value
+
+  @property
+  def segment_index(self):
+    return self._segment_index
+
+  @segment_index.setter
+  def segment_index(self, value):
+    self._segment_index += 1
+    if self._segment_index == self.number_of_segments:
+      self._is_done = True
+      self._segment_index = 0
+
+  @property
+  def number_of_segments(self):
+    return len(self.segments)
+
+  def calculate_new_target(self):
+    world_position = interpolate(*self.segments[self.segment_index], self.t)
+
+    return Frame.from_position_orientation(world_position, self.robot.pose().orientation())
 
   def is_done(self):
-    return self.t <= 0.0 or self.t >= 1.0
+    return self._is_done
 
   def restart(self):
+    self._is_done = False
     self.t = 0
 
   def reverse(self):
-    self.direction *= -1
-    # pass
+    self.segments.reverse()
+    self.segments = [(segment[1], segment[0]) for segment in self.segments]
 
   def get_closest_solution(self, solutions):
     '''Return the closest solution (in joint space) to the current arm position.'''
@@ -55,24 +89,17 @@ class LinearOS():
   def advance(self, delta):
     assert delta >= 0
 
-    self.t += self.direction * (delta / self.duration)
+    if self._is_done:
+      return self.robot.angles
 
-    self.t = min(max(self.t, 0), 1)
+    self.t += self.direction * (delta / self.segment_duration)
 
-    index = math.floor(self.t / self.interval)
-    if index == len(self.starts):
-      os_position = self.ends[-1]
-    else:
-      transformed_t = (self.t - index * self.interval) / self.interval
+    if self.t > 1:
+      self.t -= 1
+      self.segment_index += 1
 
-      os_position = interpolate(self.starts[index], self.ends[index], transformed_t)
+    target = self.calculate_new_target()
 
-    t = Quaternion(0, *os_position)
-    r = self.f.frame_to_world.rotation()
-    dual = Dual(r, 0.5 * t * r)
-
-    new_frame = Frame(Transform(dual = dual))
-
-    solutions = solve_angles(new_frame, self.robot)
+    solutions = solve_angles(target, self.robot)
 
     return self.get_closest_solution(solutions)

@@ -57,7 +57,6 @@ if __name__ == "__main__":
   robot2.serial.traj = LinearOS(
     robot2.serial,
     [Vector3(374, 320, 630), Vector3(374, -320, 330), Vector3(374, 320, 330)],
-    [Vector3(374, -320, 330), Vector3(374, 320, 330), Vector3(374, 320, 630)],
     6)
   sc = SerialController(robot2.serial, robot2.serial.traj)
 

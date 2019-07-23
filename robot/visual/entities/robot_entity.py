@@ -149,6 +149,7 @@ class RobotEntity(Entity):
     if self.serial.traj:
       if self.serial.traj.is_done():
         self.serial.traj.reverse()
+        self.serial.traj.restart()
 
       self.serial.angles = self.serial.traj.advance(delta)
 
@@ -162,7 +163,6 @@ class RobotEntity(Entity):
     self.shader_program.light_position  = light.position
     self.shader_program.light_color     = light.color
     self.shader_program.light_intensity = light.intensity
-
 
     self.shader_program.model_matrices  = [frame.frame_to_world for frame in self.serial.poses()]
     self.shader_program.use_link_colors = False
