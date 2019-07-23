@@ -66,6 +66,9 @@ class Vector3(Swizzler):
     components = ['x', 'y', 'z']
     setattr(self, components[index], value)
 
+  def transform(self, transform, as_type="point"):
+    return transform(self, as_type=as_type)
+
   def length(self):
     return math.sqrt(self.length_sq())
 

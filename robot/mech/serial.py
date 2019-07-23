@@ -52,14 +52,14 @@ class Serial:
       return None
 
   def position(self, v):
-    transform = Transform(translation = v)
-    self.links[0].frame = transform * self.links[0].frame
+    transform = Transform.from_axis_angle_translation(translation = v)
+    self.links[0].frame = self.links[0].frame.transform(transform)
     self.update_links()
 
   def update_links(self):
     last_frame = self.links[0].frame
     for link, joint in zip(self.links[1:], self.joints):
-      link.frame = joint.transform * last_frame
+      link.frame = last_frame.transform(joint.transform)
       last_frame = link.frame
 
   def pose(self) -> Frame:

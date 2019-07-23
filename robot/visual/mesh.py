@@ -4,9 +4,9 @@ from robot.spatial.aabb import AABB
 from robot.spatial.ray  import Ray
 
 class Mesh:
-  def __init__(self, name = None):
+  def __init__(self, name = None, facets = None):
     self.name = name
-    self.facets = []
+    self.facets = facets or []
     self.aabb = AABB()
 
     self._accelerator = None
@@ -18,6 +18,11 @@ class Mesh:
   @accelerator.setter
   def accelerator(self, accelerator):
     self._accelerator = accelerator(self)
+
+  def transform(self, transform: 'Transform') -> 'Mesh':
+    transformed_facets = [f.transform(transform) for f in self.facets]
+
+    return Mesh(self.name, transformed_facets)
 
   def vertices(self):
     '''Iterable list of mesh vertices returned grouped by facet.'''

@@ -39,6 +39,12 @@ class Facet:
 
     return self._edges
 
+  def transform(self, transform: 'Transform') -> 'Facet':
+    transformed_normal   = self.normal.transform(transform, as_type="vector")
+    transformed_vertices = [v.transform(transform, as_type="point") for v in self.vertices]
+
+    return Facet(transformed_vertices, transformed_normal)
+
   def append(self, vertex, recompute=True):
     '''
     Add a vertex to the Facet.

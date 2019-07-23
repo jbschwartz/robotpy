@@ -22,7 +22,7 @@ class TestQuaternion(unittest.TestCase):
     c = math.cos(angle / 2)
     s = math.sin(angle / 2)
     expected = Quaternion(c, s * axis.x, s * axis.y, s * axis.z)
-    self.assertEqual(Quaternion(axis = axis, angle = angle), expected)
+    self.assertEqual(Quaternion.from_axis_angle(axis, angle), expected)
 
   def test_add(self):
     expected = Quaternion(5, -1, 5, 3)

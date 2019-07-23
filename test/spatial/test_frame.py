@@ -12,12 +12,12 @@ class TestFrame(unittest.TestCase):
     self.f0 = Frame()
 
     # Frame is constructed by rotating around Z 45 degrees, rotation around new Y 135 degrees
-    self.f1 = Frame(Transform(dual = Dual(
+    self.f1 = Frame(Transform(Dual(
       Quaternion(0.353553, -0.353553, 0.853553, 0.146447),
       Quaternion(0, 0, 0, 0)
     )))
 
-    self.t = Transform(axis = Vector3(0, 0, 1), angle = math.radians(45))
+    self.t = Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = math.radians(45))
     self.f2 = Frame(self.t)
 
   def test_init(self):
@@ -32,9 +32,9 @@ class TestFrame(unittest.TestCase):
     self.assertEqual(self.f0.z(), expected)
 
   def test_rmul(self):
-    transform = Transform(axis = Vector3(1, 0, 0), angle = math.radians(90), translation = Vector3(0, 0, 100))
+    transform = Transform.from_axis_angle_translation(axis = Vector3(1, 0, 0), angle = math.radians(90), translation = Vector3(0, 0, 100))
 
-    new_frame = transform * self.f0
+    new_frame = self.f0.transform(transform)
 
     expected = Vector3(1, 0, 0)
     self.assertAlmostEqual(new_frame.x(), expected)

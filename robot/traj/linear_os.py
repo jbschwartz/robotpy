@@ -68,7 +68,7 @@ class LinearOS():
       os_position = interpolate(self.starts[index], self.ends[index], transformed_t)
 
     t = Quaternion(0, *os_position)
-    r = self.f.transform.rotation()
+    r = self.f.frame_to_world.rotation()
     dual = Dual(r, 0.5 * t * r)
 
     new_frame = Frame(Transform(dual = dual))

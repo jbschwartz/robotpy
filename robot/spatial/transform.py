@@ -2,109 +2,79 @@ import math
 
 import robot.spatial.dual       as     dual
 import robot.spatial.quaternion as     quaternion
-from robot.spatial.aabb         import AABB
-from robot.spatial.ray          import Ray
 from robot.spatial.vector3      import Vector3
-from robot.visual.facet         import Facet
-from robot.visual.mesh          import Mesh
 
 Quaternion = quaternion.Quaternion
 Dual       = dual.Dual
 
 class Transform:
-  '''
-  Class representing spatial rigid body transformation in three dimensions
-  '''
-  def __init__(self, **kwargs):
-    translation = Vector3() if 'translation' not in kwargs else kwargs['translation']
-    t = Quaternion(0, *translation)
-    if all(params in kwargs for params in ['axis', 'angle']):
-      kwargs['axis'].normalize()
-      r = Quaternion(axis = kwargs['axis'], angle = kwargs['angle'])
+  '''Spatial rigid body transformation in three dimensions.'''
+  def __init__(self, dual: Dual = None):
+    self.dual = dual or Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))
 
-      self.dual = Dual(r, 0.5 * t * r)
-    elif 'translation' in kwargs:
-      self.dual = Dual(Quaternion(), 0.5 * t)
-    elif 'dual' in kwargs:
-      self.dual = kwargs['dual']
-    else:
-      self.dual = Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))
+  @classmethod
+  def from_axis_angle_translation(cls, axis = None, angle = 0, translation = None):
+    '''Create a Transformation from axis, angle, and translation components.'''
+    axis        = axis        or Vector3()
+    translation = translation or Vector3()
+
+    return cls.from_orientation_translation(Quaternion.from_axis_angle(axis, angle), translation)
+
+  @classmethod
+  def from_orientation_translation(cls, orientation: Quaternion, translation: Vector3):
+    '''Create a Transformation from orientation and translation.'''
+    return cls(Dual(orientation, 0.5 * Quaternion(0, *translation) * orientation))
 
   def __mul__(self, other):
-    '''
-    Composition of transformations
-    '''
+    '''Compose this Transformation with another Transformation.'''
     if isinstance(other, Transform):
-      return Transform(dual = self.dual * other.dual)
+      return Transform(self.dual * other.dual)
     else:
-      # This specifically allows Transform * Frame to find Frame.__rmul__, for example
       return NotImplemented
 
   __rmul__ = __mul__
 
-  def __call__(self, other, **kwargs):
-    if isinstance(other, Vector3):
-      if 'type' in kwargs and str.lower(kwargs['type']) == 'vector':
-        return self.transform_vector(other)
-      else:
-        return self.transform_point(other)
-    elif isinstance(other, Mesh):
-      return self.transform_mesh(other)
-    elif isinstance(other, AABB):
-      return self.transform_aabb(other)
-    elif isinstance(other, Ray):
-      return self.transform_ray(other)
-    elif isinstance(other, list):
-      return [self.__call__(item) for item in other]
+  def __call__(self, vector: Vector3, as_type="point"):
+    '''Apply Transformation to a Vector3 with call syntax.'''
+    if isinstance(vector, (list, tuple)):
+      return [self.__call__(item) for item in vector]
 
-  def transform_vector(self, vector):
-    d = Dual(Quaternion(0, *vector.xyz), Quaternion(0, 0, 0, 0))
-    a = self.dual * d * dual.conjugate(self.dual)
-    return Vector3(*a.r.xyz)
+    if not isinstance(vector, Vector3):
+      raise NotImplementedError
 
-  def transform_point(self, point):
-    d = Dual(Quaternion(), Quaternion(0, *point.xyz))
-    a = self.dual * d * dual.conjugate(self.dual)
-    return Vector3(*a.d.xyz)
+    return self.transform(vector, as_type)
 
-  def transform_mesh(self, mesh):
-    new_mesh = Mesh()
-    new_mesh.facets = list(map(self.transform_facet, mesh.facets))
+  def transform(self, vector: Vector3, as_type) -> Vector3:
+    '''
+    Apply the transform to the provided Vector3.
 
-    return new_mesh
-
-  def transform_aabb(self, aabb):
-    new_aabb = AABB()
-    for corner in aabb.corners:
-      new_aabb.extend(self.transform_point(corner))
-
-    return new_aabb
-
-  def transform_facet(self, facet):
-    new_normal = self.transform_vector(facet.normal)
-    new_vertices = list(map(self.transform_point, facet.vertices))
-
-    return Facet(new_vertices, new_normal)
-
-  def transform_ray(self, ray):
-    new_origin    = self.transform_point(ray.origin)
-    new_direction = self.transform_vector(ray.direction)
-
-    return Ray(new_origin, new_direction)
+    Optionally treat the Vector3 as a point and apply a transformation to its position.
+    '''
+    q = Quaternion(0, *vector.xyz)
+    if as_type == 'vector':
+      d = Dual(q, Quaternion(0, 0, 0, 0))
+      a = self.dual * d * dual.conjugate(self.dual)
+      return Vector3(*a.r.xyz)
+    elif as_type == 'point':
+      d = Dual(Quaternion(), q)
+      a = self.dual * d * dual.conjugate(self.dual)
+      return Vector3(*a.d.xyz)
+    else:
+      raise KeyError
 
   def translation(self) -> Vector3:
+    '''Return the transform's translation Vector3.'''
     # "Undo" what was done in the __init__ function by working backwards
     t = 2 * self.dual.d * quaternion.conjugate(self.dual.r)
     return Vector3(*t.xyz)
 
   def rotation(self) -> Quaternion:
+    '''Return the transform's rotation Quaternion.'''
     return self.dual.r
 
-  def inverse(self):
-    '''
-    Return a new Transformation that is an inverse to this transformation
-    '''
+  def inverse(self) -> 'Transform':
+    '''Return a new inverse Transformation.'''
     rstar = quaternion.conjugate(self.dual.r)
     dstar = quaternion.conjugate(self.dual.d)
 
-    return Transform(dual = Dual(rstar, dstar))
+    return Transform(Dual(rstar, dstar))

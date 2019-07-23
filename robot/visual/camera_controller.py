@@ -179,7 +179,7 @@ class CameraController(Observer):
   def normal_to(self):
     minimum = math.radians(180)
     direction = Vector3()
-    forward = self.camera.camera_to_world(Vector3(0, 0, 1), type="vector")
+    forward = self.camera.camera_to_world(Vector3(0, 0, 1), as_type="vector")
     for coordinate in [Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1), Vector3(-1, 0, 0), Vector3(0, -1, 0), Vector3(0, 0, -1)]:
       angle = vector3.angle_between(coordinate, forward)
       if angle < minimum:
@@ -187,9 +187,9 @@ class CameraController(Observer):
         direction = coordinate
 
     axis = vector3.cross(forward, direction)
-    self.camera.camera_to_world = Transform(axis = axis, angle = minimum) * self.camera.camera_to_world
+    self.camera.camera_to_world = Transform.from_axis_angle_translation(axis = axis, angle = minimum) * self.camera.camera_to_world
 
-    right = self.camera.camera_to_world(Vector3(1, 0, 0), type="vector")
+    right = self.camera.camera_to_world(Vector3(1, 0, 0), as_type="vector")
 
     first_direction = direction
     minimum = math.radians(180)
@@ -203,7 +203,7 @@ class CameraController(Observer):
         direction = coordinate
 
     axis = vector3.cross(right, direction)
-    self.camera.camera_to_world = Transform(axis = axis, angle = minimum) * self.camera.camera_to_world
+    self.camera.camera_to_world = Transform.from_axis_angle_translation(axis = axis, angle = minimum) * self.camera.camera_to_world
 
   def toggle_projection(self):
     '''
@@ -220,7 +220,7 @@ class CameraController(Observer):
     }
 
     if isinstance(self.camera.projection, PerspectiveProjection):
-      point = self.camera.world_to_camera(self.scene.aabb.center, type="point")
+      point = self.camera.world_to_camera(self.scene.aabb.center, as_type="point")
       # Calculate the width from the above relation
       params['width'] = -2 * point.z / self.camera.projection.matrix.elements[0]
 
@@ -236,7 +236,7 @@ class CameraController(Observer):
       width = self.camera.projection.width
 
       self.camera.projection = PerspectiveProjection(**params)
-      current = self.camera.world_to_camera(self.scene.aabb.center, type="point")
+      current = self.camera.world_to_camera(self.scene.aabb.center, as_type="point")
 
       # Calculate the z camera position from the above relation
       desired = - self.camera.projection.matrix.elements[0] * width / 2
@@ -272,7 +272,8 @@ class CameraController(Observer):
     if isinstance(self.camera.projection, PerspectiveProjection):
       # This approximates the scene moving the same speed as the cursor but it isn't exactly correct for perspective projection.
       # I think perspective projection requires mouse picking to determine the correct z.
-      delta *= -self.camera.world_to_camera(self.scene.aabb).center.z
+      transformed_aabb = self.scene.aabb.transform(self.camera.world_to_camera)
+      delta *= -transformed_aabb.center.z
 
     self.camera.track(v = -delta)
 

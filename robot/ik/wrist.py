@@ -1,9 +1,6 @@
-from robot.mech.serial       import Serial
-from robot.spatial.frame     import Frame
-from robot.spatial.dual      import Dual
-from robot.spatial.transform import Transform
+from robot.spatial import euler
 
-def solve_wrist(target : Frame, arm_angles : list, robot : Serial):
+def solve_wrist(target : 'Frame', arm_angles : list, robot : 'Serial'):
   '''
   Get joint angles from a given target (inverse kinematics)
 
@@ -18,18 +15,15 @@ def solve_wrist(target : Frame, arm_angles : list, robot : Serial):
     end_effector = robot.pose()
 
     # Get "difference" between current end effector pose and the target pose
-    # TODO: Operate on quaternions here directly instead of going in and out of transforms/frames.
-    inverse = end_effector.transform.inverse()
-    result = inverse.dual.r * target.transform.dual.r
-    wrist = Frame(Transform(dual = Dual(result, 0)))
+    inverse = end_effector.frame_to_world.inverse()
+    delta = inverse.rotation() * target.frame_to_world.rotation()
 
     # Must be intrinsic ZYZ based on mechanical configuration of spherical wrist
     #   Axis 4 rotates about Z, Axis 5 rotates about Y, Axis 6 rotates about Z
     # There are at least two solutions
-    wrist_sets = wrist.euler(method="intrinsic", order="ZYZ")
+    wrist_sets = euler.angles(delta, axes=euler.Axes.ZYZ, order=euler.Order.INTRINSIC)
 
-    for solution in wrist_sets:
-      solutions.append(angle_set + solution)
+    solutions.extend([angle_set + wrist_set for wrist_set in wrist_sets])
 
     robot.angles = previous
 

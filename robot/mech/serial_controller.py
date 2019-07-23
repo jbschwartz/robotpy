@@ -16,7 +16,7 @@ class SerialController(Observer):
 
     self.traj = traj
 
-    self.frame_orientation = Frame(Transform(dual = Dual(Quaternion(0.7071067811865477, -4.3297802811774677e-17, 0.7071067811865477, -4.3297802811774677e-17), 0)))
+    self.frame_orientation = Frame(Transform(Dual(Quaternion(0.7071067811865477, -4.3297802811774677e-17, 0.7071067811865477, -4.3297802811774677e-17), 0)))
 
     self.start = Vector3(374, 320, 630)
     self.end   = Vector3(374, -320, 330)
@@ -51,11 +51,11 @@ class SerialController(Observer):
     print(ee_position)
 
     translation = Quaternion(0, *ee_position)
-    rotation = self.frame_orientation.transform.rotation()
+    rotation = self.frame_orientation.frame_to_world.rotation()
 
     dual = Dual(rotation, 0.5 * translation * rotation)
 
-    self.target = Frame(Transform(dual = dual))
+    self.target = Frame(Transform(dual))
 
   def print_results(self):
     for result in self.results:

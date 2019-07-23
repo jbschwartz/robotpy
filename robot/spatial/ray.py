@@ -4,6 +4,13 @@ class Ray():
     # TODO: What about a zero-length direction vector?
     self.direction = direction.normalize()
 
+  def transform(self, transform: 'Transform') -> 'Ray':
+    '''Return a new transformed ray.'''
+    new_origin    = self.origin.transform(transform, as_type="point")
+    new_direction = self.direction.transform(transform, as_type="vector")
+
+    return Ray(new_origin, new_direction)
+
   def closest_intersection(self, collection):
     closest = None
 
