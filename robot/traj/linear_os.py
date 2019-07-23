@@ -9,9 +9,7 @@ from robot.traj.trajectory_js import TrajectoryJS
 from robot.traj.utils         import interpolate
 
 class LinearOS():
-  '''
-  Linear trajectory in operational space
-  '''
+  '''Linear trajectory in operational space.'''
   def __init__(self, robot, starts, ends, duration = 1):
     self.starts = starts
     self.ends = ends
@@ -37,6 +35,23 @@ class LinearOS():
     self.direction *= -1
     # pass
 
+  def get_closest_solution(self, solutions):
+    '''Return the closest solution (in joint space) to the current arm position.'''
+    current = self.robot.angles
+
+    least    = math.inf
+    solution = None
+
+    for angles in solutions:
+      joint_space_distance = sum([(new - current) ** 2
+                                  for new, current in zip(angles, current)])
+
+      if joint_space_distance < least:
+        least    = joint_space_distance
+        solution = angles
+
+    return solution
+
   def advance(self, delta):
     assert delta >= 0
 
@@ -58,19 +73,6 @@ class LinearOS():
 
     new_frame = Frame(Transform(dual = dual))
 
-    results = solve_angles(new_frame, self.robot)
-    current = self.robot.angles
+    solutions = solve_angles(new_frame, self.robot)
 
-    least = math.inf
-    best = None
-    weights = [1, 0.9, 0.8, 0.7, 0.6, 0.5]
-    for result in results:
-      total = 0
-      for a, b, w in zip(result, current, weights):
-        total += w * (a - b) ** 2
-
-      if total < least:
-        least = total
-        best = result
-
-    return best
+    return self.get_closest_solution(solutions)
