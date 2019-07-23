@@ -11,8 +11,6 @@ class Quaternion(Swizzler):
     self.y = y
     self.z = z
 
-    self.normalize()
-
   @classmethod
   def from_axis_angle(cls, axis, angle):
     '''Construct a quaternion from an axis and angle (in radians).'''
