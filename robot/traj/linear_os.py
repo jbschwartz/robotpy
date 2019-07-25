@@ -5,15 +5,118 @@ from robot.spatial.frame      import Frame
 from robot.spatial.quaternion import Quaternion
 from robot.spatial.transform  import Transform
 from robot.spatial.dual       import Dual
+from robot.spatial            import vector3
+from robot.traj.segment       import Segment, SegmentType
 from robot.traj.trajectory_js import TrajectoryJS
 from robot.traj.utils         import interpolate
+
+Vector3 = vector3.Vector3
+
+def calculate_blend(first, second, radius) -> (Vector3, Vector3):
+  half_angle_between = vector3.angle_between(-first.direction, second.direction) / 2
+
+  try:
+    distance = radius / math.tan(half_angle_between)
+  except ZeroDivisionError:
+    # We have an issue if the segments are colinear. They're not blendable
+    return None, None
+
+  if distance > first.length or distance > second.length:
+    # No blend (radius clobbers the segment(s))
+    return None, None
+
+  p = first.end + distance * -first.direction
+  q = first.end + distance * second.direction
+
+  normal = first.direction % second.direction
+
+  direction_to_center = (normal % first.direction).normalize()
+
+  center = p + radius * direction_to_center
+
+  return p, q, center
+
+def calculate_blends(segments, radius = 0.375):
+  new_segments = []
+  last_endpoint = segments[0].start
+
+  for first, second in zip(segments[0:-1], segments[1:]):
+    # Segment direction vectors
+    blend_start, blend_end, center = calculate_blend(first, second, radius)
+
+    if blend_start:
+      new_first_segment = Segment(last_endpoint, blend_start, SegmentType.LINEAR)
+      new_blend_segment = Segment(blend_start, blend_end, SegmentType.ARC)
+      new_blend_segment.center = center
+      last_endpoint = blend_end
+
+      new_segments.extend([
+          new_first_segment,
+          new_blend_segment
+      ])
+    else:
+      new_first_segment = Segment(first.start, first.end, SegmentType.LINEAR)
+      new_segments.append(new_first_segment)
+      last_endpoint = first.end
+
+  new_segments.append(Segment(last_endpoint, second.end, SegmentType.LINEAR))
+
+  if segments[0].start == segments[-1].end:
+    blend_start, blend_end, center = calculate_blend(segments[-1], segments[0], radius)
+
+    if blend_start:
+      new_segments[0].start = blend_end
+      new_segments[-1].end = blend_start
+      new_blend_segment = Segment(blend_start, blend_end, SegmentType.ARC)
+      new_blend_segment.center = center
+      new_segments.append(new_blend_segment)
+
+  return new_segments
+
+def interpolate_blend(start: Vector3, end: Vector3, center: Vector3, t: float) -> Vector3:
+  radius_start = (start - center)
+  radius_end = (end - center)
+
+  angle_between = vector3.angle_between(radius_start, radius_end)
+  # print(math.degrees(angle_between))
+
+
+  normal = (radius_start % radius_end).normalize()
+
+  radius = radius_start.length()
+
+  assert radius > 0
+
+  angle = angle_between * t
+
+  transform = Transform.from_axis_angle_translation(normal, angle)
+
+  return center + transform(radius_start)
+
+def print_segments(segments):
+  print('Segments: ')
+  for index, segment in enumerate(segments, 1):
+    print(f"{index}: {segment}")
+
 
 class LinearOS():
   '''Linear trajectory in operational space.'''
   def __init__(self, robot, waypoints, duration = 1):
-    self.segments = self.create_segments(waypoints)
+    self.segments = [
+      Segment(start, end)
+      for start, end
+      in zip(waypoints[0:-1], waypoints[1:])
+    ]
 
-    self.segment_duration = duration / self.number_of_segments
+    self.segments = calculate_blends(self.segments, radius = 45)
+
+
+    print_segments(self.segments)
+
+    self.overall_length = sum([segment.length for segment in self.segments])
+
+    self.segment_duration = [segment.length / self.overall_length * duration for segment in self.segments]
+
     self._segment_index = 0
 
     self._is_done = False
@@ -23,12 +126,6 @@ class LinearOS():
 
     self.robot = robot
     self.robot.angles = [0] * 6
-
-  def create_segments(self, waypoints):
-    segments = [(start, end) for start, end in zip(waypoints[0:-1], waypoints[1:])]
-    segments.append((waypoints[-1], waypoints[0]))
-
-    return segments
 
   @property
   def t(self):
@@ -54,7 +151,12 @@ class LinearOS():
     return len(self.segments)
 
   def calculate_new_target(self):
-    world_position = interpolate(*self.segments[self.segment_index], self.t)
+    segment = self.segments[self.segment_index]
+
+    if segment.path_type == SegmentType.LINEAR:
+      world_position = interpolate(segment.start, segment.end, self.t)
+    else:
+      world_position = interpolate_blend(segment.start, segment.end, segment.center, self.t)
 
     return Frame.from_position_orientation(world_position, self.robot.pose().orientation())
 
@@ -92,7 +194,7 @@ class LinearOS():
     if self._is_done:
       return self.robot.angles
 
-    self.t += self.direction * (delta / self.segment_duration)
+    self.t += self.direction * (delta / self.segment_duration[self.segment_index])
 
     if self.t > 1:
       self.t -= 1

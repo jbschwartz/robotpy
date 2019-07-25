@@ -56,8 +56,8 @@ if __name__ == "__main__":
 
   robot2.serial.traj = LinearOS(
     robot2.serial,
-    [Vector3(374, 320, 630), Vector3(374, -320, 330), Vector3(374, 320, 330)],
-    6)
+    [Vector3(374, 320, 630), Vector3(374, -320, 330), Vector3(374, 320, 330), Vector3(374, 320, 630)],
+    5)
   sc = SerialController(robot2.serial, robot2.serial.traj)
 
   target_frame_entity = FrameEntity(sc.target, flat_program)
