@@ -10,20 +10,23 @@ class Segment(abc.ABC):
 
 class LinearSegment(Segment):
   def __init__(self, start: 'Vector3', end: 'Vector3'):
-    assert start != end
-
     self.start = start
     self.end   = end
 
+    assert not math.isclose(self.length, 0), 'Zero length LinearSegment.'
+
   @property
   def direction(self) -> 'Vector3':
+    '''Return the normalized direction vector of the segment.'''
     return vector3.normalize(self.end - self.start)
 
   @property
   def length(self) -> float:
+    '''Return the length of the segment.'''
     return (self.end - self.start).length()
 
   def interpolate(self, t: float) -> 'Vector3':
+    '''Return point on the segment for the given parameter t in [0, 1].'''
     assert 0 <= t <= 1, 'Parameter `t` outside domain [0, 1]'
     return (self.end - self.start) * t + self.start
 
@@ -60,6 +63,7 @@ class ArcSegment(Segment):
 
 
   def interpolate(self, t: float) -> 'Vector3':
+    '''Return point on the segment for the given parameter t in [0, 1].'''
     assert 0 <= t <= 1, 'Parameter `t` outside domain [0, 1]'
     theta = self.central_angle * t
     transform = Transform.from_axis_angle_translation(self.axis, theta)
