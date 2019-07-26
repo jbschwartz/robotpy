@@ -8,94 +8,18 @@ from robot.spatial.dual       import Dual
 from robot.spatial            import vector3
 from robot.traj.segment       import ArcSegment, LinearSegment
 from robot.traj.trajectory_js import TrajectoryJS
+from robot.traj.path          import PiecewisePath
 from robot.traj.utils         import interpolate
 
 Vector3 = vector3.Vector3
 
-def calculate_blend(first, second, radius) -> (Vector3, Vector3):
-  half_angle_between = vector3.angle_between(-first.direction, second.direction) / 2
-
-  try:
-    distance = radius / math.tan(half_angle_between)
-  except ZeroDivisionError:
-    # We have an issue if the segments are colinear. They're not blendable
-    return None, None
-
-  if distance > first.length or distance > second.length:
-    # No blend (radius clobbers the segment(s))
-    return None, None
-
-  p = first.end + distance * -first.direction
-  q = first.end + distance * second.direction
-
-  normal = first.direction % second.direction
-
-  direction_to_center = (normal % first.direction).normalize()
-
-  center = p + radius * direction_to_center
-
-  return p, q, center
-
-def calculate_blends(segments, radius = 0.375):
-  new_segments = []
-  last_endpoint = segments[0].start
-
-  for first, second in zip(segments[0:-1], segments[1:]):
-    # Segment direction vectors
-    blend_start, blend_end, center = calculate_blend(first, second, radius)
-
-    if blend_start:
-      new_first_segment = LinearSegment(last_endpoint, blend_start)
-      new_blend_segment = ArcSegment(blend_start, blend_end, center)
-
-      last_endpoint = blend_end
-
-      new_segments.extend([
-          new_first_segment,
-          new_blend_segment
-      ])
-    else:
-      new_first_segment = LinearSegment(first.start, first.end)
-      new_segments.append(new_first_segment)
-      last_endpoint = first.end
-
-  new_segments.append(LinearSegment(last_endpoint, second.end))
-
-  if segments[0].start == segments[-1].end:
-    blend_start, blend_end, center = calculate_blend(segments[-1], segments[0], radius)
-
-    if blend_start:
-      new_segments[0].start = blend_end
-      new_segments[-1].end = blend_start
-      new_blend_segment = ArcSegment(blend_start, blend_end, center)
-
-      new_segments.append(new_blend_segment)
-
-  return new_segments
-
-def print_segments(segments):
-  print('Segments: ')
-  for index, segment in enumerate(segments, 1):
-    print(f"{index}: {segment}")
-
-
 class LinearOS():
   '''Linear trajectory in operational space.'''
   def __init__(self, robot, waypoints, duration = 1):
-    self.segments = [
-      LinearSegment(start, end)
-      for start, end
-      in zip(waypoints[0:-1], waypoints[1:])
-    ]
+    self.path = PiecewisePath.from_waypoints(waypoints)
+    self.path.blend(30)
 
-    self.segments = calculate_blends(self.segments, radius = 45)
-
-
-    print_segments(self.segments)
-
-    self.overall_length = sum([segment.length for segment in self.segments])
-
-    self.segment_duration = [segment.length / self.overall_length * duration for segment in self.segments]
+    self.segment_duration = [segment.length / self.path.length * duration for segment in self.path.segments]
 
     self._segment_index = 0
 
@@ -122,16 +46,12 @@ class LinearOS():
   @segment_index.setter
   def segment_index(self, value):
     self._segment_index += 1
-    if self._segment_index == self.number_of_segments:
+    if self._segment_index == self.path.number_of_segments:
       self._is_done = True
       self._segment_index = 0
 
-  @property
-  def number_of_segments(self):
-    return len(self.segments)
-
   def calculate_new_target(self):
-    segment = self.segments[self.segment_index]
+    segment = self.path.segments[self.segment_index]
 
     world_position = segment.interpolate(self.t)
 
@@ -145,8 +65,7 @@ class LinearOS():
     self.t = 0
 
   def reverse(self):
-    self.segments.reverse()
-    self.segments = [(segment[1], segment[0]) for segment in self.segments]
+    self.path.reverse()
 
   def get_closest_solution(self, solutions):
     '''Return the closest solution (in joint space) to the current arm position.'''
