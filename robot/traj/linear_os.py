@@ -6,7 +6,7 @@ from robot.spatial.quaternion import Quaternion
 from robot.spatial.transform  import Transform
 from robot.spatial.dual       import Dual
 from robot.spatial            import vector3
-from robot.traj.segment       import Segment, SegmentType
+from robot.traj.segment       import ArcSegment, LinearSegment
 from robot.traj.trajectory_js import TrajectoryJS
 from robot.traj.utils         import interpolate
 
@@ -45,9 +45,9 @@ def calculate_blends(segments, radius = 0.375):
     blend_start, blend_end, center = calculate_blend(first, second, radius)
 
     if blend_start:
-      new_first_segment = Segment(last_endpoint, blend_start, SegmentType.LINEAR)
-      new_blend_segment = Segment(blend_start, blend_end, SegmentType.ARC)
-      new_blend_segment.center = center
+      new_first_segment = LinearSegment(last_endpoint, blend_start)
+      new_blend_segment = ArcSegment(blend_start, blend_end, center)
+
       last_endpoint = blend_end
 
       new_segments.extend([
@@ -55,11 +55,11 @@ def calculate_blends(segments, radius = 0.375):
           new_blend_segment
       ])
     else:
-      new_first_segment = Segment(first.start, first.end, SegmentType.LINEAR)
+      new_first_segment = LinearSegment(first.start, first.end)
       new_segments.append(new_first_segment)
       last_endpoint = first.end
 
-  new_segments.append(Segment(last_endpoint, second.end, SegmentType.LINEAR))
+  new_segments.append(LinearSegment(last_endpoint, second.end))
 
   if segments[0].start == segments[-1].end:
     blend_start, blend_end, center = calculate_blend(segments[-1], segments[0], radius)
@@ -67,31 +67,11 @@ def calculate_blends(segments, radius = 0.375):
     if blend_start:
       new_segments[0].start = blend_end
       new_segments[-1].end = blend_start
-      new_blend_segment = Segment(blend_start, blend_end, SegmentType.ARC)
-      new_blend_segment.center = center
+      new_blend_segment = ArcSegment(blend_start, blend_end, center)
+
       new_segments.append(new_blend_segment)
 
   return new_segments
-
-def interpolate_blend(start: Vector3, end: Vector3, center: Vector3, t: float) -> Vector3:
-  radius_start = (start - center)
-  radius_end = (end - center)
-
-  angle_between = vector3.angle_between(radius_start, radius_end)
-  # print(math.degrees(angle_between))
-
-
-  normal = (radius_start % radius_end).normalize()
-
-  radius = radius_start.length()
-
-  assert radius > 0
-
-  angle = angle_between * t
-
-  transform = Transform.from_axis_angle_translation(normal, angle)
-
-  return center + transform(radius_start)
 
 def print_segments(segments):
   print('Segments: ')
@@ -103,7 +83,7 @@ class LinearOS():
   '''Linear trajectory in operational space.'''
   def __init__(self, robot, waypoints, duration = 1):
     self.segments = [
-      Segment(start, end)
+      LinearSegment(start, end)
       for start, end
       in zip(waypoints[0:-1], waypoints[1:])
     ]
@@ -153,10 +133,7 @@ class LinearOS():
   def calculate_new_target(self):
     segment = self.segments[self.segment_index]
 
-    if segment.path_type == SegmentType.LINEAR:
-      world_position = interpolate(segment.start, segment.end, self.t)
-    else:
-      world_position = interpolate_blend(segment.start, segment.end, segment.center, self.t)
+    world_position = segment.interpolate(self.t)
 
     return Frame.from_position_orientation(world_position, self.robot.pose().orientation())
 
