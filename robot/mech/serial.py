@@ -10,6 +10,7 @@ from robot.spatial.vector3   import Vector3
 
 class Serial:
   def __init__(self, joints : list, links = []):
+    self._robot_to_world = Transform()
     self.joints = joints
     self.links = links
     self.traj = None
@@ -31,6 +32,17 @@ class Serial:
     assert correctElbow, 'Robot does not have a recognized elbow configuration'
 
   @property
+  def robot_to_world(self) -> Transform:
+    return self._robot_to_world
+
+  @robot_to_world.setter
+  def robot_to_world(self, transform) -> None:
+    self._robot_to_world = transform
+    self.links[0].frame = self.links[0].frame.transform(self.robot_to_world)
+
+    self.update_links()
+
+  @property
   def angles(self):
     return [joint.angle for joint in self.joints]
 
@@ -50,11 +62,6 @@ class Serial:
       return ray.closest_intersection(self.links)
     else:
       return None
-
-  def position(self, v):
-    transform = Transform.from_axis_angle_translation(translation = v)
-    self.links[0].frame = self.links[0].frame.transform(transform)
-    self.update_links()
 
   def update_links(self):
     last_frame = self.links[0].frame

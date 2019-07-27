@@ -6,7 +6,10 @@ Vector3 = vector3.Vector3
 from robot.common.bindings                 import Bindings
 from robot.common.timer                    import Timer
 from robot.mech.serial_controller          import SerialController
+from robot.spatial.euler                   import Axes, Order
 from robot.spatial.frame                   import Frame
+from robot.spatial.transform               import Transform
+from robot.spatial.quaternion              import Quaternion
 from robot.traj.linear_js                  import LinearJS
 from robot.traj.linear_os                  import LinearOS
 from robot.visual.ambient_light            import AmbientLight
@@ -45,22 +48,26 @@ if __name__ == "__main__":
     robot.shader_program = program
     # robot.frame_entity = ee_frame
     # robot.bounding_entity = bb
-    robot.serial.position(Vector3(-800, 0, 0))
+    robot.serial.robot_to_world = Transform.from_orientation_translation(
+      Quaternion.from_euler([math.radians(45), math.radians(0), 0], Axes.ZYZ, Order.INTRINSIC),
+      Vector3(-800, 0, 0))
     robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 6)
 
   robot2 = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
   robot2.shader_program = program
   robot2.frame_entity = ee_frame
-
+  robot2.serial.robot_to_world = Transform.from_orientation_translation(
+    Quaternion.from_euler([math.radians(180), 0, 0], Axes.ZYZ, Order.INTRINSIC),
+    Vector3(500, 0, 0))
   robot2.color = (0.5, 1, 0)
 
-  robot2.serial.traj = LinearOS(
-    robot2.serial,
-    [Vector3(374, 320, 630), Vector3(374, -320, 330), Vector3(374, 320, 330)],
-    6)
-  sc = SerialController(robot2.serial, robot2.serial.traj)
+  # robot2.serial.traj = LinearOS(
+  #   robot2.serial,
+  #   [Vector3(374, 320, 630), Vector3(374, -320, 330), Vector3(374, 320, 330)],
+  #   6)
+  # sc = SerialController(robot2.serial, robot2.serial.traj)
 
-  target_frame_entity = FrameEntity(sc.target, flat_program)
+  # target_frame_entity = FrameEntity(sc.target, flat_program)
 
   triangle = TriangleEntity(bill_program)
 
@@ -84,9 +91,9 @@ if __name__ == "__main__":
     WindowEvent.WINDOW_RESIZE
   ])
 
-  window.register_observer(sc, [
-    WindowEvent.KEY,
-  ])
+  # window.register_observer(sc, [
+  #   WindowEvent.KEY,
+  # ])
 
   window.register_observer(triangle, [
     WindowEvent.CLICK
@@ -96,7 +103,7 @@ if __name__ == "__main__":
   # scene.entities.append(target_frame_entity)
   scene.entities.append(grid)
   scene.entities.append(robot2)
-  # scene.entities.append(robot)
+  scene.entities.append(robot)
   scene.entities.append(triangle)
 
   # for link in robot.serial.links:
