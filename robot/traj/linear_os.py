@@ -26,7 +26,6 @@ class LinearOS():
     self._is_done = False
 
     self._t = 0
-    self.direction = 1
 
     self.robot = robot
     self.robot.angles = [0] * 6
@@ -90,7 +89,7 @@ class LinearOS():
     if self._is_done:
       return self.robot.angles
 
-    self.t += self.direction * (delta / self.segment_duration[self.segment_index])
+    self.t += (delta / self.segment_duration[self.segment_index])
 
     if self.t > 1:
       self.t -= 1
