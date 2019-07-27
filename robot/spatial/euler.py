@@ -86,7 +86,7 @@ class Axes(enum.Enum):
 
   @property
   def vectors(self) -> List[Vector3]:
-    return [Axes.basis_vector(axis) for axis in self.name]
+    return [Axes.basis_vector(axis.lower()) for axis in self.name]
 
 class Order(enum.Enum):
   INTRINSIC = enum.auto()
