@@ -148,7 +148,7 @@ class RobotEntity(Entity):
     #   self.serial.reverse()
     if self.serial.traj:
       if self.serial.traj.is_done():
-        # self.serial.traj.reverse()
+        self.serial.traj.reverse()
         self.serial.traj.restart()
 
       self.serial.angles = self.serial.traj.advance(delta)

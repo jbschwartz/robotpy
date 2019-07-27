@@ -65,6 +65,7 @@ class LinearOS():
 
   def reverse(self):
     self.path.reverse()
+    self.segment_duration.reverse()
 
   def get_closest_solution(self, solutions):
     '''Return the closest solution (in joint space) to the current arm position.'''
