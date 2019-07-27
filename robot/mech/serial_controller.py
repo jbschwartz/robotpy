@@ -37,18 +37,13 @@ class SerialController(Observer):
     self.set_pose()
 
   def solve(self):
-    print(self.target.position())
     self.results = solve_angles(self.target, self.serial)
-    print(self.results)
-    self.print_results()
 
   def interpolate(self):
-    print(self.t)
     return (self.end - self.start) * self.t + self.start
 
   def update_target(self):
     ee_position = self.interpolate()
-    print(ee_position)
 
     translation = Quaternion(0, *ee_position)
     rotation = self.frame_orientation.frame_to_world.rotation()

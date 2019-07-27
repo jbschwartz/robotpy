@@ -57,15 +57,21 @@ if __name__ == "__main__":
   robot2.shader_program = program
   robot2.frame_entity = ee_frame
   robot2.serial.robot_to_world = Transform.from_orientation_translation(
-    Quaternion.from_euler([math.radians(180), 0, 0], Axes.ZYZ, Order.INTRINSIC),
-    Vector3(500, 0, 0))
+    Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
+    Vector3(0, 0, 0))
   robot2.color = (0.5, 1, 0)
 
-  # robot2.serial.traj = LinearOS(
-  #   robot2.serial,
-  #   [Vector3(374, 320, 630), Vector3(374, -320, 330), Vector3(374, 320, 330)],
-  #   6)
-  # sc = SerialController(robot2.serial, robot2.serial.traj)
+  robot2.serial.traj = LinearOS(
+    robot2.serial,
+    [
+      Vector3(150, 320, 630),
+      Vector3(374, 160, 430),
+      Vector3(374, 0, 630),
+      Vector3(275, -320, 330),
+      Vector3(500, 320, 330),
+      Vector3(150, 320, 630)],
+    10)
+  sc = SerialController(robot2.serial, robot2.serial.traj)
 
   # target_frame_entity = FrameEntity(sc.target, flat_program)
 

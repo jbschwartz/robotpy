@@ -5,30 +5,30 @@ from robot.spatial.frame      import Frame
 from robot.spatial.quaternion import Quaternion
 from robot.spatial.transform  import Transform
 from robot.spatial.dual       import Dual
+from robot.spatial            import vector3
+from robot.traj.segment       import ArcSegment, LinearSegment
 from robot.traj.trajectory_js import TrajectoryJS
+from robot.traj.path          import PiecewisePath
 from robot.traj.utils         import interpolate
+
+Vector3 = vector3.Vector3
 
 class LinearOS():
   '''Linear trajectory in operational space.'''
   def __init__(self, robot, waypoints, duration = 1):
-    self.segments = self.create_segments(waypoints)
+    self.path = PiecewisePath.from_waypoints(waypoints)
+    self.path.blend(30)
 
-    self.segment_duration = duration / self.number_of_segments
+    self.segment_duration = [segment.length / self.path.length * duration for segment in self.path.segments]
+
     self._segment_index = 0
 
     self._is_done = False
 
     self._t = 0
-    self.direction = 1
 
     self.robot = robot
     self.robot.angles = [0] * 6
-
-  def create_segments(self, waypoints):
-    segments = [(start, end) for start, end in zip(waypoints[0:-1], waypoints[1:])]
-    segments.append((waypoints[-1], waypoints[0]))
-
-    return segments
 
   @property
   def t(self):
@@ -45,18 +45,9 @@ class LinearOS():
   @segment_index.setter
   def segment_index(self, value):
     self._segment_index += 1
-    if self._segment_index == self.number_of_segments:
+    if self._segment_index == self.path.number_of_segments:
       self._is_done = True
       self._segment_index = 0
-
-  @property
-  def number_of_segments(self):
-    return len(self.segments)
-
-  def calculate_new_target(self):
-    world_position = interpolate(*self.segments[self.segment_index], self.t)
-
-    return Frame.from_position_orientation(world_position, self.robot.pose().orientation())
 
   def is_done(self):
     return self._is_done
@@ -66,8 +57,8 @@ class LinearOS():
     self.t = 0
 
   def reverse(self):
-    self.segments.reverse()
-    self.segments = [(segment[1], segment[0]) for segment in self.segments]
+    self.path.reverse()
+    self.segment_duration.reverse()
 
   def get_closest_solution(self, solutions):
     '''Return the closest solution (in joint space) to the current arm position.'''
@@ -92,13 +83,14 @@ class LinearOS():
     if self._is_done:
       return self.robot.angles
 
-    self.t += self.direction * (delta / self.segment_duration)
+    self.t += (delta / self.segment_duration[self.segment_index])
 
     if self.t > 1:
       self.t -= 1
       self.segment_index += 1
 
-    target = self.calculate_new_target()
+    world_position = self.path.evaluate(self.segment_index, self.t)
+    target = Frame.from_position_orientation(world_position, self.robot.pose().orientation())
 
     solutions = solve_angles(target, self.robot)
 
