@@ -26,22 +26,6 @@ from robot.visual.shader_program           import ShaderProgram
 
 loaded_files = {}
 
-def parse_mesh(file_path):
-  p = STLParser()
-
-  try:
-    meshes = p.parse(file_path)
-  except ParserError as error:
-    print('\033[91m' + f'Parsing error on line {error.line}: {error}' + '\033[0m')
-    # TODO: It's probably no longer appropriate for this to be a quit() here
-    quit()
-
-  with Timer(f'Construct KD Trees') as t:
-    for mesh in meshes:
-      mesh.accelerator = KDTree
-
-  return meshes
-
 def get_joint_params(joint_json):
   for joint_params in joint_json:
     for param, value in joint_params.items():
@@ -65,7 +49,8 @@ def load(file_path):
     with open(file_path) as json_file:
       data = json.load(json_file)
 
-    meshes = parse_mesh(f'{dir_path}/../../mech/robots/meshes/{data["mesh_file"]}')
+    stl_parser = STLParser()
+    meshes = Mesh.from_file(stl_parser, f'{dir_path}/../../mech/robots/meshes/{data["mesh_file"]}')
     joint_params = get_joint_params(data['joints'])
     link_params = data['links']
 
