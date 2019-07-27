@@ -1,5 +1,6 @@
 import math
 
+from robot.spatial.euler    import Order
 from robot.spatial.swizzler import Swizzler
 
 class Quaternion(Swizzler):
@@ -17,6 +18,19 @@ class Quaternion(Swizzler):
     half_angle = angle / 2
     axis = math.sin(half_angle) * axis
     return cls(math.cos(half_angle), axis.x, axis.y, axis.z)
+
+  @classmethod
+  def from_euler(cls, angles, axes, order):
+    q = cls()
+
+    if order == Order.EXTRINSIC:
+      angles.reverse()
+      axes = axes.reverse()
+
+    for axis, angle in zip(axes.vectors, angles):
+      q *= cls.from_axis_angle(axis=axis, angle=angle)
+
+    return q
 
   def __abs__(self):
     return Quaternion(abs(self.r), abs(self.x), abs(self.y), abs(self.z))
