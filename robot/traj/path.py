@@ -78,6 +78,11 @@ class PiecewisePath(Path):
 
     self.segments = new_segments
 
+  def evaluate(self, segment_index, t) -> 'Vector3':
+    segment = self.segments[segment_index]
+
+    return segment.interpolate(t)
+
   def reverse(self) -> None:
     '''Reverse the direction of the path.'''
     self.segments.reverse()

@@ -49,13 +49,6 @@ class LinearOS():
       self._is_done = True
       self._segment_index = 0
 
-  def calculate_new_target(self):
-    segment = self.path.segments[self.segment_index]
-
-    world_position = segment.interpolate(self.t)
-
-    return Frame.from_position_orientation(world_position, self.robot.pose().orientation())
-
   def is_done(self):
     return self._is_done
 
@@ -96,7 +89,8 @@ class LinearOS():
       self.t -= 1
       self.segment_index += 1
 
-    target = self.calculate_new_target()
+    world_position = self.path.evaluate(self.segment_index, self.t)
+    target = Frame.from_position_orientation(world_position, self.robot.pose().orientation())
 
     solutions = solve_angles(target, self.robot)
 
