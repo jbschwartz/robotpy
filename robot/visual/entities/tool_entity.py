@@ -7,8 +7,8 @@ from ctypes import c_void_p
 from robot.visual.entities.entity import Entity
 
 class ToolEntity(Entity):
-  def __init__(self, entity, tool : 'Tool', shader_program : 'ShaderProgram' = None, color = (1, 0.0, 0)):
-    self.entity = entity
+  def __init__(self, robot_entity, tool : 'Tool', shader_program : 'ShaderProgram' = None, color = (1, 0.0, 0)):
+    self.robot_entity = robot_entity
     self.tool   = tool
     self.scale  = 1
     Entity.__init__(self, shader_program, color)
@@ -46,7 +46,7 @@ class ToolEntity(Entity):
 
   def update(self, delta):
     # pass
-    self.tool.tool_to_world = self.entity.serial.pose().frame_to_world
+    self.tool.tool_to_world = self.robot_entity.serial.pose().frame_to_world
 
   def draw(self, camera, light):
     # TODO: Use Uniform Buffer Objects to remove this duplicate code from each entity
