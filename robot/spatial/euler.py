@@ -1,4 +1,8 @@
+from typing import List
+
 import enum, functools, math
+
+from robot.spatial.vector3 import Vector3
 
 # All of these functions convert quaternion representations to intrinsic euler angles
 # This is done by converting the quaternion representation to a partial matrix representation and then to an euler angle representation
@@ -65,12 +69,24 @@ class Axes(enum.Enum):
   ZYX = functools.partial(zyx)
   YXZ = functools.partial(_not_implemented)
 
+  @classmethod
+  def basis_vector(cls, axis: str):
+    v = Vector3()
+
+    # For now, allow exceptions for unrecognized `axis` to go uncaught
+    setattr(v, axis, 1)
+    return v
+
   def convert(self, quaternion: 'Quaternion'):
     return self.value(*quaternion)
 
   def reverse(self):
     reversed_name = self.name[::-1]
     return Axes[reversed_name]
+
+  @property
+  def vectors(self) -> List[Vector3]:
+    return [Axes.basis_vector(axis) for axis in self.name]
 
 class Order(enum.Enum):
   INTRINSIC = enum.auto()
