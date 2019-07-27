@@ -3,6 +3,7 @@ import copy, itertools, math
 from robot                   import constant
 from robot.mech.joint        import Joint
 from robot.mech.link         import Link
+from robot.mech.tool         import Tool
 from robot.spatial.aabb      import AABB
 from robot.spatial.frame     import Frame
 from robot.spatial.transform import Transform
@@ -15,6 +16,7 @@ class Serial:
     self.links = links
     self.traj = None
     self.qs = [0] * 6
+    self.tool = None
 
     self.checkStructure()
 
@@ -56,6 +58,10 @@ class Serial:
   @property
   def aabb(self) -> AABB:
     return AABB(*[link.aabb for link in self.links])
+
+  def attach(self, tool: Tool = None):
+    '''Attach the tool to the robot's end effector.'''
+    self.tool = tool
 
   def intersect(self, ray):
     if self.aabb.intersect(ray):
@@ -118,9 +124,11 @@ class Serial:
       angles[2] = direction['elbow'] * (angles[2] + zero['elbow'])
 
   def wrist_center(self, pose : Frame):
-    '''
-    Get wrist center point given the end-effector pose
-    '''
-    # TODO: Handle tools
+    '''Get wrist center point given the end-effector pose and tool.'''
     wrist_length = self.joints[5].dh['d']
-    return pose.position() - pose.z() * wrist_length
+
+    tool_tip = Vector3()
+    if self.tool is not None:
+      tool_tip = self.tool.translation
+
+    return pose.position() - pose.z() * wrist_length - tool_tip
