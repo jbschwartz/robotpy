@@ -1,7 +1,9 @@
 import math, unittest
 
-from robot.spatial.transform import Transform
-from robot.spatial.vector3   import Vector3
+from robot.spatial.euler      import Axes, Order
+from robot.spatial.quaternion import Quaternion
+from robot.spatial.transform  import Transform
+from robot.spatial.vector3    import Vector3
 
 class TestTransform(unittest.TestCase):
   def setUp(self):
@@ -15,6 +17,52 @@ class TestTransform(unittest.TestCase):
     Transform accepts ...
     '''
     pass
+
+  def test_from_json(self):
+    translation = [1, 2, 3]
+    angles      = [-30, 60, 90]
+    axes        = 'ZYZ'
+    order       = 'INTRINSIC'
+
+    payload = {
+      'translation': translation,
+      'euler': {
+        'angles': angles,
+        'axes': axes,
+        'order': order
+      }
+    }
+
+    expected = Transform.from_orientation_translation(
+      Quaternion.from_euler(
+        list(map(math.radians, angles)),
+        Axes[axes],
+        Order[order]
+      ),
+      Vector3(*translation)
+    )
+
+    result = Transform.from_json(payload)
+
+    self.assertAlmostEqual(result.dual, expected.dual)
+
+  def test_from_json_raises(self):
+    failed_payload = {
+      'translation': [1, 2, 3],
+      'euler': {
+        'angles': [-30, 60, 90],
+        'axes': 'ZZZ',
+        'order': 'SIC'
+      }
+    }
+
+    with self.assertRaises(KeyError):
+      _ = Transform.from_json(failed_payload)
+
+    del failed_payload['translation']
+
+    with self.assertRaises(KeyError):
+      _ = Transform.from_json(failed_payload)
 
   def test_mul(self):
     # Rotate then translate

@@ -2,7 +2,9 @@ import math
 
 import robot.spatial.dual       as     dual
 import robot.spatial.quaternion as     quaternion
-from robot.spatial.vector3      import Vector3
+
+from robot.spatial.euler   import Axes, Order
+from robot.spatial.vector3 import Vector3
 
 Quaternion = quaternion.Quaternion
 Dual       = dual.Dual
@@ -11,6 +13,24 @@ class Transform:
   '''Spatial rigid body transformation in three dimensions.'''
   def __init__(self, dual: Dual = None):
     self.dual = dual or Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))
+
+  @classmethod
+  def from_json(cls, payload) -> 'Transform':
+    try:
+      axes  = Axes[payload['euler']['axes'].upper()]
+      order = Order[payload['euler']['order'].upper()]
+      angles_radians = list(map(math.radians, payload['euler']['angles']))
+      orientation = Quaternion.from_euler(angles_radians, axes, order)
+
+      translation = Vector3(*payload['translation'])
+
+      return cls.from_orientation_translation(orientation, translation)
+    except KeyError:
+      # TODO: This is a catchall. Will not provide very useful debugging or handling information
+      #   This could be caused by the json file not having those particular keys present. Need to provide defaults
+      # TODO: Handle unknown euler angle axes or order
+      #   Maybe we can choose a default instead of just erroring out.
+      raise
 
   @classmethod
   def from_axis_angle_translation(cls, axis = None, angle = 0, translation = None):
