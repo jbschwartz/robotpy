@@ -1,14 +1,14 @@
 {
   "name": "Welding Head",
   "description": "Weldin' robots!",
-  "color": [1.00, 0.25, 0.25],
+  "color": [0.25, 0.25, 0.25],
   "mesh": {
     "file": "welder.stl",
     "scale": 30,
     "transform": {
       "translation": [0, 0, 0],
       "euler": {
-        "angles": [-90, 0, 0],
+        "angles": [90, 0, 0],
         "axes": "ZYZ",
         "order": "INTRINSIC"
       }
