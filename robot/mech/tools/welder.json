@@ -15,9 +15,9 @@
     }
   },
   "tip_transform": {
-    "translation": [0, 0, 0],
+    "translation": [41.8, 0, 270],
     "euler": {
-      "angles": [0, -60, 0],
+      "angles": [0, 45, 0],
       "axes": "ZYZ",
       "order": "INTRINSIC"
     }
