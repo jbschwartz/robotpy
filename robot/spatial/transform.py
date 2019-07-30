@@ -83,12 +83,14 @@ class Transform:
     else:
       raise KeyError
 
+  # TODO: Make me a property
   def translation(self) -> Vector3:
     '''Return the transform's translation Vector3.'''
     # "Undo" what was done in the __init__ function by working backwards
     t = 2 * self.dual.d * quaternion.conjugate(self.dual.r)
     return Vector3(*t.xyz)
 
+  # TODO: Make me a property
   def rotation(self) -> Quaternion:
     '''Return the transform's rotation Quaternion.'''
     return self.dual.r

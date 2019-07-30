@@ -4,6 +4,7 @@ from robot.spatial           import euler
 from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
 
+# TODO: Candidate to be immutable to guarantee functions that receive Frame don't have side effects.
 class Frame:
   def __init__(self, frame_to_world : Transform = None):
     self.frame_to_world = frame_to_world or Transform()

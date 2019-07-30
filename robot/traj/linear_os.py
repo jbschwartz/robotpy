@@ -17,6 +17,7 @@ class LinearOS():
   '''Linear trajectory in operational space.'''
   def __init__(self, robot, waypoints, duration = 1):
     self.path = PiecewisePath.from_waypoints(waypoints)
+    # TODO: Don't forget to handle the blending case when there is only one segment.
     self.path.blend(30)
 
     self.segment_duration = [segment.length / self.path.length * duration for segment in self.path.segments]
