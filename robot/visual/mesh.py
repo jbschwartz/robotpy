@@ -42,6 +42,11 @@ class Mesh:
 
     return Mesh(self.name, transformed_facets)
 
+  def scale(self, scale = 1) -> 'Mesh':
+    transformed_facets = [f.scale(scale) for f in self.facets]
+
+    return Mesh(self.name, transformed_facets)
+
   def vertices(self):
     '''Iterable list of mesh vertices returned grouped by facet.'''
     for facet in self.facets:

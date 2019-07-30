@@ -45,6 +45,11 @@ class Facet:
 
     return Facet(transformed_vertices, transformed_normal)
 
+  def scale(self, scale = 1) -> 'Facet':
+    transformed_vertices = [scale * v for v in self.vertices]
+
+    return Facet(transformed_vertices, self.computed_normal)
+
   def append(self, vertex, recompute=True):
     '''
     Add a vertex to the Facet.
