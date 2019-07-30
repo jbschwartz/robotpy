@@ -1,16 +1,40 @@
+import json, os
 import numpy as np
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 from OpenGL.GL import *
 
 from ctypes import c_void_p
 
-from robot.visual.entities.entity import Entity
+from robot.mech.tool                       import Tool
+from robot.spatial.transform               import Transform
+from robot.visual.entities.entity          import Entity
+from robot.visual.filetypes.stl.stl_parser import STLParser
+from robot.visual.mesh                     import Mesh
+
+def load(file_path: str) -> Tool:
+  with open(file_path) as json_file:
+    data = json.load(json_file)
+
+  mesh_transform = Transform.from_json(data['mesh']['transform'])
+
+  stl_parser = STLParser()
+  mesh, *_ = Mesh.from_file(stl_parser, f'{dir_path}/../../mech/tools/meshes/{data["mesh"]["file"]}')
+
+  mesh = mesh.scale(data["mesh"]["scale"])
+
+  # Move the mesh onto a useful origin position if the modeler decided to include positional or rotational offsets
+  mesh = mesh.transform(mesh_transform)
+
+  tip_transform = Transform.from_json(data['tip_transform'])
+
+  return ToolEntity(Tool(tip_transform, mesh), None, data['color'])
 
 class ToolEntity(Entity):
-  def __init__(self, robot_entity, tool : 'Tool', shader_program : 'ShaderProgram' = None, color = (1, 0.0, 0)):
-    self.robot_entity = robot_entity
+  def __init__(self, tool : 'Tool', shader_program : 'ShaderProgram' = None, color = (1, 0.0, 0)):
+    self.robot_entity = None
     self.tool   = tool
-    self.scale  = 1
     Entity.__init__(self, shader_program, color)
 
   def build_buffer(self):
@@ -18,7 +42,6 @@ class ToolEntity(Entity):
     for facet in self.tool.mesh.facets:
       for vertex in facet.vertices:
         float_data = [*vertex, *(facet.normal)]
-        float_data = [f * self.scale for f in float_data]
 
         data_list.append((float_data, 0))
 
@@ -45,8 +68,8 @@ class ToolEntity(Entity):
     glBindVertexArray(0)
 
   def update(self, delta):
-    # pass
-    self.tool.tool_to_world = self.robot_entity.serial.pose().frame_to_world
+    pass
+    # self.tool.tool_to_world = self.robot_entity.serial.pose().frame_to_world
 
   def draw(self, camera, light):
     # TODO: Use Uniform Buffer Objects to remove this duplicate code from each entity
