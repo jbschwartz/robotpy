@@ -16,6 +16,11 @@ def zyz(r, x, y, z):
   rx = 2 * r * x
 
   beta = math.acos(1 - 2 * (x ** 2 + y ** 2))
+  if math.isclose(beta, 0):
+    # Y is zero so there are multiple solutions (infinitely many?). Pick [0, 0, 0]
+    # TODO: Confirm that this is a valid way to handle the singular configuration.
+    #   That is, is there ever a case where choosing [0, 0, 0] is wrong?
+    return [[0, 0, 0]]
 
   results = []
   for yp in [beta, -beta]:
