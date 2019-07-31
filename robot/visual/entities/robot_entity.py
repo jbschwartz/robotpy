@@ -76,6 +76,7 @@ class RobotEntity(Entity):
     self.serial = serial
     self.frame_entity = None
     self.bounding_entity = None
+    self.tool_entity = None
 
     Entity.__init__(self, shader_program, color)
 
@@ -86,6 +87,11 @@ class RobotEntity(Entity):
   @property
   def aabb(self):
     return self.serial.aabb
+
+  def attach(self, tool_entity: 'ToolEntity'):
+    self.tool_entity = tool_entity
+    self.tool_entity.robot_entity = self
+    self.serial.attach(tool_entity.tool)
 
   def intersect(self, ray):
     return self.serial.intersect(ray)
@@ -102,6 +108,9 @@ class RobotEntity(Entity):
     self.buffer = np.array(data_list, dtype=[('', np.float32, 6),('', np.int32, 1)])
 
   def load(self):
+    if self.tool_entity:
+      self.tool_entity.load()
+
     if self.frame_entity:
       self.frame_entity.load()
 
@@ -132,11 +141,14 @@ class RobotEntity(Entity):
     # if not self.serial.is_moving():
     #   self.serial.reverse()
     if self.serial.traj:
+      self.serial.angles = self.serial.traj.advance(delta)
+
       if self.serial.traj.is_done():
         self.serial.traj.reverse()
         self.serial.traj.restart()
 
-      self.serial.angles = self.serial.traj.advance(delta)
+    if self.tool_entity:
+      self.tool_entity.update(delta)
 
   def draw(self, camera, light):
     # TODO: Use Uniform Buffer Objects to remove this duplicate code from each entity
@@ -160,9 +172,16 @@ class RobotEntity(Entity):
 
     glBindVertexArray(0)
 
+    if self.tool_entity:
+      self.tool_entity.draw(camera, light)
+
     if self.frame_entity:
-      # for link in self.serial.links:
-      self.frame_entity.draw(camera, light, Matrix4(self.serial.links[-1].frame.frame_to_world))
+      for link in self.serial.links:
+        self.frame_entity.draw(camera, light, Matrix4(link.frame.frame_to_world))
+
+      if self.serial.tool:
+        f = Frame(self.serial.tool.tip)
+        self.frame_entity.draw(camera, light, Matrix4(f.frame_to_world))
 
     if self.bounding_entity:
       for mesh, link in zip(self.meshes, self.serial.links):

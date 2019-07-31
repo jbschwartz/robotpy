@@ -63,6 +63,9 @@ class Serial:
     '''Attach the tool to the robot's end effector.'''
     self.tool = tool
 
+    if self.tool:
+      self.tool.tool_to_world = self.links[-1].frame.frame_to_world
+
   def intersect(self, ray):
     if self.aabb.intersect(ray):
       return ray.closest_intersection(self.links)
@@ -75,8 +78,14 @@ class Serial:
       link.frame = last_frame.transform(joint.transform)
       last_frame = link.frame
 
+    if self.tool is not None:
+      self.tool.tool_to_world = self.links[-1].frame.frame_to_world
+
   def pose(self) -> Frame:
-    return self.links[-1].frame
+    if self.tool is not None:
+      return Frame(self.tool.tip)
+    else:
+      return self.links[-1].frame
 
   def poses(self) -> list:
     return [link.frame for link in self.links]
@@ -127,8 +136,10 @@ class Serial:
     '''Get wrist center point given the end-effector pose and tool.'''
     wrist_length = self.joints[5].dh['d']
 
-    tool_tip = Vector3()
+    tip_transform = Transform()
     if self.tool is not None:
-      tool_tip = self.tool.translation
+      tip_transform = self.tool._tip.inverse()
 
-    return pose.position() - pose.z() * wrist_length - tool_tip
+    total = pose.frame_to_world * tip_transform * Transform.from_axis_angle_translation(translation=Vector3(0, 0, -wrist_length))
+
+    return total.translation()

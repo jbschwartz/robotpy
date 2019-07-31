@@ -6,6 +6,8 @@ Vector3 = vector3.Vector3
 from robot.common.bindings                 import Bindings
 from robot.common.timer                    import Timer
 from robot.mech.serial_controller          import SerialController
+from robot.mech.link                       import Link
+from robot.mech.tool                       import Tool
 from robot.spatial.euler                   import Axes, Order
 from robot.spatial.frame                   import Frame
 from robot.spatial.transform               import Transform
@@ -21,6 +23,7 @@ from robot.visual.entities.com_entity      import COMEntity
 from robot.visual.entities.frame_entity    import FrameEntity
 from robot.visual.entities.bounding_entity import BoundingEntity
 from robot.visual.entities.grid_entity     import GridEntity
+from robot.visual.entities                 import tool_entity
 from robot.visual.scene                    import Scene
 from robot.visual.shader_program           import ShaderProgram
 from robot.visual.window                   import Window
@@ -42,38 +45,58 @@ if __name__ == "__main__":
   ee_frame = FrameEntity(Frame(), flat_program)
   bb = BoundingEntity(flat_program)
   grid = GridEntity(grid_program)
+  welder = tool_entity.load('./robot/mech/tools/welder.json')
+  welder.shader_program = program
 
   with Timer('Initialize Robot') as t:
     robot = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
     robot.shader_program = program
-    # robot.frame_entity = ee_frame
+    robot.frame_entity = ee_frame
     # robot.bounding_entity = bb
     robot.serial.robot_to_world = Transform.from_orientation_translation(
-      Quaternion.from_euler([math.radians(45), math.radians(0), 0], Axes.ZYZ, Order.INTRINSIC),
-      Vector3(-800, 0, 0))
-    robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 6)
+      Quaternion.from_euler([0, 0, 0], Axes.ZYZ, Order.INTRINSIC),
+      Vector3(0, 400, 0))
+    # robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 4)
+
+  robot.serial.angles = [0] * 6
 
   robot2 = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
   robot2.shader_program = program
   robot2.frame_entity = ee_frame
-  robot2.serial.robot_to_world = Transform.from_orientation_translation(
-    Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
-    Vector3(0, 0, 0))
+  # robot2.serial.robot_to_world = Transform.from_orientation_translation(
+  #   Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
+  #   Vector3(0, 0, 0))
   robot2.color = (0.5, 1, 0)
+
+  # robot2.serial.traj = LinearOS(
+  #   robot2.serial,
+  #   [
+  #     Vector3(150, 320, 630),
+  #     Vector3(374, 160, 430),
+  #     Vector3(374, 0, 630),
+  #     Vector3(275, -320, 330),
+  #     Vector3(500, 320, 330),
+  #     Vector3(150, 320, 630)],
+  #   8)
 
   robot2.serial.traj = LinearOS(
     robot2.serial,
     [
-      Vector3(150, 320, 630),
-      Vector3(374, 160, 430),
-      Vector3(374, 0, 630),
-      Vector3(275, -320, 330),
-      Vector3(500, 320, 330),
-      Vector3(150, 320, 630)],
-    10)
-  sc = SerialController(robot2.serial, robot2.serial.traj)
+      Vector3(644, 0, 588.2),
+      Vector3(644, 0, 430),
+      Vector3(444, 120, 430),
+      Vector3(744, 10, 330),
+      Vector3(644, 0, 588.2)
+    ],
+    3)
+  robot2.attach(welder)
 
-  # target_frame_entity = FrameEntity(sc.target, flat_program)
+  f23 = robot2.serial.pose()
+  robot2.serial.traj.target_orientation = f23.orientation()
+
+  # target_frame_entity = FrameEntity(Frame(welder.tool.tip), flat_program)
+
+  # sc = SerialController(robot2.serial, target_frame_entity)
 
   triangle = TriangleEntity(bill_program)
 
@@ -109,7 +132,7 @@ if __name__ == "__main__":
   # scene.entities.append(target_frame_entity)
   scene.entities.append(grid)
   scene.entities.append(robot2)
-  scene.entities.append(robot)
+  # scene.entities.append(robot)
   scene.entities.append(triangle)
 
   # for link in robot.serial.links:
