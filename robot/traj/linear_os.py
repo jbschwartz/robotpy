@@ -88,9 +88,20 @@ class LinearOS():
 
     self.t += (delta / self.segment_duration[self.segment_index])
 
-    if self.t > 1:
-      self.t -= 1
+    # Handle very long frame times (such as during resize)
+    # TODO: This assumes that the segment durations are the same (they aren't necessarily in general)
+    #   This also waits at the end of the trajectory until the next frame can be rendered.
+    #   If the trajectory loops it will lose sync because it will not be allowed to restart
+    while self.t > 1:
       self.segment_index += 1
+      if not self._is_done:
+        self.t -= 1
+      else:
+        self.t = 1
+        break
+
+    assert self.t >= 0
+    assert self.t <= 1
 
     world_position = self.path.evaluate(self.segment_index, self.t)
 
