@@ -20,6 +20,8 @@ class LinearOS():
     # TODO: Don't forget to handle the blending case when there is only one segment.
     self.path.blend(30)
 
+    self.target_orientation = robot.pose().orientation()
+
     self.segment_duration = [segment.length / self.path.length * duration for segment in self.path.segments]
 
     self._segment_index = 0
@@ -91,7 +93,8 @@ class LinearOS():
       self.segment_index += 1
 
     world_position = self.path.evaluate(self.segment_index, self.t)
-    target = Frame.from_position_orientation(world_position, self.robot.pose().orientation())
+
+    target = Frame.from_position_orientation(world_position, self.target_orientation)
 
     solutions = solve_angles(target, self.robot)
 
