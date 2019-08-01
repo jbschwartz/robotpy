@@ -17,7 +17,10 @@ def solve_wrist(target : 'Frame', arm_angles : list, robot : 'Serial'):
 
     # Get "difference" between current end effector pose and the target pose
     # That is: Delta = Current Flange Inverse * Target * Tool Frame Inverse
-    delta = current_flange.inverse() * target.frame_to_world * robot.tool._tip.inverse()
+    delta = current_flange.inverse() * target.frame_to_world
+
+    if robot.tool is not None:
+      delta *= robot.tool._tip.inverse()
 
     # Must be intrinsic ZYZ based on mechanical configuration of spherical wrist
     #   Axis 4 rotates about Z, Axis 5 rotates about Y, Axis 6 rotates about Z
