@@ -58,7 +58,7 @@ class Transform:
   def __call__(self, vector: Vector3, as_type="point"):
     '''Apply Transformation to a Vector3 with call syntax.'''
     if isinstance(vector, (list, tuple)):
-      return [self.__call__(item) for item in vector]
+      return [self.__call__(item, as_type) for item in vector]
 
     if not isinstance(vector, Vector3):
       raise NotImplementedError
