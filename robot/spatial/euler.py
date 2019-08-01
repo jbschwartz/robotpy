@@ -108,6 +108,6 @@ def angles(quaternion: 'Quaternion', axes=Axes.ZYZ, order=Order.INTRINSIC):
   solutions = axes.convert(quaternion)
 
   if order == Order.EXTRINSIC:
-    solutions = [angles.reverse() for angles in solutions]
+    solutions = [angles[::-1] for angles in solutions]
 
   return solutions
