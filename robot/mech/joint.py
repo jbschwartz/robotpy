@@ -1,5 +1,7 @@
 import math
 
+from collections import namedtuple
+
 from robot.spatial.dual       import Dual
 from robot.spatial.quaternion import Quaternion
 from robot.spatial.transform  import Transform
@@ -7,19 +9,12 @@ from robot.spatial.vector3    import Vector3
 
 # TODO: Generalize this class to potentially handle prismatic case
 
-class Joint:
-  def __init__(self, alpha, a, theta, d, limits):
-    self.dh = {
-      'alpha': alpha,
-      'a': a,
-      'theta': theta,
-      'd': d
-    }
+DenavitHartenberg = namedtuple('DenavitHartenberg', 'alpha, a, theta, d')
 
-    self.alpha = alpha
-    self.a = a
-    self.theta = theta
-    self.d = d
+class Joint:
+  def __init__(self, dh: DenavitHartenberg, limits):
+    self.dh = dh
+
     self.angle = 0
 
     self.limits = {}
@@ -32,10 +27,34 @@ class Joint:
       raise KeyError()
 
     # Precompute quaternions for the joint transform
-    self.alpha = Quaternion.from_axis_angle(Vector3(1, 0, 0), self.dh['alpha'])
-    self.a = Quaternion(0, self.dh['a'], 0, 0)
+    self.alpha = Quaternion.from_axis_angle(Vector3(1, 0, 0), self.dh.alpha)
+    self.a = Quaternion(0, self.dh.a, 0, 0)
     self.a_alpha = self.a * self.alpha
-    self.d = Quaternion(0, 0, 0, self.dh['d'])
+    self.d = Quaternion(0, 0, 0, self.dh.d)
+
+  @classmethod
+  def from_json(cls, json: dict) -> 'Joint':
+    """Construct a joint from json dictionary."""
+    try:
+      dh = DenavitHartenberg(
+        math.radians(json['dh']['alpha']),
+                     json['dh']['a'],
+        math.radians(json['dh']['theta']),
+                     json['dh']['d']
+      )
+    except TypeError:
+      raise KeyError('Missing required Denavit-Hartenberg parameter')
+
+    # Set an unlimited joint by default if limits are not specified
+    joint_limits = {
+      **{
+        'low': -math.inf,
+        'high': math.inf
+      },
+      **{k: math.radians(v) for k, v in json['limits'].items()}
+    }
+
+    return cls(dh, joint_limits)
 
   @property
   def transform(self):
@@ -45,7 +64,7 @@ class Joint:
     Transform = Translate_z(d) * Rotate_z(theta) * Translate_x(a) * Rotate_x(alpha)
     '''
 
-    angle_sum = self.dh['theta'] + self.angle
+    angle_sum = self.dh.theta + self.angle
     theta = Quaternion.from_axis_angle(Vector3(0, 0, 1), angle_sum)
     r = theta * self.alpha
     dual = Dual(r, 0.5 * (theta * self.a_alpha + self.d * r))

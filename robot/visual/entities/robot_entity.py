@@ -26,17 +26,6 @@ from robot.visual.shader_program           import ShaderProgram
 
 loaded_files = {}
 
-def get_joint_params(joint_json):
-  for joint_params in joint_json:
-    for param, value in joint_params.items():
-      if param == 'limits':
-        value['low'] = math.radians(value['low'])
-        value['high'] = math.radians(value['high'])
-      elif param in ['alpha', 'theta']:
-        joint_params[param] = math.radians(value)
-
-  return joint_json
-
 def load(file_path):
   links = []
 
@@ -51,7 +40,7 @@ def load(file_path):
 
     stl_parser = STLParser()
     meshes = Mesh.from_file(stl_parser, f'{dir_path}/../../mech/robots/meshes/{data["mesh_file"]}')
-    joint_params = get_joint_params(data['joints'])
+    joint_params = data['joints']
     link_params = data['links']
 
     loaded_files[file_path] = {
@@ -64,8 +53,8 @@ def load(file_path):
     joint_params = cached_result['joint_params']
     link_params = cached_result['link_params']
 
-  for joint in joint_params:
-    joints.append(Joint(**joint))
+  joints = [Joint.from_json(params) for params in joint_params]
+
   for link, mesh in zip(link_params, meshes):
     links.append(Link(link['name'], mesh, link['color']))
 

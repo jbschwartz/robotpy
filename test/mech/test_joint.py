@@ -1,12 +1,19 @@
 import math, unittest
 
-from robot.mech.joint        import Joint
+from robot.mech.joint        import  DenavitHartenberg, Joint
 from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
 
 class TestJoint(unittest.TestCase):
   def setUp(self):
-    self.joint = Joint(math.radians(45), 50, math.radians( 180), 72, { 'low': math.radians(400), 'high': math.radians(-400) })
+    self.dh = DenavitHartenberg(math.radians(45), 50, math.radians( 180), 72)
+    self.joint = Joint(
+      self.dh,
+      {
+        'low': math.radians(400),
+        'high': math.radians(-400)
+      }
+    )
 
   def test_init(self):
     # Check that limits are swapped
@@ -22,10 +29,10 @@ class TestJoint(unittest.TestCase):
   def test_transform(self):
     q = math.radians(30)
 
-    d = Transform.from_axis_angle_translation(translation = Vector3(0, 0, self.joint.dh['d']))
-    theta = Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = self.joint.dh['theta'] + q)
-    a = Transform.from_axis_angle_translation(translation = Vector3(self.joint.dh['a'], 0, 0))
-    alpha = Transform.from_axis_angle_translation(axis = Vector3(1, 0, 0), angle = self.joint.dh['alpha'])
+    d = Transform.from_axis_angle_translation(translation = Vector3(0, 0, self.joint.dh.d))
+    theta = Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = self.joint.dh.theta + q)
+    a = Transform.from_axis_angle_translation(translation = Vector3(self.joint.dh.a, 0, 0))
+    alpha = Transform.from_axis_angle_translation(axis = Vector3(1, 0, 0), angle = self.joint.dh.alpha)
 
     expected = d * theta * a * alpha
     self.joint.angle = q

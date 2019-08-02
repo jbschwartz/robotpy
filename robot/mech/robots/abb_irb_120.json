@@ -4,60 +4,72 @@
   "mesh_file": "abb_irb_120.stl",
   "joints": [
     {
-      "alpha": -90,
-      "a": 0,
-      "theta": 0,
-      "d": 290,
+      "dh": {
+        "alpha": -90,
+        "a": 0,
+        "theta": 0,
+        "d": 290
+      },
       "limits": {
         "low": -165,
         "high": 165
       }
     },
     {
-      "alpha": 0,
-      "a": 270,
-      "theta": -90,
-      "d": 0,
+      "dh": {
+        "alpha": 0,
+        "a": 270,
+        "theta": -90,
+        "d": 0
+      },
       "limits": {
         "low": -110,
         "high": 110
       }
     },
     {
-      "alpha": -90,
-      "a": 70,
-      "theta": 0,
-      "d": 0,
+      "dh": {
+        "alpha": -90,
+        "a": 70,
+        "theta": 0,
+        "d": 0
+      },
       "limits": {
         "low": -110,
         "high": 70
       }
     },
     {
-      "alpha": 90,
-      "a": 0,
-      "theta": 0,
-      "d": 302,
+      "dh": {
+        "alpha": 90,
+        "a": 0,
+        "theta": 0,
+        "d": 302
+      },
       "limits": {
         "low": -160,
         "high": 160
       }
     },
     {
-      "alpha": -90,
-      "a": 0,
-      "theta": 0,
-      "d": 0,
+      "dh": {
+        "alpha": -90,
+        "a": 0,
+        "theta": 0,
+        "d": 0
+      },
       "limits": {
         "low": -120,
         "high": 120
       }
     },
     {
-      "alpha": 0,
-      "a": 0,
-      "theta": 180,
-      "d": 72,
+      "dh": {
+        "alpha": 0,
+        "a": 0,
+        "theta": 180,
+        "d": 72
+      },
       "limits": {
         "low": -400,
         "high": 400
