@@ -106,11 +106,7 @@ class Serial:
     return self.joints[0].dh.d
 
   def within_limits(self, qs : list):
-    for q, joint in zip(qs, self.joints):
-      if q != constant.SINGULAR:
-        if q < joint.limits['low'] or q > joint.limits['high']:
-          return False
-    return True
+    return all(map(lambda joint, q: joint.within_limits(q), self.joints, qs))
 
   def transform_to_robot(self, angle_sets):
     '''

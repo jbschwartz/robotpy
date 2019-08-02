@@ -2,6 +2,7 @@ import math
 
 from collections import namedtuple
 
+from robot                    import constant
 from robot.spatial.dual       import Dual
 from robot.spatial.quaternion import Quaternion
 from robot.spatial.transform  import Transform
@@ -11,20 +12,19 @@ from robot.spatial.vector3    import Vector3
 
 DenavitHartenberg = namedtuple('DenavitHartenberg', 'alpha, a, theta, d')
 
+JointLimits = namedtuple('JointLimits', 'low high', defaults=(-math.inf, math.inf))
+
 class Joint:
-  def __init__(self, dh: DenavitHartenberg, limits):
+  def __init__(self, dh: DenavitHartenberg, limits: JointLimits):
     self.dh = dh
 
     self.angle = 0
 
-    self.limits = {}
-    if all(key in limits for key in ('low', 'high')):
-      if limits['low'] > limits['high']:
-        limits['low'], limits['high'] = limits['high'], limits['low']
-      self.limits['low'] = limits['low']
-      self.limits['high'] = limits['high']
-    else:
-      raise KeyError()
+    self.limits = limits
+
+    # Swap limits if they are out of order
+    if limits.low > limits.high:
+      self.limits = JointLimits(limits.high, limits.low)
 
     # Precompute quaternions for the joint transform
     self.alpha = Quaternion.from_axis_angle(Vector3(1, 0, 0), self.dh.alpha)
@@ -45,14 +45,14 @@ class Joint:
     except TypeError:
       raise KeyError('Missing required Denavit-Hartenberg parameter')
 
+    # Convert limits to radians
+    limit_dictionary = {k: math.radians(v) for k, v in json['limits'].items()}
+
     # Set an unlimited joint by default if limits are not specified
-    joint_limits = {
-      **{
-        'low': -math.inf,
-        'high': math.inf
-      },
-      **{k: math.radians(v) for k, v in json['limits'].items()}
-    }
+    joint_limits = JointLimits(
+      limit_dictionary.get('low', None),
+      limit_dictionary.get('high', None)
+    )
 
     return cls(dh, joint_limits)
 
@@ -72,4 +72,10 @@ class Joint:
     return Transform(dual)
 
   def num_revolutions(self):
-    return math.floor((self.limits['high'] - self.limits['low']) / (2 * math.pi))
+    return math.floor((self.limits.high - self.limits.low) / (2 * math.pi))
+
+  def within_limits(self, q):
+    if q == constant.SINGULAR:
+      return True
+
+    return self.limits.low <= q <= self.limits.high

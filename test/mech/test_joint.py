@@ -1,30 +1,23 @@
 import math, unittest
 
-from robot.mech.joint        import  DenavitHartenberg, Joint
+from robot.mech.joint        import DenavitHartenberg, JointLimits, Joint
 from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
 
 class TestJoint(unittest.TestCase):
   def setUp(self):
     self.dh = DenavitHartenberg(math.radians(45), 50, math.radians( 180), 72)
-    self.joint = Joint(
-      self.dh,
-      {
-        'low': math.radians(400),
-        'high': math.radians(-400)
-      }
-    )
+    self.limits = JointLimits(math.radians(400), math.radians(-400))
+    self.joint = Joint(self.dh, self.limits)
 
   def test_init(self):
     # Check that limits are swapped
-    expected = {
-      'low': math.radians(-400),
-      'high': math.radians(400)
-    }
+    expected = JointLimits(math.radians(-400), math.radians(400))
+
     result = self.joint.limits
 
-    self.assertEqual(result['low'], expected['low'])
-    self.assertEqual(result['high'], expected['high'])
+    self.assertEqual(result.low, expected.low)
+    self.assertEqual(result.high, expected.high)
 
   def test_transform(self):
     q = math.radians(30)
@@ -41,8 +34,8 @@ class TestJoint(unittest.TestCase):
     self.assertAlmostEqual(result.dual, expected.dual)
 
   def test_num_revolutions(self):
-    low = self.joint.limits['low']
-    high = self.joint.limits['high']
+    low = self.joint.limits.low
+    high = self.joint.limits.high
 
     expected = math.floor((high - low) / (2 * math.pi))
     result = self.joint.num_revolutions()
