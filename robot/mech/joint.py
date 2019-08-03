@@ -76,8 +76,8 @@ class Joint:
     """The amount of travel the joint is capable of."""
     return self.limits.high - self.limits.low
 
-  def num_revolutions(self):
-    return self.travel // (2 * math.pi)
+  def num_revolutions(self) -> int:
+    return int(self.travel // (2 * math.pi))
 
   def within_limits(self, q):
     if q == constant.SINGULAR:
