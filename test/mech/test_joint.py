@@ -103,3 +103,12 @@ class TestJoint(unittest.TestCase):
     expected = math.floor((self.joint.limits.high - self.joint.limits.low) / (2 * math.pi))
 
     self.assertEqual(self.joint.travel_in_revs, expected)
+
+  def test_within_limits_checks_floating_point_angles(self):
+    # Generate an angle guaranteed to be inside joint limits
+    inside = (self.joint.limits.high - self.joint.limits.low) / 2
+    self.assertTrue(self.joint.within_limits(inside))
+
+    # Generate an angle guaranteed to be outside joint limits
+    outside = (self.joint.limits.high + abs(self.joint.limits.low))
+    self.assertFalse(self.joint.within_limits(outside))
