@@ -13,7 +13,7 @@ def solve_wrist(target : 'Frame', arm_angles : list, robot : 'Serial'):
     # We use the equation by forward kinematics: Current Flange Frame * Delta * Tool Frame = Target
     previous = robot.angles
     robot.angles = angle_set + [0] * 3
-    current_flange = robot.links[-1].frame.frame_to_world
+    current_flange = robot.links[-1].to_world
 
     # Get "difference" between current end effector pose and the target pose
     # That is: Delta = Current Flange Inverse * Target * Tool Frame Inverse

@@ -39,7 +39,7 @@ class Serial:
   @robot_to_world.setter
   def robot_to_world(self, transform) -> None:
     self._robot_to_world = transform
-    self.links[0].frame = self.links[0].frame.transform(self.robot_to_world)
+    self.links[0].frame = self.links[0].to_world(self.robot_to_world)
 
     self.update_links()
 
@@ -77,7 +77,7 @@ class Serial:
       last_frame = link.frame
 
     if self.tool is not None:
-      self.tool.tool_to_world = self.links[-1].frame.frame_to_world
+      self.tool.tool_to_world = self.links[-1].to_world
 
   def pose(self) -> Frame:
     if self.tool is not None:
