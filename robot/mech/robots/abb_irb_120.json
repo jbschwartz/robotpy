@@ -2,87 +2,106 @@
   "name": "Robot",
   "description": "ABB IRB 120",
   "mesh_file": "abb_irb_120.stl",
-  "joints": [
+  "links": [
     {
-      "dh": {
-        "alpha": -90,
-        "a": 0,
-        "theta": 0,
-        "d": 290
-      },
-      "limits": {
-        "low": -165,
-        "high": 165
+      "name": "Base",
+      "color": [1.00, 0.25, 0.25]
+    },
+    {
+      "name": "Waist",
+      "color": [0.50, 0.15, 0.85],
+      "joint": {
+        "dh": {
+          "alpha": -90,
+          "a": 0,
+          "theta": 0,
+          "d": 290
+        },
+        "limits": {
+          "low": -165,
+          "high": 165
+        }
       }
     },
     {
-      "dh": {
-        "alpha": 0,
-        "a": 270,
-        "theta": -90,
-        "d": 0
-      },
-      "limits": {
-        "low": -110,
-        "high": 110
+      "name": "Upper Arm",
+      "color": [1.00, 0.00, 1.00],
+      "joint": {
+        "dh": {
+          "alpha": 0,
+          "a": 270,
+          "theta": -90,
+          "d": 0
+        },
+        "limits": {
+          "low": -110,
+          "high": 110
+        }
       }
     },
     {
-      "dh": {
-        "alpha": -90,
-        "a": 70,
-        "theta": 0,
-        "d": 0
-      },
-      "limits": {
-        "low": -110,
-        "high": 70
+      "name": "Forearm",
+      "color": [0.25, 0.25, 1.00],
+      "joint": {
+        "dh": {
+          "alpha": -90,
+          "a": 70,
+          "theta": 0,
+          "d": 0
+        },
+        "limits": {
+          "low": -110,
+          "high": 70
+        }
       }
     },
     {
-      "dh": {
-        "alpha": 90,
-        "a": 0,
-        "theta": 0,
-        "d": 302
-      },
-      "limits": {
-        "low": -160,
-        "high": 160
+      "name": "Wrist 1",
+      "color": [0.50, 0.25, 1.00],
+      "joint": {
+        "dh": {
+          "alpha": 90,
+          "a": 0,
+          "theta": 0,
+          "d": 302
+        },
+        "limits": {
+          "low": -160,
+          "high": 160
+        }
       }
     },
     {
-      "dh": {
-        "alpha": -90,
-        "a": 0,
-        "theta": 0,
-        "d": 0
-      },
-      "limits": {
-        "low": -120,
-        "high": 120
+      "name": "Wrist 2",
+      "color": [1.00, 1.00, 0.00],
+      "joint": {
+        "dh": {
+          "alpha": -90,
+          "a": 0,
+          "theta": 0,
+          "d": 0
+        },
+        "limits": {
+          "low": -120,
+          "high": 120
+        }
       }
     },
     {
-      "dh": {
-        "alpha": 0,
-        "a": 0,
-        "theta": 180,
-        "d": 72
-      },
-      "limits": {
-        "low": -400,
-        "high": 400
+      "name": "Wrist 3",
+      "color": [1.00, 1.00, 0.00],
+      "joint": {
+        "dh": {
+          "alpha": 0,
+          "a": 0,
+          "theta": 180,
+          "d": 72
+        },
+        "limits": {
+          "low": -400,
+          "high": 400
+        }
       }
     }
-  ],
-  "links": [
-    { "name": "Base",      "color": [1.00, 0.25, 0.25] },
-    { "name": "Waist",     "color": [0.50, 0.15, 0.85] },
-    { "name": "Upper Arm", "color": [1.00, 0.00, 1.00] },
-    { "name": "Forearm",   "color": [0.25, 0.25, 1.00] },
-    { "name": "Wrist 1",   "color": [0.50, 0.25, 1.00] },
-    { "name": "Wrist 2",   "color": [1.00, 1.00, 0.00] },
-    { "name": "Wrist 3",   "color": [1.00, 1.00, 0.00] }
   ]
 }

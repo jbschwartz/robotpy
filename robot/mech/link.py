@@ -1,10 +1,12 @@
 import math
 
+from robot.mech.joint        import Joint
 from robot.spatial.aabb      import AABB
 from robot.spatial.frame     import Frame
 from robot.spatial.ray       import Ray
 from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
+from robot.visual.mesh       import Mesh
 
 class Link:
   def __init__(self, name, joint, mesh, color):
@@ -21,6 +23,13 @@ class Link:
       'moments': None,
       'volume':  None
     }
+
+  @classmethod
+  def from_dict_mesh(cls, d: dict, mesh: Mesh) -> 'Link':
+    """Construct a Link from a dictionary of parameters."""
+    joint = Joint.Immovable() if d.get('joint', None) is None else Joint.from_dict(d['joint'])
+
+    return cls(d.get('name', None), joint, mesh, d.get('color', None))
 
   @property
   def to_world(self) -> Transform:

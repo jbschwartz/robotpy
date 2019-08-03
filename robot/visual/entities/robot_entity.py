@@ -27,12 +27,7 @@ from robot.visual.shader_program           import ShaderProgram
 loaded_files = {}
 
 def load(file_path):
-  links = []
-
   cached_result = loaded_files.get(file_path)
-
-  joints = []
-  links = []
 
   if not cached_result:
     with open(file_path) as json_file:
@@ -40,23 +35,23 @@ def load(file_path):
 
     stl_parser = STLParser()
     meshes = Mesh.from_file(stl_parser, f'{dir_path}/../../mech/robots/meshes/{data["mesh_file"]}')
-    joint_params = data['joints']
     link_params = data['links']
 
     loaded_files[file_path] = {
       'meshes': meshes,
-      'joint_params': joint_params,
       'link_params': link_params
     }
   else:
     meshes = cached_result['meshes']
-    joint_params = cached_result['joint_params']
     link_params = cached_result['link_params']
 
-  joints = [Joint.Immovable()] + [Joint.from_dict(params) for params in joint_params]
+  assert len(link_params) <= len(meshes)
 
-  for link, joint, mesh in zip(link_params, joints, meshes):
-    links.append(Link(link['name'], joint, mesh, link['color']))
+  links = [
+    Link.from_dict_mesh(link_dict, mesh)
+    for link_dict, mesh
+    in zip(link_params, meshes)
+  ]
 
   return RobotEntity(Serial(links))
 
