@@ -6,7 +6,6 @@ from robot                    import constant
 from robot.spatial.dual       import Dual
 from robot.spatial.quaternion import Quaternion
 from robot.spatial.transform  import Transform
-from robot.spatial.vector3    import Vector3
 
 # TODO: Generalize this class to potentially handle prismatic case
 
@@ -15,7 +14,7 @@ DenavitHartenberg = namedtuple('DenavitHartenberg', 'alpha a theta d')
 JointLimits = namedtuple('JointLimits', 'low high', defaults=(-math.inf, math.inf))
 
 class Joint:
-  def __init__(self, dh: DenavitHartenberg, limits: JointLimits):
+  def __init__(self, dh: DenavitHartenberg, limits: JointLimits) -> None:
     self.dh = dh
 
     self.angle = 0
@@ -51,10 +50,11 @@ class Joint:
     return cls(dh, joint_limits)
 
   @property
-  def transform(self):
+  def transform(self) -> Transform:
     """The joint's transformation given its angle."""
     # This is derived and precomputed from the following sequence of transformations, applied left to right:
     #   Translate_z(d), Rotate_z(theta), Translate_x(a), Rotate_x(alpha)
+    # See Joint tests for the geometrically and mathematically intuitive version
 
     theta = (self.dh.theta + self.angle) / 2
 
@@ -94,7 +94,8 @@ class Joint:
   def num_revolutions(self) -> int:
     return int(self.travel // (2 * math.pi))
 
-  def within_limits(self, q):
+  def within_limits(self, q) -> bool:
+    """Return True if the provided angle is within joint limits. False otherwise."""
     if q == constant.SINGULAR:
       return True
 
