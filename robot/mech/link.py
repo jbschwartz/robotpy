@@ -9,7 +9,7 @@ from robot.spatial.vector3   import Vector3
 class Link:
   def __init__(self, name, joint, mesh, color):
     # TODO: Mass, Moments of Inertia
-    self.to_world = Transform.Identity()
+    self.previous_link = Transform.Identity()
     self.joint = joint
     self.name = name
     self.mesh = mesh
@@ -20,6 +20,14 @@ class Link:
       'moments': None,
       'volume':  None
     }
+
+  @property
+  def to_world(self) -> Transform:
+    """Return the DH frame transformation.
+
+    That is, the transformation from the previous link's frame to this link's frame.
+    """
+    return self.previous_link * self.joint.transform
 
   @property
   def frame(self) -> Frame:
@@ -108,8 +116,3 @@ class Link:
       return self.mesh.intersect(world_ray.transform(world_to_link))
 
     return None
-
-  def update_transform(self, previous_link_transform) -> Transform:
-    """Update and return link transform from it's previous neighbor's transform."""
-    self.to_world =  previous_link_transform * self.joint.transform
-    return self.to_world
