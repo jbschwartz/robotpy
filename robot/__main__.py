@@ -33,7 +33,7 @@ RobotEntity = robot_entity.RobotEntity
 
 if __name__ == "__main__":
   with Timer('Initialize Window') as t:
-    window = Window(1550, 900, "robotpy")
+    window = Window(750, 750, "robotpy")
 
   with Timer('Initialize Shaders') as t:
     program = ShaderProgram(vertex='serial_v', fragment='serial_f')
@@ -54,8 +54,8 @@ if __name__ == "__main__":
     robot.frame_entity = ee_frame
     # robot.bounding_entity = bb
     robot.serial.robot_to_world = Transform.from_orientation_translation(
-      Quaternion.from_euler([0, 0, 0], Axes.ZYZ, Order.INTRINSIC),
-      Vector3(0, 400, 0))
+      Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
+      Vector3(-400, 400, 0))
     # robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 4)
 
   robot.serial.angles = [0] * 6
@@ -63,21 +63,22 @@ if __name__ == "__main__":
   robot2 = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
   robot2.shader_program = program
   robot2.frame_entity = ee_frame
-  # robot2.serial.robot_to_world = Transform.from_orientation_translation(
-  #   Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
-  #   Vector3(0, 0, 0))
+  robot2.serial.robot_to_world = Transform.from_orientation_translation(
+    Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
+    Vector3(0, 0, 0))
   robot2.color = (0.5, 1, 0)
 
-  # robot2.serial.traj = LinearOS(
-  #   robot2.serial,
-  #   [
-  #     Vector3(150, 320, 630),
-  #     Vector3(374, 160, 430),
-  #     Vector3(374, 0, 630),
-  #     Vector3(275, -320, 330),
-  #     Vector3(500, 320, 330),
-  #     Vector3(150, 320, 630)],
-  #   8)
+
+  robot.serial.traj = LinearOS(
+    robot.serial,
+    [
+      Vector3(150, 320, 630),
+      Vector3(374, 160, 430),
+      Vector3(374, 0, 630),
+      Vector3(275, -320, 330),
+      Vector3(500, 320, 330),
+      Vector3(150, 320, 630)],
+    8)
 
   robot2.serial.traj = LinearOS(
     robot2.serial,
@@ -93,6 +94,8 @@ if __name__ == "__main__":
 
   f23 = robot2.serial.pose()
   robot2.serial.traj.target_orientation = f23.orientation()
+  f23 = robot.serial.pose()
+  robot.serial.traj.target_orientation = f23.orientation()
 
   # target_frame_entity = FrameEntity(Frame(welder.tool.tip), flat_program)
 
@@ -132,7 +135,7 @@ if __name__ == "__main__":
   # scene.entities.append(target_frame_entity)
   scene.entities.append(grid)
   scene.entities.append(robot2)
-  # scene.entities.append(robot)
+  scene.entities.append(robot)
   scene.entities.append(triangle)
 
   # for link in robot.serial.links:

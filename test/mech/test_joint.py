@@ -92,4 +92,4 @@ class TestJoint(unittest.TestCase):
   def test_travel_in_revs_returns_amount_of_travel_in_integer_revolutions(self):
     expected = math.floor((self.joint.limits.high - self.joint.limits.low) / (2 * math.pi))
 
-    self.assertEqual(self.joint.travel_in_revs(), expected)
+    self.assertEqual(self.joint.travel_in_revs, expected)

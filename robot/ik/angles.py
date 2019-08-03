@@ -11,7 +11,7 @@ def redundant_solutions(solutions, robot):
   # TODO: Replace solutions lists with a tree structure. Lists can be generated with DFS
   additional_solutions = []
   for index, joint in enumerate(robot.joints):
-    travel_in_revs = joint.travel_in_revs()
+    travel_in_revs = joint.travel_in_revs
     if travel_in_revs >= 1:
       for angle_set in solutions:
         for x in range(1, travel_in_revs + 1):
