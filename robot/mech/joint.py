@@ -91,7 +91,8 @@ class Joint:
     """The amount of travel the joint is capable of."""
     return self.limits.high - self.limits.low
 
-  def num_revolutions(self) -> int:
+  def travel_in_revs(self) -> int:
+    """The integer number of revolutions the joint is capable of traveling."""
     return int(self.travel // (2 * math.pi))
 
   def within_limits(self, q) -> bool:
