@@ -4,6 +4,18 @@ from robot.mech.joint        import DenavitHartenberg, JointLimits, Joint
 from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
 
+def create_dummy_dict(dh: dict = None, limits: dict = None):
+  """Create a sample dictionary with all of the DH fields present."""
+  defaults = {
+    tup: {k: v for k, v in zip(tup._fields, range(0, len(tup._fields)))}
+    for tup in (DenavitHartenberg, JointLimits)
+  }
+
+  return {
+    'dh': dh if dh is not None else defaults[DenavitHartenberg],
+    'limits': limits if limits is not None else defaults[JointLimits]
+  }
+
 class TestJoint(unittest.TestCase):
   def setUp(self):
     dh     = DenavitHartenberg(math.radians(45), 50, math.radians( 180), 72)
@@ -22,10 +34,7 @@ class TestJoint(unittest.TestCase):
 
     for field in fields:
       with self.subTest(msg=f'Remove `{field}` from dictionary'):
-        # Create a sample dictionary with all of the DH fields present
-        d = {
-          'dh': {k: v for k, v in zip(fields, range(0, len(fields)))}
-        }
+        d = create_dummy_dict()
         del d['dh'][field]
 
         with self.assertRaises(KeyError):
