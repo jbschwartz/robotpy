@@ -47,7 +47,7 @@ class Serial:
 
   @to_world.setter
   def to_world(self, transform) -> None:
-    self.base.previous_link = transform
+    self.base.previous = transform
 
     self.update_link_transforms()
 
@@ -79,11 +79,9 @@ class Serial:
       return None
 
   def update_link_transforms(self):
-    last_link_transform = self.base.to_world
     # Walk the chain updating each link with it's previous neighbors transform
-    for link in self.links[1:]:
-      link.previous_link = last_link_transform
-      last_link_transform = link.to_world
+    for previous, link in zip(self.links[0:], self.links[1:]):
+      link.previous = previous.to_world
 
     # TODO: Move this into the loop above (by either adding tool to links list or concatenating on the spot)
     if self.tool is not None:

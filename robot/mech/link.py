@@ -9,7 +9,8 @@ from robot.spatial.vector3   import Vector3
 class Link:
   def __init__(self, name, joint, mesh, color):
     # TODO: Mass, Moments of Inertia
-    self.previous_link = Transform.Identity()
+    # Previous links DH frame transformation
+    self.previous = Transform.Identity()
     self.joint = joint
     self.name = name
     self.mesh = mesh
@@ -27,7 +28,7 @@ class Link:
 
     That is, the transformation from the previous link's frame to this link's frame.
     """
-    return self.previous_link * self.joint.transform
+    return self.previous * self.joint.transform
 
   @property
   def frame(self) -> Frame:
