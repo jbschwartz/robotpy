@@ -10,7 +10,7 @@ from robot.spatial.vector3    import Vector3
 
 # TODO: Generalize this class to potentially handle prismatic case
 
-DenavitHartenberg = namedtuple('DenavitHartenberg', 'alpha, a, theta, d')
+DenavitHartenberg = namedtuple('DenavitHartenberg', 'alpha a theta d')
 
 JointLimits = namedtuple('JointLimits', 'low high', defaults=(-math.inf, math.inf))
 
