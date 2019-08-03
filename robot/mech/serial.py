@@ -14,8 +14,6 @@ class Serial:
   def __init__(self, links = []):
     self._robot_to_world = Transform()
     self.links = links
-    self.traj = None
-    self.qs = [0] * 6
     self.tool = None
 
     self.checkStructure()
