@@ -7,7 +7,7 @@ from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
 
 class Link:
-  def __init__(self, name, mesh, color, joint = None):
+  def __init__(self, name, joint, mesh, color):
     # TODO: Mass, Moments of Inertia
     self.to_world = Transform.Identity()
     self.joint = joint

@@ -56,7 +56,7 @@ def load(file_path):
   joints = [Joint.Immovable()] + [Joint.from_dict(params) for params in joint_params]
 
   for link, joint, mesh in zip(link_params, joints, meshes):
-    links.append(Link(link['name'], mesh, link['color'], joint))
+    links.append(Link(link['name'], joint, mesh, link['color']))
 
   return RobotEntity(Serial(links))
 
