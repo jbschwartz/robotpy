@@ -11,7 +11,7 @@ from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
 
 class Serial:
-  def __init__(self, links = []):
+  def __init__(self, links):
     self.links = links
     self.tool = None
 
