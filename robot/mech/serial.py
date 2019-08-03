@@ -17,7 +17,7 @@ class Serial:
     self.qs = [0] * 6
     self.tool = None
 
-    self.links[0].joint = Joint.Immovable()
+    self.base.joint = Joint.Immovable()
     for link, joint in zip(self.links[1:], self.joints):
       link.joint = joint
 
@@ -37,13 +37,18 @@ class Serial:
     assert correctElbow, 'Robot does not have a recognized elbow configuration'
 
   @property
+  def base(self) -> Link:
+    """Return the robot's base Link."""
+    return self.links[0]
+
+  @property
   def robot_to_world(self) -> Transform:
     return self._robot_to_world
 
   @robot_to_world.setter
   def robot_to_world(self, transform) -> None:
     self._robot_to_world = transform
-    self.links[0].update_transform(self.robot_to_world)
+    self.base.update_transform(self.robot_to_world)
 
     self.update_link_transforms()
 
@@ -75,7 +80,7 @@ class Serial:
       return None
 
   def update_link_transforms(self):
-    last_link_transform = self.links[0].to_world
+    last_link_transform = self.base.to_world
     # Walk the chain updating each link with it's previous neighbors transform
     for link in self.links[1:]:
       last_link_transform = link.update_transform(last_link_transform)
