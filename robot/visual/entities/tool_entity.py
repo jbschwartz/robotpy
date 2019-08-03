@@ -69,7 +69,6 @@ class ToolEntity(Entity):
 
   def update(self, delta):
     pass
-    # self.tool.tool_to_world = self.robot_entity.serial.pose().frame_to_world
 
   def draw(self, camera, light):
     # TODO: Use Uniform Buffer Objects to remove this duplicate code from each entity
