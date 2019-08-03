@@ -43,10 +43,6 @@ class Link:
   def frame(self) -> Frame:
     return Frame(self.to_world)
 
-  @frame.setter
-  def frame(self, frame) -> None:
-    self.to_world = frame.frame_to_world
-
   @property
   def aabb(self):
     return AABB(*[self.to_world(corner) for corner in self.mesh.aabb.corners])
