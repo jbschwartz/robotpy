@@ -7,9 +7,10 @@ from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
 
 class Link:
-  def __init__(self, name, mesh, color):
+  def __init__(self, name, mesh, color, joint = None):
     # TODO: Mass, Moments of Inertia
     self.to_world = Transform.Identity()
+    self.joint = joint
     self.name = name
     self.mesh = mesh
     self.color = color
@@ -107,3 +108,8 @@ class Link:
       return self.mesh.intersect(world_ray.transform(world_to_link))
 
     return None
+
+  def update_transform(self, previous_link_transform) -> Transform:
+    """Update and return link transform from it's previous neighbor's transform."""
+    self.to_world =  previous_link_transform * self.joint.transform
+    return self.to_world

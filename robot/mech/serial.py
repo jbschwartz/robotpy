@@ -17,9 +17,13 @@ class Serial:
     self.qs = [0] * 6
     self.tool = None
 
+    self.links[0].joint = Joint.Immovable()
+    for link, joint in zip(self.links[1:], self.joints):
+      link.joint = joint
+
     self.checkStructure()
 
-    self.update_links()
+    self.update_link_transforms()
 
   def checkStructure(self):
     # TODO: Check the structure of the robot to see if it is 6R with spherical wrist
@@ -39,20 +43,20 @@ class Serial:
   @robot_to_world.setter
   def robot_to_world(self, transform) -> None:
     self._robot_to_world = transform
-    self.links[0].frame = self.links[0].to_world(self.robot_to_world)
+    self.links[0].update_transform(self.robot_to_world)
 
-    self.update_links()
+    self.update_link_transforms()
 
   @property
   def angles(self):
-    return [joint.angle for joint in self.joints]
+    return [link.joint.angle for link in self.links[1:]]
 
   @angles.setter
   def angles(self, angles):
-    for angle, joint in zip(angles, self.joints):
-      joint.angle = angle
+    for angle, link in zip(angles, self.links[1:]):
+      link.joint.angle = angle
 
-    self.update_links()
+    self.update_link_transforms()
 
   @property
   def aabb(self) -> AABB:
@@ -62,7 +66,7 @@ class Serial:
     '''Attach the tool to the robot's end effector.'''
     self.tool = tool
 
-    self.update_links()
+    self.update_link_transforms()
 
   def intersect(self, ray):
     if self.aabb.intersect(ray):
@@ -70,12 +74,13 @@ class Serial:
     else:
       return None
 
-  def update_links(self):
-    last_frame = self.links[0].frame
-    for link, joint in zip(self.links[1:], self.joints):
-      link.frame = last_frame.transform(joint.transform)
-      last_frame = link.frame
+  def update_link_transforms(self):
+    last_link_transform = self.links[0].to_world
+    # Walk the chain updating each link with it's previous neighbors transform
+    for link in self.links[1:]:
+      last_link_transform = link.update_transform(last_link_transform)
 
+    # TODO: Move this into the loop above (by either adding tool to links list or concatenating on the spot)
     if self.tool is not None:
       self.tool.tool_to_world = self.links[-1].to_world
 
