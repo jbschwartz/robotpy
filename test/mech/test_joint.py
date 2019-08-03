@@ -1,7 +1,9 @@
 import math, unittest
 
+
 from collections import namedtuple
 
+from robot                   import constant
 from robot.mech.joint        import DenavitHartenberg, JointLimits, Joint
 from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
@@ -82,7 +84,7 @@ class TestJoint(unittest.TestCase):
         with self.subTest(msg=f"{test.name}: `{field}` not as expected"):
           self.assertEqual(getattr(joint.limits, field), expecteds.get(field))
 
-  def test_transform(self):
+  def test_transform_constructs_transform_for_joint_angle(self):
     self.joint.angle = math.radians(30)
 
     theta = Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = self.joint.dh.theta + self.joint.angle)
