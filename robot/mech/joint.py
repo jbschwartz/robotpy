@@ -13,6 +13,9 @@ DenavitHartenberg = namedtuple('DenavitHartenberg', 'alpha a theta d')
 
 JointLimits = namedtuple('JointLimits', 'low high', defaults=(-math.inf, math.inf))
 
+# TODO: Think about allowing the construction of a joint from a Transform instead of just
+#   through DH parameters.
+
 class Joint:
   def __init__(self, dh: DenavitHartenberg, limits: JointLimits = None) -> None:
     self.dh = dh
@@ -24,6 +27,14 @@ class Joint:
     # Swap limits if they are out of order
     if limits.low > limits.high:
       self.limits = JointLimits(limits.high, limits.low)
+
+  @classmethod
+  def Immovable(cls) -> 'Joint':
+    """Construct a Joint that does not move or transform its link.
+
+    This is primarily useful for giving the base link of a robot a dummy joint transform.
+    """
+    return cls(DenavitHartenberg(0, 0, 0, 0), JointLimits(0, 0))
 
   @classmethod
   def from_dict(cls, d: dict) -> 'Joint':

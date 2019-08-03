@@ -32,6 +32,11 @@ class TestJoint(unittest.TestCase):
     for component in self.joint.limits._fields:
       self.assertEqual(getattr(self.joint.limits, component), getattr(expected, component))
 
+  def test_immovable_is_identity_transform(self):
+    joint = Joint.Immovable()
+
+    self.assertEqual(joint.transform.dual, Transform.Identity().dual)
+
   def test_from_dict_converts_degrees_to_radians(self):
     d = create_dummy_dict()
 
