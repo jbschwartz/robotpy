@@ -1,5 +1,7 @@
 import copy, itertools, math
 
+from typing import Iterable
+
 from robot.mech.joint        import Joint
 from robot.mech.link         import Link
 from robot.mech.tool         import Tool
@@ -9,17 +11,12 @@ from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
 
 class Serial:
-  def __init__(self, joints : list, links = []):
+  def __init__(self, links = []):
     self._robot_to_world = Transform()
-    self.joints = joints
     self.links = links
     self.traj = None
     self.qs = [0] * 6
     self.tool = None
-
-    self.base.joint = Joint.Immovable()
-    for link, joint in zip(self.links[1:], self.joints):
-      link.joint = joint
 
     self.checkStructure()
 
@@ -35,6 +32,12 @@ class Serial:
     # The elbow must be parallel to the shoulder joint (alpha dictates the angle between z-axes)
     correctElbow = math.isclose(self.links[2].joint.dh.alpha, 0) or math.isclose(self.links[2].joint.dh.alpha, math.pi)
     assert correctElbow, 'Robot does not have a recognized elbow configuration'
+
+  # Temporary (probably) property
+  @property
+  def joints(self) -> Iterable[Joint]:
+    """Return a list of robot Joint objects."""
+    return [link.joint for link in self.links[1:]]
 
   @property
   def base(self) -> Link:
@@ -113,7 +116,8 @@ class Serial:
     return self.links[1].joint.dh.d
 
   def within_limits(self, qs : list):
-    return all(map(lambda joint, q: joint.within_limits(q), self.joints, qs))
+    joints = [link.joint for link in self.links[1:]]
+    return all(map(lambda joint, q: joint.within_limits(q), joints, qs))
 
   def transform_to_robot(self, angle_sets):
     '''

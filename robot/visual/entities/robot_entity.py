@@ -53,12 +53,12 @@ def load(file_path):
     joint_params = cached_result['joint_params']
     link_params = cached_result['link_params']
 
-  joints = [Joint.from_dict(params) for params in joint_params]
+  joints = [Joint.Immovable()] + [Joint.from_dict(params) for params in joint_params]
 
-  for link, mesh in zip(link_params, meshes):
-    links.append(Link(link['name'], mesh, link['color']))
+  for link, joint, mesh in zip(link_params, joints, meshes):
+    links.append(Link(link['name'], mesh, link['color'], joint))
 
-  return RobotEntity(Serial(joints, links))
+  return RobotEntity(Serial(links))
 
 class RobotEntity(Entity):
   def __init__(self, serial : Serial, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):
