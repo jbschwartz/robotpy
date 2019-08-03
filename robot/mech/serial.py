@@ -30,10 +30,10 @@ class Serial:
     #   The code currently assumes this configuration only
 
     # Robots handled in this code _must_ have a shoulder that is perpendicular to the waist
-    assert math.isclose(abs(self.joints[0].dh.alpha), math.pi / 2), 'Robot does not have a recognized shoulder configuration'
+    assert math.isclose(abs(self.links[1].joint.dh.alpha), math.pi / 2), 'Robot does not have a recognized shoulder configuration'
 
     # The elbow must be parallel to the shoulder joint (alpha dictates the angle between z-axes)
-    correctElbow = math.isclose(self.joints[1].dh.alpha, 0) or math.isclose(self.joints[1].dh.alpha, math.pi)
+    correctElbow = math.isclose(self.links[2].joint.dh.alpha, 0) or math.isclose(self.links[2].joint.dh.alpha, math.pi)
     assert correctElbow, 'Robot does not have a recognized elbow configuration'
 
   @property
@@ -99,18 +99,18 @@ class Serial:
     return [link.frame for link in self.links]
 
   def upper_arm_length(self):
-    return self.joints[1].dh.a
+    return self.links[2].joint.dh.a
 
   def fore_arm_length(self):
-    y = self.joints[2].dh.a
-    x = self.joints[3].dh.d
+    y = self.links[3].joint.dh.a
+    x = self.links[4].joint.dh.d
     return math.sqrt(y ** 2 + x ** 2)
 
   def shoulder_wrist_offset(self):
-    return self.joints[1].dh.d + self.joints[2].dh.d
+    return self.links[2].joint.dh.d + self.links[3].joint.dh.d
 
   def shoulder_z(self):
-    return self.joints[0].dh.d
+    return self.links[1].joint.dh.d
 
   def within_limits(self, qs : list):
     return all(map(lambda joint, q: joint.within_limits(q), self.joints, qs))
@@ -121,15 +121,15 @@ class Serial:
     '''
 
     zero = {
-      'waist': self.joints[0].dh.theta,
-      'shoulder': self.joints[1].dh.theta,
-      'elbow': math.atan(self.joints[3].dh.d / self.joints[2].dh.a)
+      'waist': self.links[1].joint.dh.theta,
+      'shoulder': self.links[2].joint.dh.theta,
+      'elbow': math.atan(self.links[4].joint.dh.d / self.links[3].joint.dh.a)
     }
 
     direction = {
-      'shoulder': 1 if self.joints[0].dh.alpha > 0 else -1
+      'shoulder': 1 if self.links[1].joint.dh.alpha > 0 else -1
     }
-    direction['elbow'] = -direction['shoulder'] if self.joints[1].dh.alpha == math.pi else direction['shoulder']
+    direction['elbow'] = -direction['shoulder'] if self.links[2].joint.dh.alpha == math.pi else direction['shoulder']
 
     for angles in angle_sets:
       angles[0] -= zero['waist']
@@ -138,7 +138,7 @@ class Serial:
 
   def wrist_center(self, pose : Frame):
     '''Get wrist center point given the end-effector pose and tool.'''
-    wrist_length = self.joints[5].dh.d
+    wrist_length = self.links[6].joint.dh.d
 
     tip_transform = Transform()
     if self.tool is not None:
