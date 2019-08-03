@@ -13,6 +13,18 @@ class Vector3(Swizzler):
     self.y = y
     self.z = z
 
+  @classmethod
+  def X(cls) -> 'Vector3':
+    return cls(1, 0, 0)
+
+  @classmethod
+  def Y(cls) -> 'Vector3':
+    return cls(0, 1, 0)
+
+  @classmethod
+  def Z(cls) -> 'Vector3':
+    return cls(0, 0, 1)
+
   def __abs__(self):
     return Vector3(abs(self.x), abs(self.y), abs(self.z))
 

@@ -16,7 +16,7 @@ class Camera():
   '''
   Camera model responsible for camera positioning and manipulation.
   '''
-  def __init__(self, position : Vector3, target : Vector3, up = Vector3(0, 0, 1), projection = PerspectiveProjection()):
+  def __init__(self, position : Vector3, target : Vector3, up = Vector3.Z(), projection = PerspectiveProjection()):
     self.projection = projection
     self.look_at(position, target, up)
 
@@ -43,12 +43,12 @@ class Camera():
     '''
 
     forward = (position - target).normalize()       # Step 2
-    angle_z = math.acos(Vector3(0, 0, 1) * forward) # Step 3
+    angle_z = math.acos(Vector3.Z() * forward) # Step 3
 
     right = (up % forward).normalize()
     align_z = Transform.from_axis_angle_translation(axis=right, angle=angle_z)  # Step 4
 
-    intermediate_x = align_z(Vector3(1, 0, 0), as_type="vector") # Step 5
+    intermediate_x = align_z(Vector3.X(), as_type="vector") # Step 5
 
     dot = right * intermediate_x
     angle_x = utils.safe_acos(dot)
@@ -79,15 +79,15 @@ class Camera():
 
     if pitch != 0:
       # Rotation around camera x axis in world coordinates
-      pitch_axis = self.camera_to_world(Vector3(1, 0, 0), as_type="vector")
+      pitch_axis = self.camera_to_world(Vector3.X(), as_type="vector")
       self.camera_to_world = Transform.from_axis_angle_translation(axis = pitch_axis, angle = pitch) * self.camera_to_world
     if yaw != 0:
       if orbit_type is OrbitType.FREE:
         # Rotation around camera y axis in world coordinates
-        yaw_axis = self.camera_to_world(Vector3(0, 1, 0), as_type="vector")
+        yaw_axis = self.camera_to_world(Vector3.Y(), as_type="vector")
       elif orbit_type is OrbitType.CONSTRAINED:
         # Rotation around world z axis
-        yaw_axis = Vector3(0, 0, 1)
+        yaw_axis = Vector3.Z()
 
       self.camera_to_world = Transform.from_axis_angle_translation(axis = yaw_axis, angle = yaw) * self.camera_to_world
 
@@ -112,7 +112,7 @@ class Camera():
     self.camera_to_world *= Transform.from_axis_angle_translation(translation = v)
 
   def roll(self, angle):
-    self.camera_to_world *= Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = angle)
+    self.camera_to_world *= Transform.from_axis_angle_translation(axis = Vector3.Z(), angle = angle)
 
   def fit(self, world_aabb, scale = 1):
     '''

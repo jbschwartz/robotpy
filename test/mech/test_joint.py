@@ -87,8 +87,8 @@ class TestJoint(unittest.TestCase):
   def test_transform_constructs_transform_for_joint_angle(self):
     self.joint.angle = math.radians(30)
 
-    theta = Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = self.joint.dh.theta + self.joint.angle)
-    alpha = Transform.from_axis_angle_translation(axis = Vector3(1, 0, 0), angle = self.joint.dh.alpha)
+    theta = Transform.from_axis_angle_translation(axis = Vector3.Z(), angle = self.joint.dh.theta + self.joint.angle)
+    alpha = Transform.from_axis_angle_translation(axis = Vector3.X(), angle = self.joint.dh.alpha)
     d     = Transform.from_axis_angle_translation(translation = Vector3(0, 0, self.joint.dh.d))
     a     = Transform.from_axis_angle_translation(translation = Vector3(self.joint.dh.a, 0, 0))
 

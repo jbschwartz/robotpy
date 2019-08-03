@@ -90,8 +90,8 @@ class TestVector3(unittest.TestCase):
     expected = 0
     self.assertAlmostEqual(angle_between(self.v1, 5 * self.v1), expected)
 
-    x = Vector3(1, 0, 0)
-    y = Vector3(0, 1, 0)
+    x = Vector3.X()
+    y = Vector3.Y()
 
     expected = math.radians(90)
     self.assertAlmostEqual(angle_between(x, y), expected)

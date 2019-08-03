@@ -179,8 +179,8 @@ class CameraController(Observer):
   def normal_to(self):
     minimum = math.radians(180)
     direction = Vector3()
-    forward = self.camera.camera_to_world(Vector3(0, 0, 1), as_type="vector")
-    for coordinate in [Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1), Vector3(-1, 0, 0), Vector3(0, -1, 0), Vector3(0, 0, -1)]:
+    forward = self.camera.camera_to_world(Vector3.Z(), as_type="vector")
+    for coordinate in [Vector3.X(), Vector3.Y(), Vector3.Z(), -Vector3.X(), -Vector3.Y(), -Vector3.Z()]:
       angle = vector3.angle_between(coordinate, forward)
       if angle < minimum:
         minimum = angle
@@ -189,11 +189,11 @@ class CameraController(Observer):
     axis = vector3.cross(forward, direction)
     self.camera.camera_to_world = Transform.from_axis_angle_translation(axis = axis, angle = minimum) * self.camera.camera_to_world
 
-    right = self.camera.camera_to_world(Vector3(1, 0, 0), as_type="vector")
+    right = self.camera.camera_to_world(Vector3.X(), as_type="vector")
 
     first_direction = direction
     minimum = math.radians(180)
-    for coordinate in [Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)]:
+    for coordinate in [Vector3.X(), Vector3.Y(), Vector3.Z()]:
       if first_direction == coordinate:
         continue
 
@@ -336,6 +336,6 @@ class CameraController(Observer):
     self.camera.look_at(
       view['position'],
       view.get('target', Vector3(0, 0, 500)),
-      view.get('up', Vector3(0, 0, 1))
+      view.get('up', Vector3.Z())
     )
     self.camera.fit(self.scene.aabb, self.settings.FIT_SCALE)

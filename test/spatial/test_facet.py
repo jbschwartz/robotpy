@@ -7,9 +7,9 @@ from robot.visual.facet    import Facet
 class TestFacet(unittest.TestCase):
   def setUp(self):
     self.vertices = [
-      Vector3(1, 0, 0),
-      Vector3(0, 1, 0),
-      Vector3(-1, 0, 0)
+       Vector3.X(),
+       Vector3.Y(),
+      -Vector3.X()
     ]
     self.facet = Facet(self.vertices)
 
@@ -28,13 +28,13 @@ class TestFacet(unittest.TestCase):
         return None
 
     rays = [
-      Ray(self.origins[0], Vector3(0, 0,  1)),
-      Ray(self.origins[0], Vector3(0, 0, -1)),
-      Ray(self.origins[1], Vector3(0, 0, -1)),
-      Ray(self.origins[1], Vector3(0, 0,  1)),
-      Ray(self.origins[1], Vector3(0.5, 0.25, -1)),
-      Ray(self.origins[2], Vector3(0, 0, -1)),
-      Ray(self.origins[2], Vector3(-1, -1, -1))
+      Ray(self.origins[0],  Vector3.Z()),
+      Ray(self.origins[0], -Vector3.Z()),
+      Ray(self.origins[1], -Vector3.Z()),
+      Ray(self.origins[1],  Vector3.Z()),
+      Ray(self.origins[1],  Vector3(0.5, 0.25, -1)),
+      Ray(self.origins[2], -Vector3.Z()),
+      Ray(self.origins[2],  Vector3(-1, -1, -1))
     ]
 
     intersections = [
