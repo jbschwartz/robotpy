@@ -39,7 +39,7 @@ class Joint:
 
   @classmethod
   def from_dict(cls, d: dict) -> 'Joint':
-    """Construct a joint from dictionary of parameters."""
+    """Construct a Joint from a dictionary of parameters."""
     try:
       dh = DenavitHartenberg(
         math.radians(d['dh']['alpha']),
