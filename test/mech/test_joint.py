@@ -1,5 +1,7 @@
 import math, unittest
 
+from collections import namedtuple
+
 from robot.mech.joint        import DenavitHartenberg, JointLimits, Joint
 from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
@@ -39,6 +41,37 @@ class TestJoint(unittest.TestCase):
 
         with self.assertRaises(KeyError):
           Joint.from_dict(d)
+
+  def test_from_dict_handles_limits_key(self):
+    TestSpec = namedtuple('TestSpec', 'name input_dict')
+
+    tests = [
+      TestSpec("No limits", {}),
+      TestSpec("Low only", { 'low': 10 }),
+      TestSpec("High only", { 'high': 20 }),
+      TestSpec("Both limits", { 'low': 10, 'high': 20 }),
+      TestSpec("Junk limits", { 'Junk': 'Limits' })
+    ]
+
+    defaults = { 'low': -math.inf, 'high': math.inf }
+
+    for test in tests:
+      d = create_dummy_dict(limits=test.input_dict)
+
+      joint = Joint.from_dict(d)
+
+      expecteds = {
+        **defaults,
+        **{
+          k: math.radians(v)
+          for k, v in test.input_dict.items()
+          if k in JointLimits._fields
+        }
+      }
+
+      for field in JointLimits._fields:
+        with self.subTest(msg=f"{test.name}: `{field}` not as expected"):
+          self.assertEqual(getattr(joint.limits, field), expecteds.get(field))
 
   def test_transform(self):
     self.joint.angle = math.radians(30)
