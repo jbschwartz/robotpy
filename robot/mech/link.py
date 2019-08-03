@@ -1,6 +1,7 @@
 import math
 
 from collections import namedtuple
+from typing      import Iterable, Union
 
 from robot.mech.joint        import Joint
 from robot.spatial.aabb      import AABB
@@ -15,8 +16,8 @@ PhysicalProperties = namedtuple('PhysicalProperties', 'com moments volume', defa
 Moments = namedtuple('Moments', 'ixx iyy izz ixy iyz ixz', defaults=(0,) * 6)
 
 class Link:
-  def __init__(self, name, joint, mesh, color):
-    # TODO: Mass, Moments of Inertia
+  def __init__(self, name: str, joint: Joint, mesh: Mesh, color: Iterable[float]) -> None:
+    # TODO: Mass/density
     # Previous links DH frame transformation
     self.previous = Transform.Identity()
     self.joint = joint
@@ -46,25 +47,29 @@ class Link:
     return Frame(self.to_world)
 
   @property
-  def aabb(self):
+  def aabb(self) -> AABB:
+    """Return the Link Mesh's AABB in world space."""
     return AABB(*[self.to_world(corner) for corner in self.mesh.aabb.corners])
 
   @property
-  def properties(self):
+  def properties(self) -> PhysicalProperties:
+    """Return the computed physical Link properties (e.g., center of mass, volume)."""
     if any([value is None for value in self._properties]):
       self.calculate_properties()
 
     return self._properties
 
-  def calculate_properties(self):
-    '''Calculate the volume, moments, and center of mass (assuming uniform density) of the mesh.'''
+  def calculate_properties(self) -> None:
+    """Calculate the center of mass, moments, and volume of the Mesh.
+
+    The calculations assume a uniform density where relevant (center of mass)."""
     def tetrahedron_volume(facet):
-      '''Volume of a tetrahedron created by the three facet vertices and origin.'''
+      """Volume of a tetrahedron created by the three facet vertices and origin."""
       a, b, c = facet.vertices
       return (a * (b % c)) / 6
 
     def tetrahedron_centroid(facet):
-      '''Volume of a tetrahedron created by the three facet vertices and origin.'''
+      """Volume of a tetrahedron created by the three facet vertices and origin."""
       return sum(facet.vertices, Vector3()) / 4
 
     mesh_volume   = 0
@@ -101,11 +106,12 @@ class Link:
 
     self._properties = PhysicalProperties(
       com     = mesh_centroid / mesh_volume,
-      volume  = mesh_volume,
-      moments = Moments(**moments)
+      moments = Moments(**moments),
+      volume  = mesh_volume
     )
 
-  def intersect(self, world_ray : Ray):
+  def intersect(self, world_ray : Ray) -> Union[bool, None]:
+    """Return whether or not the provided Ray in world space intersects the Link Mesh."""
     if self.aabb.intersect(world_ray):
       world_to_link = self.to_world.inverse()
 
