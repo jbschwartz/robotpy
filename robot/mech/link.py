@@ -1,14 +1,15 @@
 import math
 
-from robot.spatial.aabb    import AABB
-from robot.spatial.frame   import Frame
-from robot.spatial.ray     import Ray
-from robot.spatial.vector3 import Vector3
+from robot.spatial.aabb      import AABB
+from robot.spatial.frame     import Frame
+from robot.spatial.ray       import Ray
+from robot.spatial.transform import Transform
+from robot.spatial.vector3   import Vector3
 
 class Link:
   def __init__(self, name, mesh, color):
     # TODO: Mass, Moments of Inertia
-    self.frame = Frame()
+    self.to_world = Transform.Identity()
     self.name = name
     self.mesh = mesh
     self.color = color
@@ -18,6 +19,14 @@ class Link:
       'moments': None,
       'volume':  None
     }
+
+  @property
+  def frame(self) -> Frame:
+    return Frame(self.to_world)
+
+  @frame.setter
+  def frame(self, frame) -> None:
+    self.to_world = frame.frame_to_world
 
   @property
   def aabb(self):
