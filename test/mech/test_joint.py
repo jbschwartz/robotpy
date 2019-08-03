@@ -30,6 +30,16 @@ class TestJoint(unittest.TestCase):
     for component in self.joint.limits._fields:
       self.assertEqual(getattr(self.joint.limits, component), getattr(expected, component))
 
+  def test_from_dict_converts_degrees_to_radians(self):
+    d = create_dummy_dict()
+
+    joint = Joint.from_dict(d)
+
+    self.assertAlmostEqual(joint.dh.alpha,    math.radians(d['dh']['alpha']))
+    self.assertAlmostEqual(joint.dh.theta,    math.radians(d['dh']['theta']))
+    self.assertAlmostEqual(joint.limits.low,  math.radians(d['limits']['low']))
+    self.assertAlmostEqual(joint.limits.high, math.radians(d['limits']['high']))
+
   def test_from_dict_raises_on_missing_dh_key(self):
     fields = self.joint.dh._fields
 
