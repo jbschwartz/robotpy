@@ -53,7 +53,7 @@ def load(file_path):
     joint_params = cached_result['joint_params']
     link_params = cached_result['link_params']
 
-  joints = [Joint.from_json(params) for params in joint_params]
+  joints = [Joint.from_dict(params) for params in joint_params]
 
   for link, mesh in zip(link_params, meshes):
     links.append(Link(link['name'], mesh, link['color']))

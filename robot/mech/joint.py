@@ -26,20 +26,20 @@ class Joint:
       self.limits = JointLimits(limits.high, limits.low)
 
   @classmethod
-  def from_json(cls, json: dict) -> 'Joint':
-    """Construct a joint from json dictionary."""
+  def from_dict(cls, d: dict) -> 'Joint':
+    """Construct a joint from dictionary of parameters."""
     try:
       dh = DenavitHartenberg(
-        math.radians(json['dh']['alpha']),
-                     json['dh']['a'],
-        math.radians(json['dh']['theta']),
-                     json['dh']['d']
+        math.radians(d['dh']['alpha']),
+                     d['dh']['a'],
+        math.radians(d['dh']['theta']),
+                     d['dh']['d']
       )
     except TypeError:
       raise KeyError('Missing required Denavit-Hartenberg parameter')
 
     # Convert limits to radians
-    limit_dictionary = {k: math.radians(v) for k, v in json['limits'].items()}
+    limit_dictionary = {k: math.radians(v) for k, v in d['limits'].items()}
 
     # Set an unlimited joint by default if limits are not specified
     joint_limits = JointLimits(
