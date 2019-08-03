@@ -112,3 +112,9 @@ class TestJoint(unittest.TestCase):
     # Generate an angle guaranteed to be outside joint limits
     outside = (self.joint.limits.high + abs(self.joint.limits.low))
     self.assertFalse(self.joint.within_limits(outside))
+
+  def test_within_limits_returns_true_for_singular_values(self):
+    # Useful for checking limits on the inverse kinematic results
+    # Some axes will have singular solutions (meaning infinitely many)
+    # So clearly the solution should be considered within limits
+    self.assertTrue(self.joint.within_limits(constant.SINGULAR))
