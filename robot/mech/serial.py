@@ -12,7 +12,6 @@ from robot.spatial.vector3   import Vector3
 
 class Serial:
   def __init__(self, links = []):
-    self._robot_to_world = Transform()
     self.links = links
     self.tool = None
 
@@ -44,12 +43,11 @@ class Serial:
 
   @property
   def robot_to_world(self) -> Transform:
-    return self._robot_to_world
+    return self.base.to_world
 
   @robot_to_world.setter
   def robot_to_world(self, transform) -> None:
-    self._robot_to_world = transform
-    self.base.update_transform(self.robot_to_world)
+    self.base.update_transform(transform)
 
     self.update_link_transforms()
 
