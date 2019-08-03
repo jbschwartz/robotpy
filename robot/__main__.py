@@ -53,7 +53,7 @@ if __name__ == "__main__":
     robot.shader_program = program
     robot.frame_entity = ee_frame
     # robot.bounding_entity = bb
-    robot.serial.robot_to_world = Transform.from_orientation_translation(
+    robot.serial.to_world = Transform.from_orientation_translation(
       Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
       Vector3(-400, 400, 0))
     # robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 4)
@@ -63,7 +63,7 @@ if __name__ == "__main__":
   robot2 = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
   robot2.shader_program = program
   robot2.frame_entity = ee_frame
-  robot2.serial.robot_to_world = Transform.from_orientation_translation(
+  robot2.serial.to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
     Vector3(0, 0, 0))
   robot2.color = (0.5, 1, 0)

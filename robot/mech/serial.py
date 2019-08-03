@@ -42,11 +42,11 @@ class Serial:
     return self.links[0]
 
   @property
-  def robot_to_world(self) -> Transform:
+  def to_world(self) -> Transform:
     return self.base.to_world
 
-  @robot_to_world.setter
-  def robot_to_world(self, transform) -> None:
+  @to_world.setter
+  def to_world(self, transform) -> None:
     self.base.previous_link = transform
 
     self.update_link_transforms()
