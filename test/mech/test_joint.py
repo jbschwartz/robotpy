@@ -17,6 +17,20 @@ class TestJoint(unittest.TestCase):
     for component in self.joint.limits._fields:
       self.assertEqual(getattr(self.joint.limits, component), getattr(expected, component))
 
+  def test_from_dict_raises_on_missing_dh_key(self):
+    fields = self.joint.dh._fields
+
+    for field in fields:
+      with self.subTest(msg=f'Remove `{field}` from dictionary'):
+        # Create a sample dictionary with all of the DH fields present
+        d = {
+          'dh': {k: v for k, v in zip(fields, range(0, len(fields)))}
+        }
+        del d['dh'][field]
+
+        with self.assertRaises(KeyError):
+          Joint.from_dict(d)
+
   def test_transform(self):
     self.joint.angle = math.radians(30)
 
