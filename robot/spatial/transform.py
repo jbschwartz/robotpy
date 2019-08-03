@@ -53,6 +53,11 @@ class Transform:
     else:
       return NotImplemented
 
+  @classmethod
+  def Identity(cls) -> 'Transform':
+    """Construct an identity transformation (i.e., a transform that does not transform)."""
+    return cls(Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0)))
+
   __rmul__ = __mul__
 
   def __call__(self, vector: Vector3, as_type="point"):
