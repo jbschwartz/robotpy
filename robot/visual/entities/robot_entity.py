@@ -1,59 +1,14 @@
-import json, math, os
 import numpy as np
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
 
 from OpenGL.GL import *
 
 from ctypes import c_void_p
 
-from robot.common.timer                    import Timer
-from robot.mech.joint                      import Joint
-from robot.mech.link                       import Link
 from robot.mech.serial                     import Serial
-from robot.spatial.aabb                    import AABB
 from robot.spatial.frame                   import Frame
-from robot.spatial.kdtree                  import KDTree
 from robot.spatial.matrix4                 import Matrix4
-from robot.spatial.ray                     import Ray
-from robot.spatial.vector3                 import Vector3
-from robot.visual.exceptions               import ParserError
 from robot.visual.entities.entity          import Entity
-from robot.visual.entities.frame_entity    import FrameEntity
-from robot.visual.filetypes.stl.stl_parser import STLParser
-from robot.visual.mesh                     import Mesh
 from robot.visual.shader_program           import ShaderProgram
-
-loaded_files = {}
-
-def load(file_path):
-  cached_result = loaded_files.get(file_path)
-
-  if not cached_result:
-    with open(file_path) as json_file:
-      data = json.load(json_file)
-
-    stl_parser = STLParser()
-    meshes = Mesh.from_file(stl_parser, f'{dir_path}/../../mech/robots/meshes/{data["mesh_file"]}')
-    link_params = data['links']
-
-    loaded_files[file_path] = {
-      'meshes': meshes,
-      'link_params': link_params
-    }
-  else:
-    meshes = cached_result['meshes']
-    link_params = cached_result['link_params']
-
-  assert len(link_params) <= len(meshes)
-
-  links = [
-    Link.from_dict_mesh(link_dict, mesh)
-    for link_dict, mesh
-    in zip(link_params, meshes)
-  ]
-
-  return RobotEntity(Serial(links))
 
 class RobotEntity(Entity):
   def __init__(self, serial : Serial, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):

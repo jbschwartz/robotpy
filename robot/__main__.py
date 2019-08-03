@@ -1,4 +1,4 @@
-import math
+import json, math
 
 from robot.spatial import vector3
 Vector3 = vector3.Vector3
@@ -8,6 +8,7 @@ from robot.common.timer                    import Timer
 from robot.mech.serial_controller          import SerialController
 from robot.mech.link                       import Link
 from robot.mech.tool                       import Tool
+from robot.mech.serial                     import Serial
 from robot.spatial.euler                   import Axes, Order
 from robot.spatial.frame                   import Frame
 from robot.spatial.transform               import Transform
@@ -28,6 +29,9 @@ from robot.visual.scene                    import Scene
 from robot.visual.shader_program           import ShaderProgram
 from robot.visual.window                   import Window
 from robot.visual.window_event             import WindowEvent
+from robot.visual.filetypes.stl.stl_parser import STLParser
+from robot.visual.mesh                     import Mesh
+
 
 RobotEntity = robot_entity.RobotEntity
 
@@ -48,20 +52,28 @@ if __name__ == "__main__":
   welder = tool_entity.load('./robot/mech/tools/welder.json')
   welder.shader_program = program
 
-  with Timer('Initialize Robot') as t:
-    robot = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
-    robot.shader_program = program
-    robot.frame_entity = ee_frame
-    # robot.bounding_entity = bb
-    robot.serial.to_world = Transform.from_orientation_translation(
-      Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
-      Vector3(-400, 400, 0))
-    # robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 4)
+  with Timer('Load Robot JSON') as t:
+    with open('./robot/mech/robots/abb_irb_120.json') as json_file:
+      serial_dictionary = json.load(json_file)
+
+      if 'mesh_file' in serial_dictionary.keys():
+        meshes = Mesh.from_file(STLParser(), f'./robot/mech/robots/meshes/{serial_dictionary["mesh_file"]}')
+
+      serials = [Serial.from_dict_meshes(serial_dictionary, meshes or []) for _ in range(2)]
+
+  robot, robot2 = [RobotEntity(serial, program) for serial in serials]
+
+
+  robot.frame_entity = ee_frame
+  # robot.bounding_entity = bb
+  robot.serial.to_world = Transform.from_orientation_translation(
+    Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
+    Vector3(-400, 400, 0))
+  # robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 4)
 
   robot.serial.angles = [0] * 6
 
-  robot2 = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
-  robot2.shader_program = program
+
   robot2.frame_entity = ee_frame
   robot2.serial.to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
@@ -138,9 +150,9 @@ if __name__ == "__main__":
   scene.entities.append(robot)
   scene.entities.append(triangle)
 
-  # for link in robot.serial.links:
-  #   com = COMEntity(link, com_program)
-  #   scene.entities.append(com)
+  for link in robot.serial.links:
+    com = COMEntity(link, com_program)
+    scene.entities.append(com)
 
   window.register_observer(scene)
 

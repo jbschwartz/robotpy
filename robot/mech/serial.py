@@ -1,7 +1,8 @@
-import copy, itertools, math
+import itertools, math
 
 from typing import Iterable
 
+from robot.mech.exceptions   import InvalidSerialDictError
 from robot.mech.joint        import Joint
 from robot.mech.link         import Link
 from robot.mech.tool         import Tool
@@ -9,6 +10,7 @@ from robot.spatial.aabb      import AABB
 from robot.spatial.frame     import Frame
 from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
+from robot.visual.mesh       import Mesh
 
 class Serial:
   def __init__(self, links):
@@ -18,6 +20,23 @@ class Serial:
     self.checkStructure()
 
     self.update_link_transforms()
+
+  @classmethod
+  def from_dict_meshes(cls, d: dict, meshes: Iterable[Mesh]) -> 'Serial':
+    """Construct a Serial robot from provided dictionary and meshes.
+
+    If there are more Links than Meshes, the Link is provided an empty Mesh."""
+    link_dictionary = d.get('links', None)
+    if not link_dictionary or not isinstance(link_dictionary, (list, tuple)):
+      raise InvalidSerialDictError
+
+    return cls(
+      [
+        Link.from_dict_mesh(link, mesh)
+        for link, mesh
+        in itertools.zip_longest(link_dictionary, meshes, fillvalue=Mesh())
+      ]
+    )
 
   def checkStructure(self):
     # TODO: Check the structure of the robot to see if it is 6R with spherical wrist
