@@ -20,7 +20,7 @@ class COMEntity(Observer):
     pass
 
   def draw(self, camera, light):
-    center_of_mass = camera.world_to_camera(self.link.frame.transform(self.link.center_of_mass))
+    center_of_mass = camera.world_to_camera(self.link.to_world(self.link.properties.com))
 
     # TODO: This maybe could be a decorator to the draw function inside the entity
     self.shader_program.use()

@@ -1,5 +1,7 @@
 import math
 
+from collections import namedtuple
+
 from robot.mech.joint        import Joint
 from robot.spatial.aabb      import AABB
 from robot.spatial.frame     import Frame
@@ -7,6 +9,8 @@ from robot.spatial.ray       import Ray
 from robot.spatial.transform import Transform
 from robot.spatial.vector3   import Vector3
 from robot.visual.mesh       import Mesh
+
+PhysicalProperties = namedtuple('PhysicalProperties', 'com moments volume', defaults=(None, None, None))
 
 class Link:
   def __init__(self, name, joint, mesh, color):
@@ -18,11 +22,7 @@ class Link:
     self.mesh = mesh
     self.color = color
 
-    self.properties = {
-      'com':     None,
-      'moments': None,
-      'volume':  None
-    }
+    self._properties = PhysicalProperties()
 
   @classmethod
   def from_dict_mesh(cls, d: dict, mesh: Mesh) -> 'Link':
@@ -48,25 +48,11 @@ class Link:
     return AABB(*[self.to_world(corner) for corner in self.mesh.aabb.corners])
 
   @property
-  def center_of_mass(self):
-    if not self.properties['com']:
+  def properties(self):
+    if any([value is None for value in self._properties]):
       self.calculate_properties()
 
-    return self.properties['com']
-
-  @property
-  def moments(self):
-    if not self.properties['moments']:
-      self.calculate_properties()
-
-    return self.properties['moments']
-
-  @property
-  def volume(self):
-    if not self.properties['volume']:
-      self.calculate_properties()
-
-    return self.properties['volume']
+    return self._properties
 
   def calculate_properties(self):
     '''Calculate the volume, moments, and center of mass (assuming uniform density) of the mesh.'''
@@ -111,9 +97,11 @@ class Link:
       moments['iyz'] -= (centroid.y * centroid.z * volume)
       moments['ixz'] -= (centroid.x * centroid.z * volume)
 
-    self.properties['com']     = mesh_centroid / mesh_volume
-    self.properties['volume']  = mesh_volume
-    self.properties['moments'] = moments
+    self._properties = PhysicalProperties(
+      com     = mesh_centroid / mesh_volume,
+      volume  = mesh_volume,
+      moments = moments
+    )
 
   def intersect(self, world_ray : Ray):
     if self.aabb.intersect(world_ray):
