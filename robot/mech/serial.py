@@ -1,6 +1,5 @@
 import copy, itertools, math
 
-from robot                   import constant
 from robot.mech.joint        import Joint
 from robot.mech.link         import Link
 from robot.mech.tool         import Tool
@@ -23,7 +22,6 @@ class Serial:
     self.update_links()
 
   def checkStructure(self):
-    print(self.joints[0].dh)
     # TODO: Check the structure of the robot to see if it is 6R with spherical wrist
     #   The code currently assumes this configuration only
 
@@ -64,8 +62,7 @@ class Serial:
     '''Attach the tool to the robot's end effector.'''
     self.tool = tool
 
-    if self.tool:
-      self.tool.tool_to_world = self.links[-1].frame.frame_to_world
+    self.update_links()
 
   def intersect(self, ray):
     if self.aabb.intersect(ray):
