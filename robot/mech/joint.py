@@ -14,12 +14,12 @@ DenavitHartenberg = namedtuple('DenavitHartenberg', 'alpha a theta d')
 JointLimits = namedtuple('JointLimits', 'low high', defaults=(-math.inf, math.inf))
 
 class Joint:
-  def __init__(self, dh: DenavitHartenberg, limits: JointLimits) -> None:
+  def __init__(self, dh: DenavitHartenberg, limits: JointLimits = None) -> None:
     self.dh = dh
 
     self.angle = 0
 
-    self.limits = limits
+    self.limits = limits or JointLimits()
 
     # Swap limits if they are out of order
     if limits.low > limits.high:
@@ -38,14 +38,15 @@ class Joint:
     except TypeError:
       raise KeyError('Missing required Denavit-Hartenberg parameter')
 
-    # Convert limits to radians
-    limit_dictionary = {k: math.radians(v) for k, v in d['limits'].items()}
+    # Convert limits to radians (if they are provided)
+    # Take only fields that exist in the JointLimits namedtuple
+    limit_dictionary = {
+      k: math.radians(v)
+      for k, v in d.get('limits', {}).items()
+      if k in JointLimits._fields
+    }
 
-    # Set an unlimited joint by default if limits are not specified
-    joint_limits = JointLimits(
-      limit_dictionary.get('low', None),
-      limit_dictionary.get('high', None)
-    )
+    joint_limits = JointLimits(**limit_dictionary)
 
     return cls(dh, joint_limits)
 
