@@ -6,38 +6,30 @@ from robot.spatial.transform import Transform
 
 class TestJoint(unittest.TestCase):
   def setUp(self):
-    self.dh = DenavitHartenberg(math.radians(45), 50, math.radians( 180), 72)
-    self.limits = JointLimits(math.radians(400), math.radians(-400))
-    self.joint = Joint(self.dh, self.limits)
+    dh     = DenavitHartenberg(math.radians(45), 50, math.radians( 180), 72)
+    limits = JointLimits(math.radians(400), math.radians(-400))
+    self.joint = Joint(dh, limits)
 
   def test_init(self):
     # Check that limits are swapped
     expected = JointLimits(math.radians(-400), math.radians(400))
 
-    result = self.joint.limits
-
-    self.assertEqual(result.low, expected.low)
-    self.assertEqual(result.high, expected.high)
+    for component in self.joint.limits._fields:
+      self.assertEqual(getattr(self.joint.limits, component), getattr(expected, component))
 
   def test_transform(self):
-    q = math.radians(30)
+    self.joint.angle = math.radians(30)
 
-    d = Transform.from_axis_angle_translation(translation = Vector3(0, 0, self.joint.dh.d))
-    theta = Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = self.joint.dh.theta + q)
-    a = Transform.from_axis_angle_translation(translation = Vector3(self.joint.dh.a, 0, 0))
+    theta = Transform.from_axis_angle_translation(axis = Vector3(0, 0, 1), angle = self.joint.dh.theta + self.joint.angle)
     alpha = Transform.from_axis_angle_translation(axis = Vector3(1, 0, 0), angle = self.joint.dh.alpha)
+    d     = Transform.from_axis_angle_translation(translation = Vector3(0, 0, self.joint.dh.d))
+    a     = Transform.from_axis_angle_translation(translation = Vector3(self.joint.dh.a, 0, 0))
 
     expected = d * theta * a * alpha
-    self.joint.angle = q
-    result = self.joint.transform
 
-    self.assertAlmostEqual(result.dual, expected.dual)
+    self.assertAlmostEqual(self.joint.transform.dual, expected.dual)
 
   def test_travel_in_revs(self):
-    low = self.joint.limits.low
-    high = self.joint.limits.high
+    expected = math.floor((self.joint.limits.high - self.joint.limits.low) / (2 * math.pi))
 
-    expected = math.floor((high - low) / (2 * math.pi))
-    result = self.joint.travel_in_revs()
-
-    self.assertEqual(result, expected)
+    self.assertEqual(self.joint.travel_in_revs(), expected)
