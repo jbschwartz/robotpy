@@ -84,7 +84,12 @@ class TestJoint(unittest.TestCase):
 
     self.assertAlmostEqual(self.joint.transform.dual, expected.dual)
 
-  def test_travel_in_revs(self):
+  def test_travel_returns_amount_of_travel_between_limits(self):
+    expected = self.joint.limits.high - self.joint.limits.low
+
+    self.assertAlmostEqual(self.joint.travel, expected)
+
+  def test_travel_in_revs_returns_amount_of_travel_in_integer_revolutions(self):
     expected = math.floor((self.joint.limits.high - self.joint.limits.low) / (2 * math.pi))
 
     self.assertEqual(self.joint.travel_in_revs(), expected)
