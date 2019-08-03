@@ -3,6 +3,7 @@ import math
 from collections import namedtuple
 
 from robot                    import constant
+from robot.mech.exceptions    import InvalidJointAngleError
 from robot.spatial.dual       import Dual
 from robot.spatial.quaternion import Quaternion
 from robot.spatial.transform  import Transform
@@ -20,7 +21,7 @@ class Joint:
   def __init__(self, dh: DenavitHartenberg, limits: JointLimits = None) -> None:
     self.dh = dh
 
-    self.angle = 0
+    self._angle = 0
 
     self.limits = limits or JointLimits()
 
@@ -60,6 +61,17 @@ class Joint:
     joint_limits = JointLimits(**limit_dictionary)
 
     return cls(dh, joint_limits)
+
+  @property
+  def angle(self) -> float:
+    return self._angle
+
+  @angle.setter
+  def angle(self, value) -> None:
+    if not self.within_limits(value):
+      raise InvalidJointAngleError(f"{value} outside of joint limits [{self.limits.low}, {self.limits.high}]")
+
+    self._angle = value
 
   @property
   def transform(self) -> Transform:

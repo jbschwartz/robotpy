@@ -4,6 +4,7 @@ import math, unittest
 from collections import namedtuple
 
 from robot                   import constant
+from robot.mech.exceptions   import InvalidJointAngleError
 from robot.mech.joint        import DenavitHartenberg, JointLimits, Joint
 from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
@@ -88,6 +89,19 @@ class TestJoint(unittest.TestCase):
       for field in JointLimits._fields:
         with self.subTest(msg=f"{test.name}: `{field}` not as expected"):
           self.assertEqual(getattr(joint.limits, field), expecteds.get(field))
+
+  def test_angle_property_accepts_valid_angles_and_raises_for_exceeding_limits(self):
+    with self.subTest(f"Valid angle is accepted"):
+      valid_angle = (self.joint.limits.high + self.joint.limits.low) / 2
+
+      self.joint.angle = valid_angle
+      self.assertAlmostEqual(self.joint.angle, valid_angle)
+
+    with self.subTest(f"Invalid angle raises exception"):
+      invalid_angle = self.joint.limits.high + abs(self.joint.limits.low)
+
+      with self.assertRaises(InvalidJointAngleError):
+        self.joint.angle = invalid_angle
 
   def test_transform_constructs_transform_for_joint_angle(self):
     self.joint.angle = math.radians(30)
