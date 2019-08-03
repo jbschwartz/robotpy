@@ -5,9 +5,6 @@ Vector3 = vector3.Vector3
 
 from robot.common.bindings                 import Bindings
 from robot.common.timer                    import Timer
-from robot.mech.serial_controller          import SerialController
-from robot.mech.link                       import Link
-from robot.mech.tool                       import Tool
 from robot.mech.serial                     import Serial
 from robot.spatial.euler                   import Axes, Order
 from robot.spatial.frame                   import Frame
@@ -31,7 +28,6 @@ from robot.visual.window                   import Window
 from robot.visual.window_event             import WindowEvent
 from robot.visual.filetypes.stl.stl_parser import STLParser
 from robot.visual.mesh                     import Mesh
-
 
 RobotEntity = robot_entity.RobotEntity
 
@@ -62,27 +58,15 @@ if __name__ == "__main__":
       serials = [Serial.from_dict_meshes(serial_dictionary, meshes or []) for _ in range(2)]
 
   robot, robot2 = [RobotEntity(serial, program) for serial in serials]
+  robot.frame_entity  = ee_frame
+  robot2.frame_entity = ee_frame
 
-
-  robot.frame_entity = ee_frame
-  # robot.bounding_entity = bb
-  robot.serial.to_world = Transform.from_orientation_translation(
+  serials[0].to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
     Vector3(-400, 400, 0))
-  # robot.serial.traj = LinearJS([0] * 6, [math.radians(45)] * 6, 4)
 
-  robot.serial.angles = [0] * 6
-
-
-  robot2.frame_entity = ee_frame
-  robot2.serial.to_world = Transform.from_orientation_translation(
-    Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
-    Vector3(0, 0, 0))
-  robot2.color = (0.5, 1, 0)
-
-
-  robot.serial.traj = LinearOS(
-    robot.serial,
+  serials[0].traj = LinearOS(
+    serials[0],
     [
       Vector3(150, 320, 630),
       Vector3(374, 160, 430),
@@ -92,8 +76,14 @@ if __name__ == "__main__":
       Vector3(150, 320, 630)],
     8)
 
-  robot2.serial.traj = LinearOS(
-    robot2.serial,
+  serials[1].to_world = Transform.from_orientation_translation(
+    Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
+    Vector3(0, 0, 0))
+  robot2.color = (0.5, 1, 0)
+  robot2.attach(welder)
+
+  serials[1].traj = LinearOS(
+    serials[1],
     [
       Vector3(644, 0, 588.2),
       Vector3(644, 0, 430),
@@ -102,16 +92,6 @@ if __name__ == "__main__":
       Vector3(644, 0, 588.2)
     ],
     3)
-  robot2.attach(welder)
-
-  f23 = robot2.serial.pose()
-  robot2.serial.traj.target_orientation = f23.orientation()
-  f23 = robot.serial.pose()
-  robot.serial.traj.target_orientation = f23.orientation()
-
-  # target_frame_entity = FrameEntity(Frame(welder.tool.tip), flat_program)
-
-  # sc = SerialController(robot2.serial, target_frame_entity)
 
   triangle = TriangleEntity(bill_program)
 
@@ -135,16 +115,11 @@ if __name__ == "__main__":
     WindowEvent.WINDOW_RESIZE
   ])
 
-  # window.register_observer(sc, [
-  #   WindowEvent.KEY,
-  # ])
-
   window.register_observer(triangle, [
     WindowEvent.CLICK
   ])
 
   scene.entities.append(world_frame)
-  # scene.entities.append(target_frame_entity)
   scene.entities.append(grid)
   scene.entities.append(robot2)
   scene.entities.append(robot)
