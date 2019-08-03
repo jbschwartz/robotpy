@@ -24,8 +24,7 @@ class TestJoint(unittest.TestCase):
     limits = JointLimits(math.radians(400), math.radians(-400))
     self.joint = Joint(dh, limits)
 
-  def test_init(self):
-    # Check that limits are swapped
+  def test_init_swaps_limits(self):
     expected = JointLimits(math.radians(-400), math.radians(400))
 
     for component in self.joint.limits._fields:
