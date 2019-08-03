@@ -12,6 +12,8 @@ from robot.visual.mesh       import Mesh
 
 PhysicalProperties = namedtuple('PhysicalProperties', 'com moments volume', defaults=(None, None, None))
 
+Moments = namedtuple('Moments', 'ixx iyy izz ixy iyz ixz', defaults=(0,) * 6)
+
 class Link:
   def __init__(self, name, joint, mesh, color):
     # TODO: Mass, Moments of Inertia
@@ -100,7 +102,7 @@ class Link:
     self._properties = PhysicalProperties(
       com     = mesh_centroid / mesh_volume,
       volume  = mesh_volume,
-      moments = moments
+      moments = Moments(**moments)
     )
 
   def intersect(self, world_ray : Ray):
