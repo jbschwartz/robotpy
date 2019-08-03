@@ -3,7 +3,7 @@ import math
 from collections import namedtuple
 
 from robot                    import constant
-from robot.mech.exceptions    import InvalidJointAngleError
+from robot.mech.exceptions    import InvalidJointAngleError, InvalidJointDictError
 from robot.spatial.dual       import Dual
 from robot.spatial.quaternion import Quaternion
 from robot.spatial.transform  import Transform
@@ -48,7 +48,7 @@ class Joint:
                      d['dh']['d']
       )
     except TypeError:
-      raise KeyError('Missing required Denavit-Hartenberg parameter')
+      raise InvalidJointDictError('Missing required Denavit-Hartenberg parameter for Joint construction')
 
     # Convert limits to radians (if they are provided)
     # Take only fields that exist in the JointLimits namedtuple

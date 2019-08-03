@@ -4,7 +4,7 @@ import math, unittest
 from collections import namedtuple
 
 from robot                   import constant
-from robot.mech.exceptions   import InvalidJointAngleError
+from robot.mech.exceptions   import InvalidJointAngleError, InvalidJointDictError
 from robot.mech.joint        import DenavitHartenberg, JointLimits, Joint
 from robot.spatial.vector3   import Vector3
 from robot.spatial.transform import Transform
@@ -56,7 +56,7 @@ class TestJoint(unittest.TestCase):
         d = create_dummy_dict()
         del d['dh'][field]
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(InvalidJointDictError):
           Joint.from_dict(d)
 
   def test_from_dict_handles_limits_key(self):
