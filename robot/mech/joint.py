@@ -26,12 +26,6 @@ class Joint:
     if limits.low > limits.high:
       self.limits = JointLimits(limits.high, limits.low)
 
-    # Precompute quaternions for the joint transform
-    self.alpha = Quaternion.from_axis_angle(Vector3(1, 0, 0), self.dh.alpha)
-    self.a = Quaternion(0, self.dh.a, 0, 0)
-    self.a_alpha = self.a * self.alpha
-    self.d = Quaternion(0, 0, 0, self.dh.d)
-
   @classmethod
   def from_json(cls, json: dict) -> 'Joint':
     """Construct a joint from json dictionary."""
@@ -58,18 +52,39 @@ class Joint:
 
   @property
   def transform(self):
-    '''
-    Create transformation from Denavit-Hartenberg parameters
+    """The joint's transformation given its angle."""
+    # This is derived and precomputed from the following sequence of transformations, applied left to right:
+    #   Translate_z(d), Rotate_z(theta), Translate_x(a), Rotate_x(alpha)
 
-    Transform = Translate_z(d) * Rotate_z(theta) * Translate_x(a) * Rotate_x(alpha)
-    '''
+    theta = (self.dh.theta + self.angle) / 2
 
-    angle_sum = self.dh.theta + self.angle
-    theta = Quaternion.from_axis_angle(Vector3(0, 0, 1), angle_sum)
-    r = theta * self.alpha
-    dual = Dual(r, 0.5 * (theta * self.a_alpha + self.d * r))
+    ct = math.cos(theta)
+    st = math.sin(theta)
 
-    return Transform(dual)
+    ca = math.cos(self.dh.alpha / 2)
+    sa = math.sin(self.dh.alpha / 2)
+
+    ctca = ct * ca
+    ctsa = ct * sa
+    stca = st * ca
+    stsa = st * sa
+
+    return Transform(
+      Dual(
+        Quaternion(
+          ctca,
+          ctsa,
+          stsa,
+          stca
+        ),
+        0.5 * Quaternion(
+          -self.dh.a * ctsa - self.dh.d * stca,
+           self.dh.a * ctca - self.dh.d * stsa,
+           self.dh.a * stca + self.dh.d * ctsa,
+          -self.dh.a * stsa + self.dh.d * ctca
+        )
+      )
+    )
 
   @property
   def travel(self) -> float:
