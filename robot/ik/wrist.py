@@ -17,6 +17,7 @@ def solve_wrist(target : 'Frame', arm_angles : list, robot : 'Serial'):
     try:
       robot.angles = angle_set + [0] * 3
     except InvalidJointAngleError:
+      robot.angles = previous
       # If the angle from angle_set is outside joint limits, there is no sense in continuing farther.
       # This solution will be pruned out later anyway
       continue
