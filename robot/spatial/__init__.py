@@ -1,6 +1,5 @@
 from .aabb       import AABB
 from .dual       import Dual
-from .frame      import Frame
 from .kdtree     import KDTree
 from .matrix4    import Matrix4
 from .quaternion import Quaternion
