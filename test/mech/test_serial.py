@@ -7,7 +7,7 @@ from robot.spatial.vector3 import Vector3
 
 class TestSerial(unittest.TestCase):
   def setUp(self):
-    self.robot = ABB_IRB_120.serial
+    self.robot = ABB_IRB_120
 
   def test_pose(self):
     angles = [ math.radians(45) ] * 6

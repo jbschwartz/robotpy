@@ -1,3 +1,14 @@
-from robot.visual.entities import robot_entity
+import json
 
-ABB_IRB_120 = robot_entity.load('./robot/mech/robots/abb_irb_120.json')
+from robot.mech.serial                     import Serial
+from robot.visual.entities                 import robot_entity
+from robot.visual.filetypes.stl.stl_parser import STLParser
+from robot.visual.mesh                     import Mesh
+
+with open('./robot/mech/robots/abb_irb_120.json') as json_file:
+  serial_dictionary = json.load(json_file)
+
+if 'mesh_file' in serial_dictionary.keys():
+  meshes = Mesh.from_file(STLParser(), f'./robot/mech/robots/meshes/{serial_dictionary["mesh_file"]}')
+
+ABB_IRB_120 = Serial.from_dict_meshes(serial_dictionary, meshes or [])
