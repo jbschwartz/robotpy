@@ -1,7 +1,7 @@
 import enum, json, math, glfw
 
 from robot.common.timer import Timer
-from robot.spatial      import Ray, Transform, vector3
+from robot.spatial      import AABB, Ray, Transform, vector3
 from .camera            import Camera, OrbitType
 from .observer          import Observer
 from .projection        import OrthoProjection, PerspectiveProjection
@@ -267,10 +267,16 @@ class CameraController(Observer):
 
     delta = self.camera.camera_space(delta_ndc)
 
+    # TODO: Move this calculation out to mouse_down event handler.
+    # This does not need to be called per mouse_drag event handler-- It's ruining frame rate.
     if isinstance(self.camera.projection, PerspectiveProjection):
       # This approximates the scene moving the same speed as the cursor but it isn't exactly correct for perspective projection.
       # I think perspective projection requires mouse picking to determine the correct z.
-      transformed_aabb = self.scene.aabb.transform(self.camera.world_to_camera)
+      transformed_aabb = AABB.from_points([
+        point.transform(self.camera.world_to_camera, as_type="point")
+        for point in self.scene.aabb.corners
+      ])
+
       delta *= -transformed_aabb.center.z
 
     self.camera.track(v = -delta)

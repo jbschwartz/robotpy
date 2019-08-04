@@ -1,6 +1,9 @@
 import math
 
-from .vector3 import Vector3
+from typing import Iterable
+
+from .vector3   import Vector3
+from .transform import Transform
 
 class AABB:
   def __init__(self, *elements):
@@ -9,9 +12,12 @@ class AABB:
 
     self.extend(*elements)
 
-  def transform(self, transform: 'Transform') -> 'AABB':
-    '''Return an AABB (in the new transformed space) of the transformed AABB.'''
-    return AABB(*[point.transform(transform, as_type="point") for point in self.corners])
+  @classmethod
+  def from_points(cls, points: Iterable[Vector3]) -> 'AABB':
+    aabb = cls()
+    aabb.extend(*points)
+
+    return aabb
 
   def extend(self, *args):
     for other in args:
