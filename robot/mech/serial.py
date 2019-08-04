@@ -112,6 +112,16 @@ class Serial:
     else:
       return self.links[-1].frame
 
+  def pose_at(self, angles: Iterable[float]) -> Frame:
+    t = self.base.to_world
+    for link, angle in zip(self.links[1:], angles):
+      t *= link.joint.transform_at(angle)
+
+    if self.tool is not None:
+      t *= self.tool._tip
+
+    return Frame(t)
+
   def poses(self) -> list:
     return [link.frame for link in self.links]
 
