@@ -53,3 +53,7 @@ See `robot/common/bindings.py` for all keyboard and mouse bindings.
 - <kbd>F</kbd>: Fit Scene
 - <kbd>O</kbd>: Orbit Toggle (Free, Constrained)
 - <kbd>P</kbd>: Projection Toggle (Orthographic, Perspective)
+
+### License
+
+This project is licensed under the MIT License. Please see `LICENSE` for details.
