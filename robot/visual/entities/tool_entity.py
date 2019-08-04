@@ -8,10 +8,9 @@ from OpenGL.GL import *
 from ctypes import c_void_p
 
 from robot.mech.tool                       import Tool
-from robot.spatial                         import Transform
+from robot.spatial                         import Mesh, Transform
 from robot.visual.entities.entity          import Entity
 from robot.visual.filetypes.stl.stl_parser import STLParser
-from robot.visual.mesh                     import Mesh
 
 def load(file_path: str) -> Tool:
   with open(file_path) as json_file:

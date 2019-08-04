@@ -7,7 +7,7 @@ from robot.common.bindings import Bindings
 from robot.common.timer    import Timer
 from robot.mech.serial     import Serial
 from robot.spatial.euler   import Axes, Order
-from robot.spatial         import Transform, Quaternion
+from robot.spatial         import Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
 from robot.traj.linear_os  import LinearOS
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
       serial_dictionary = json.load(json_file)
 
       if 'mesh_file' in serial_dictionary.keys():
-        meshes = vis.Mesh.from_file(vis.STLParser(), f'./robot/mech/robots/meshes/{serial_dictionary["mesh_file"]}')
+        meshes = Mesh.from_file(vis.STLParser(), f'./robot/mech/robots/meshes/{serial_dictionary["mesh_file"]}')
 
       serials = [Serial.from_dict_meshes(serial_dictionary, meshes or []) for _ in range(2)]
 

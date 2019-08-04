@@ -20,9 +20,3 @@ class STLUnexpectedSize(ParserError):
 class STLFloatError(ParserError):
   def __init__(self, line, keyword):
     ParserError.__init__(self, line, f'`{keyword}` component cannot be converted to float')
-
-class MeshError(RobotError):
-  pass
-
-class DegenerateTriangleError(MeshError):
-  pass

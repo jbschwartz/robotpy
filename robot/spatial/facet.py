@@ -2,8 +2,9 @@ import math
 
 from typing import Tuple
 
-from robot.spatial import AABB, Vector3
-from .exceptions   import DegenerateTriangleError
+from .aabb       import AABB
+from .exceptions import DegenerateTriangleError
+from .vector3    import Vector3
 
 class Facet:
   def __init__(self, vertices = [], normal = Vector3()):

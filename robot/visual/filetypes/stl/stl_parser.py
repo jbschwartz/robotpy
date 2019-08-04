@@ -4,9 +4,7 @@ from .stl_type import STLType
 
 from robot.common.timer import Timer
 from robot.exceptions   import *
-from robot.spatial      import vector3
-from robot.visual.facet import Facet
-from robot.visual.mesh  import Mesh
+from robot.spatial      import Facet, Mesh, vector3
 
 Vector3 = vector3.Vector3
 
