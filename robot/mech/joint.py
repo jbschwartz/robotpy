@@ -77,12 +77,15 @@ class Joint:
 
   @property
   def transform(self) -> Transform:
-    """The joint's transformation given its angle."""
+    return self.transform_at(self.angle)
+
+  def transform_at(self, angle: float = None) -> Transform:
+    """The joint's spatial DH transformation given an angle."""
     # This is derived and precomputed from the following sequence of transformations, applied left to right:
     #   Translate_z(d), Rotate_z(theta), Translate_x(a), Rotate_x(alpha)
     # See Joint tests for the geometrically and mathematically intuitive version
 
-    theta = (self.dh.theta + self.angle) / 2
+    theta = (self.dh.theta + angle) / 2
 
     ct = math.cos(theta)
     st = math.sin(theta)
