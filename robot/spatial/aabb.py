@@ -1,6 +1,6 @@
 import math
 
-from robot.spatial.vector3 import Vector3
+from .vector3 import Vector3
 
 class AABB:
   def __init__(self, *elements):

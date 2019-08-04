@@ -1,7 +1,7 @@
 import math
 
 from robot                  import utils
-from robot.spatial.swizzler import Swizzler
+from .swizzler import Swizzler
 
 VECTOR_X = 0
 VECTOR_Y = 1
