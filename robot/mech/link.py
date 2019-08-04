@@ -4,7 +4,7 @@ from collections import namedtuple
 from typing      import Iterable, Union
 
 from robot.mech.joint   import Joint
-from robot.spatial      import AABB, Frame, Ray, Transform, Vector3
+from robot.spatial      import AABB, Ray, Transform, Vector3
 from robot.visual.mesh  import Mesh
 
 PhysicalProperties = namedtuple('PhysicalProperties', 'com moments volume', defaults=(None, None, None))
@@ -37,10 +37,6 @@ class Link:
     That is, the transformation from the previous link's frame to this link's frame.
     """
     return self.previous * self.joint.transform
-
-  @property
-  def frame(self) -> Frame:
-    return Frame(self.to_world)
 
   @property
   def aabb(self) -> AABB:

@@ -5,12 +5,12 @@ from OpenGL.GL import *
 
 from ctypes import c_void_p
 
-from robot.spatial                import Frame, Matrix4, Transform, Vector3
+from robot.spatial                import Matrix4, Transform, Vector3
 from robot.visual.entities.entity import Entity
 from robot.visual.shader_program  import ShaderProgram
 
 class FrameEntity(Entity):
-  def __init__(self, frame = Frame(), shader_program : ShaderProgram = None):
+  def __init__(self, frame = Transform(), shader_program : ShaderProgram = None):
     self.buffer = []
     self.frame = frame
     self.scale = 15
@@ -192,7 +192,7 @@ class FrameEntity(Entity):
 
   def draw(self, camera, light, transform = None):
     if not transform:
-      transform = self.frame.frame_to_world
+      transform = self.frame
 
     self.shader_program.use()
 

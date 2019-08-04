@@ -7,7 +7,7 @@ from robot.common.bindings                 import Bindings
 from robot.common.timer                    import Timer
 from robot.mech.serial                     import Serial
 from robot.spatial.euler                   import Axes, Order
-from robot.spatial                         import Frame, Transform, Quaternion
+from robot.spatial                         import Transform, Quaternion
 from robot.traj.linear_js                  import LinearJS
 from robot.traj.linear_os                  import LinearOS
 from robot.visual.ambient_light            import AmbientLight
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     bill_program = ShaderProgram('billboard')
     com_program = ShaderProgram('com')
 
-  ee_frame = FrameEntity(Frame(), flat_program)
+  ee_frame = FrameEntity(Transform(), flat_program)
   bb = BoundingEntity(flat_program)
   grid = GridEntity(grid_program)
   welder = tool_entity.load('./robot/mech/tools/welder.json')
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
   camera = Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
-  world_frame = FrameEntity(Frame(), flat_program)
+  world_frame = FrameEntity(Transform(), flat_program)
   light = AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
 
   scene = Scene(camera, light)

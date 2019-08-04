@@ -6,7 +6,7 @@ from robot.mech.exceptions import InvalidSerialDictError
 from robot.mech.joint      import Joint
 from robot.mech.link       import Link
 from robot.mech.tool       import Tool
-from robot.spatial         import AABB, Frame, Transform, Vector3
+from robot.spatial         import AABB, Transform, Vector3
 from robot.visual.mesh     import Mesh
 
 class Serial:
@@ -103,13 +103,13 @@ class Serial:
     if self.tool is not None:
       self.tool.tool_to_world = self.links[-1].to_world
 
-  def pose(self) -> Frame:
+  def pose(self) -> Transform:
     if self.tool is not None:
-      return Frame(self.tool.tip)
+      return self.tool.tip
     else:
-      return self.links[-1].frame
+      return self.links[-1].to_world
 
-  def pose_at(self, angles: Iterable[float]) -> Frame:
+  def pose_at(self, angles: Iterable[float]) -> Transform:
     t = self.base.to_world
     for link, angle in zip(self.links[1:], angles):
       t *= link.joint.transform_at(angle)
@@ -117,10 +117,10 @@ class Serial:
     if self.tool is not None:
       t *= self.tool._tip
 
-    return Frame(t)
+    return t
 
   def poses(self) -> list:
-    return [link.frame for link in self.links]
+    return [link.to_world for link in self.links]
 
   def upper_arm_length(self):
     return self.links[2].joint.dh.a
@@ -161,7 +161,7 @@ class Serial:
       angles[1] = direction['shoulder'] * angles[1] - zero['shoulder']
       angles[2] = direction['elbow'] * (angles[2] + zero['elbow'])
 
-  def wrist_center(self, pose : Frame):
+  def wrist_center(self, pose : Transform):
     '''Get wrist center point given the end-effector pose and tool.'''
     wrist_length = self.links[6].joint.dh.d
 
@@ -169,6 +169,6 @@ class Serial:
     if self.tool is not None:
       tip_transform = self.tool._tip.inverse()
 
-    total = pose.frame_to_world * tip_transform * Transform.from_axis_angle_translation(translation=Vector3(0, 0, -wrist_length))
+    total = pose * tip_transform * Transform.from_axis_angle_translation(translation=Vector3(0, 0, -wrist_length))
 
     return total.translation()

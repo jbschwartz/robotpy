@@ -2,7 +2,7 @@ import glfw, math
 
 from robot.ik.angles       import solve_angles
 from robot.visual.observer import Observer
-from robot.spatial         import Dual, Frame, Quaternion, Transform, Vector3
+from robot.spatial         import Dual, Quaternion, Transform, Vector3
 
 class SerialController(Observer):
   def __init__(self, serial, frame_entity):
@@ -25,7 +25,7 @@ class SerialController(Observer):
 
   def advance(self, step):
     self.serial.angles = self.serial.traj.advance(step)
-    self.frame_entity.frame = Frame(self.serial.tool.tip)
+    self.frame_entity.frame = self.serial.tool.tip
 
   def print_results(self):
     print(self.serial.angles)

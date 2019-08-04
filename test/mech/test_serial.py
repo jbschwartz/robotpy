@@ -14,7 +14,7 @@ class TestSerial(unittest.TestCase):
     self.robot.angles = angles
     frame = self.robot.pose()
 
-    result = frame.position()
+    result = frame.translation()
     expected = Vector3(133.58578643, 184.49747468, 128.00714267)
 
     self.assertAlmostEqual(result, expected)
@@ -35,7 +35,7 @@ class TestSerial(unittest.TestCase):
 
     for index, (frame, expected) in enumerate(zip(frames, expecteds)):
       with self.subTest(f"Frame #{index + 1}"):
-        result = frame.position()
+        result = frame.translation()
         self.assertAlmostEqual(result, expected)
 
   def test_transform_to_robot(self):

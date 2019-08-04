@@ -5,7 +5,7 @@ from OpenGL.GL import *
 
 from ctypes import c_void_p
 
-from robot.spatial               import Frame, Matrix4, Vector3
+from robot.spatial               import Matrix4, Vector3
 from robot.visual.observer       import Observer
 from robot.visual.shader_program import ShaderProgram
 
@@ -55,7 +55,7 @@ class TriangleEntity(Observer):
 
   def draw(self, camera, light):
     if self.link:
-      target = self.link.frame.transform(self.link.com)
+      target = self.link.to_world(self.link.com)
     else:
       if not self.show:
         return
