@@ -2,12 +2,12 @@ import itertools, math
 
 from typing import Iterable
 
-from robot.mech.exceptions import InvalidSerialDictError
-from robot.mech.joint      import Joint
-from robot.mech.link       import Link
-from robot.mech.tool       import Tool
-from robot.spatial         import AABB, Transform, Vector3
-from robot.visual.mesh     import Mesh
+from robot.spatial     import AABB, Transform, Vector3
+from robot.visual      import Mesh
+from .exceptions       import InvalidSerialDictError
+from .joint            import Joint
+from .link             import Link
+from .tool             import Tool
 
 class Serial:
   def __init__(self, links):
