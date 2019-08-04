@@ -40,15 +40,17 @@ class Joint:
   @classmethod
   def from_dict(cls, d: dict) -> 'Joint':
     """Construct a Joint from a dictionary of parameters."""
-    try:
-      dh = DenavitHartenberg(
-        math.radians(d['dh']['alpha']),
-                     d['dh']['a'],
-        math.radians(d['dh']['theta']),
-                     d['dh']['d']
-      )
-    except TypeError:
+    dh_dict = d.get('dh', None)
+
+    if not dh_dict or not all(key in dh_dict for key in DenavitHartenberg._fields):
       raise InvalidJointDictError('Missing required Denavit-Hartenberg parameter for Joint construction')
+
+    dh = DenavitHartenberg(
+      math.radians(dh_dict['alpha']),
+                   dh_dict['a'],
+      math.radians(dh_dict['theta']),
+                   dh_dict['d']
+    )
 
     # Convert limits to radians (if they are provided)
     # Take only fields that exist in the JointLimits namedtuple
