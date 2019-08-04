@@ -50,13 +50,14 @@ class LinearOS():
     self._segment_index += 1
     if self._segment_index == self.path.number_of_segments:
       self._is_done = True
-      self._segment_index = 0
+      self._segment_index -= 1
 
   def is_done(self):
     return self._is_done
 
   def restart(self):
     self._is_done = False
+    self._segment_index = 0
     self.t = 0
 
   def reverse(self):
