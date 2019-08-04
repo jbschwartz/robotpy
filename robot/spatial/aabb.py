@@ -6,14 +6,14 @@ from .vector3   import Vector3
 from .transform import Transform
 
 class AABB:
-  def __init__(self, *elements):
-    self.min = Vector3(math.inf, math.inf, math.inf)
-    self.max = Vector3(-math.inf, -math.inf, -math.inf)
-
-    self.extend(*elements)
+  """Axis Aligned Bounding Box."""
+  def __init__(self, min_corner: Vector3 = None, max_corner: Vector3 = None) -> None:
+    self.min = min_corner or  Vector3(math.inf, math.inf, math.inf)
+    self.max = max_corner or -Vector3(math.inf, math.inf, math.inf)
 
   @classmethod
   def from_points(cls, points: Iterable[Vector3]) -> 'AABB':
+    """Construct an AABB from a list of Vector3 points."""
     aabb = cls()
     aabb.extend(*points)
 

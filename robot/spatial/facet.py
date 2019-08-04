@@ -122,7 +122,7 @@ class Facet:
 
   def compute_aabb(self):
     '''Construct the AABB bounding the Facet from the Facet's current vertices.'''
-    self._aabb = AABB(*self.vertices)
+    self._aabb = AABB.from_points(self.vertices)
 
   def compute_normal(self):
     '''Compute the normal vector from the Facet's current vertices.'''

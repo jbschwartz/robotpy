@@ -79,7 +79,7 @@ class Serial:
 
   @property
   def aabb(self) -> AABB:
-    return AABB(*[link.aabb for link in self.links])
+    return AABB.from_points([link.aabb for link in self.links])
 
   def attach(self, tool: Tool = None):
     '''Attach the tool to the robot's end effector.'''
