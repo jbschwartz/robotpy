@@ -1,6 +1,6 @@
 import math
 
-from typing import Iterable
+from typing import Iterable, Union
 
 from .vector3   import Vector3
 from .transform import Transform
@@ -15,26 +15,25 @@ class AABB:
   def from_points(cls, points: Iterable[Vector3]) -> 'AABB':
     """Construct an AABB from a list of Vector3 points."""
     aabb = cls()
-    aabb.extend(*points)
+    aabb.extend(points)
 
     return aabb
 
-  def extend(self, *args):
-    for other in args:
-      if isinstance(other, Vector3):
-        self._extend_vector(other)
-      elif isinstance(other, AABB):
-        self._extend_vector(other.min)
-        self._extend_vector(other.max)
-    # TODO: Extend with Facet
+  def extend(self, objects: Iterable[Union[Vector3, 'AABB']]) -> None:
+    # If the passed parameter looks iterable, try to break it up recursively
+    if isinstance(objects, (list, tuple)):
+      list(map(lambda obj: self.extend(obj), objects))
+      return None
 
-  # TODO: Rename this to extend_point (so we're consistent with contains)
-  def _extend_vector(self, v : Vector3):
-    for index, value in enumerate(v):
-      if value < self.min[index]:
-        self.min[index] = value
-      if value > self.max[index]:
-        self.max[index] = value
+    if isinstance(objects, AABB):
+      # Extend the bounding box with the extreme points of the passed bounding box
+      self.extend([objects.min, objects.max])
+    elif isinstance(objects, Vector3):
+      for index, value in enumerate(objects):
+        self.min[index] = min(value, self.min[index])
+        self.max[index] = max(value, self.max[index])
+    else:
+      raise TypeError('Unexpected type passed to AABB.extend()')
 
   def contains(self, element):
     if isinstance(element, Vector3):

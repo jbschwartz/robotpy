@@ -9,7 +9,7 @@ class TestAABB(unittest.TestCase):
     self.v3 = Vector3(0, 1, 2)
     self.v4 = Vector3(4, 4, 4)
 
-    self.aabb = AABB(self.v1, self.v2, self.v3)
+    self.aabb = AABB.from_points([self.v1, self.v2, self.v3])
 
   def test_extend(self):
     self.assertAlmostEqual(self.v2, self.aabb.min)
