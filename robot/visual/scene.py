@@ -1,8 +1,8 @@
 from OpenGL.GL import *
 
-from robot.spatial         import AABB
-from robot.visual.camera   import Camera
-from robot.visual.observer import Observer
+from robot.spatial import AABB
+from .camera       import Camera
+from .observer     import Observer
 
 class Scene(Observer):
   def __init__(self, camera, light):

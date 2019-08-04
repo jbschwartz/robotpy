@@ -1,7 +1,7 @@
 import math
 
-from robot.spatial           import AABB, KDTree, Ray
-from robot.visual.exceptions import ParserError
+from robot.spatial import AABB, KDTree, Ray
+from .exceptions   import ParserError
 
 class Mesh:
   def __init__(self, name = None, facets = None):

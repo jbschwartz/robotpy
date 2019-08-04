@@ -1,10 +1,10 @@
 import enum, json, math, glfw
 
-from robot.common.timer      import Timer
-from robot.spatial           import Ray, Transform, vector3
-from robot.visual.camera     import Camera, OrbitType
-from robot.visual.observer   import Observer
-from robot.visual.projection import OrthoProjection, PerspectiveProjection
+from robot.common.timer import Timer
+from robot.spatial      import Ray, Transform, vector3
+from .camera            import Camera, OrbitType
+from .observer          import Observer
+from .projection        import OrthoProjection, PerspectiveProjection
 
 Vector3 = vector3.Vector3
 

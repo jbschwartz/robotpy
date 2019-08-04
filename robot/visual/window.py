@@ -2,9 +2,9 @@ import math, numpy, glfw, statistics, sys
 
 from OpenGL.GL import GL_TRUE
 
-from robot.common.timer         import Timer
-from robot.spatial.vector3      import Vector3
-from robot.visual.window_event  import WindowEvent
+from robot.common.timer import Timer
+from robot.spatial      import Vector3
+from .window_event      import WindowEvent
 
 class Window():
   def __init__(self, width, height, title):

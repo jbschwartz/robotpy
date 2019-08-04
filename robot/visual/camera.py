@@ -1,8 +1,8 @@
 import enum, math
 
-from robot                   import utils
-from robot.spatial           import vector3, Ray, Transform
-from robot.visual.projection import OrthoProjection, PerspectiveProjection
+from robot         import utils
+from robot.spatial import vector3, Ray, Transform
+from .projection   import OrthoProjection, PerspectiveProjection
 
 Vector3 = vector3.Vector3
 
