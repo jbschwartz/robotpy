@@ -1,5 +1,4 @@
-from robot.spatial.transform import Transform
-from robot.spatial.vector3   import Vector3
+from robot.spatial import Transform, Vector3
 
 class Tool:
   """Attachable robot end effector."""

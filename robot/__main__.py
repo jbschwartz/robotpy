@@ -7,9 +7,7 @@ from robot.common.bindings                 import Bindings
 from robot.common.timer                    import Timer
 from robot.mech.serial                     import Serial
 from robot.spatial.euler                   import Axes, Order
-from robot.spatial.frame                   import Frame
-from robot.spatial.transform               import Transform
-from robot.spatial.quaternion              import Quaternion
+from robot.spatial                         import Frame, Transform, Quaternion
 from robot.traj.linear_js                  import LinearJS
 from robot.traj.linear_os                  import LinearOS
 from robot.visual.ambient_light            import AmbientLight

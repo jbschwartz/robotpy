@@ -8,7 +8,7 @@ from OpenGL.GL import *
 from ctypes import c_void_p
 
 from robot.mech.tool                       import Tool
-from robot.spatial.transform               import Transform
+from robot.spatial                         import Transform
 from robot.visual.entities.entity          import Entity
 from robot.visual.filetypes.stl.stl_parser import STLParser
 from robot.visual.mesh                     import Mesh

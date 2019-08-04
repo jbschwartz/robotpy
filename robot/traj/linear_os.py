@@ -1,17 +1,11 @@
 import math
 
 from robot.ik.angles          import solve_angles
-from robot.spatial.frame      import Frame
-from robot.spatial.quaternion import Quaternion
-from robot.spatial.transform  import Transform
-from robot.spatial.dual       import Dual
-from robot.spatial            import vector3
+from robot.spatial            import Dual, Frame, Quaternion, Transform, Vector3
 from robot.traj.segment       import ArcSegment, LinearSegment
 from robot.traj.trajectory_js import TrajectoryJS
 from robot.traj.path          import PiecewisePath
 from robot.traj.utils         import interpolate
-
-Vector3 = vector3.Vector3
 
 class LinearOS():
   '''Linear trajectory in operational space.'''

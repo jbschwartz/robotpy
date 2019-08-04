@@ -1,9 +1,7 @@
 import unittest
 
-from robot.spatial.aabb    import AABB
-from robot.spatial.ray     import Ray
-from robot.spatial.vector3 import Vector3
-from robot.visual.facet    import Facet
+from robot.spatial      import AABB, Ray, Vector3
+from robot.visual.facet import Facet
 
 class TestAABB(unittest.TestCase):
   def setUp(self):

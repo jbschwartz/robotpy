@@ -3,7 +3,7 @@ import math
 from robot.ik.elbow        import solve_elbow
 from robot.ik.waist        import solve_waist
 from robot.ik.shoulder     import solve_shoulder
-from robot.spatial.vector3 import Vector3
+from robot.spatial         import Vector3
 
 def rs_coordinates(wrist_center : Vector3, shoulder_wrist_offset, shoulder_z_offset):
   '''

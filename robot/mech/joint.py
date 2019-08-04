@@ -2,11 +2,9 @@ import math
 
 from collections import namedtuple
 
-from robot                    import constant
-from robot.mech.exceptions    import InvalidJointAngleError, InvalidJointDictError
-from robot.spatial.dual       import Dual
-from robot.spatial.quaternion import Quaternion
-from robot.spatial.transform  import Transform
+from robot                 import constant
+from robot.mech.exceptions import InvalidJointAngleError, InvalidJointDictError
+from robot.spatial         import Dual, Quaternion, Transform
 
 # TODO: Generalize this class to potentially handle prismatic case
 

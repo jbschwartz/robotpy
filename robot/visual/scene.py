@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 
-from robot.spatial.aabb    import AABB
+from robot.spatial         import AABB
 from robot.visual.camera   import Camera
 from robot.visual.observer import Observer
 

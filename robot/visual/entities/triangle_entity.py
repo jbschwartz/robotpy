@@ -5,9 +5,7 @@ from OpenGL.GL import *
 
 from ctypes import c_void_p
 
-from robot.spatial.frame         import Frame
-from robot.spatial.matrix4       import Matrix4
-from robot.spatial.vector3       import Vector3
+from robot.spatial               import Frame, Matrix4, Vector3
 from robot.visual.observer       import Observer
 from robot.visual.shader_program import ShaderProgram
 

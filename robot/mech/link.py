@@ -3,13 +3,9 @@ import math
 from collections import namedtuple
 from typing      import Iterable, Union
 
-from robot.mech.joint        import Joint
-from robot.spatial.aabb      import AABB
-from robot.spatial.frame     import Frame
-from robot.spatial.ray       import Ray
-from robot.spatial.transform import Transform
-from robot.spatial.vector3   import Vector3
-from robot.visual.mesh       import Mesh
+from robot.mech.joint   import Joint
+from robot.spatial      import AABB, Frame, Ray, Transform, Vector3
+from robot.visual.mesh  import Mesh
 
 PhysicalProperties = namedtuple('PhysicalProperties', 'com moments volume', defaults=(None, None, None))
 

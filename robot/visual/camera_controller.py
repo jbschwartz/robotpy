@@ -1,9 +1,7 @@
 import enum, json, math, glfw
 
 from robot.common.timer      import Timer
-from robot.spatial           import vector3
-from robot.spatial.ray       import Ray
-from robot.spatial.transform import Transform
+from robot.spatial           import Ray, Transform, vector3
 from robot.visual.camera     import Camera, OrbitType
 from robot.visual.observer   import Observer
 from robot.visual.projection import OrthoProjection, PerspectiveProjection

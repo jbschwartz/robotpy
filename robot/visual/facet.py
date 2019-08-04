@@ -2,8 +2,7 @@ import math
 
 from typing import Tuple
 
-from robot.spatial.aabb      import AABB
-from robot.spatial.vector3   import Vector3
+from robot.spatial           import AABB, Vector3
 from robot.visual.exceptions import DegenerateTriangleError
 
 class Facet:

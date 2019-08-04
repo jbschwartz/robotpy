@@ -1,10 +1,6 @@
 import math, unittest
 
-from robot.spatial.dual       import Dual
-from robot.spatial.frame      import Frame
-from robot.spatial.quaternion import Quaternion
-from robot.spatial.transform  import Transform
-from robot.spatial.vector3    import Vector3
+from robot.spatial import Dual, Frame, Quaternion, Transform, Vector3
 
 class TestFrame(unittest.TestCase):
   def setUp(self):

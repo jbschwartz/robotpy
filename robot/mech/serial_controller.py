@@ -1,12 +1,8 @@
 import glfw, math
 
-from robot.ik.angles          import solve_angles
-from robot.visual.observer    import Observer
-from robot.spatial.dual       import Dual
-from robot.spatial.frame      import Frame
-from robot.spatial.quaternion import Quaternion
-from robot.spatial.transform  import Transform
-from robot.spatial.vector3    import Vector3
+from robot.ik.angles       import solve_angles
+from robot.visual.observer import Observer
+from robot.spatial         import Dual, Frame, Quaternion, Transform, Vector3
 
 class SerialController(Observer):
   def __init__(self, serial, frame_entity):

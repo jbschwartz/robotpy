@@ -2,7 +2,7 @@ import math
 
 from robot.ik.arm        import solve_arm
 from robot.ik.wrist      import solve_wrist
-from robot.spatial.frame import Frame
+from robot.spatial       import Frame
 
 def redundant_solutions(solutions, robot):
   # TODO: This can probably be more concise
