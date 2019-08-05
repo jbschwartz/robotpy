@@ -11,14 +11,14 @@ class TestAABB(unittest.TestCase):
 
     self.aabb = AABB.from_points([self.v1, self.v2, self.v3])
 
-  def test_extend(self):
+  def test_expand(self):
     self.assertAlmostEqual(self.v2, self.aabb.min)
     self.assertAlmostEqual(self.v1, self.aabb.max)
 
-  def test_extend_aabb(self):
+  def test_expand_aabb(self):
     other_aabb = AABB(self.v3, self.v4)
 
-    self.aabb.extend(other_aabb)
+    self.aabb.expand(other_aabb)
 
     self.assertAlmostEqual(self.v2, self.aabb.min)
     self.assertAlmostEqual(self.v4, self.aabb.max)

@@ -60,7 +60,7 @@ class Facet:
     self.vertices.append(vertex)
 
     if recompute:
-      self._aabb.extend(vertex)
+      self._aabb.expand(vertex)
 
       # Remove the last edge as it no longer exists
       # Insert two new edges created by new vertex

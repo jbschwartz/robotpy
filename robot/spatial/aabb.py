@@ -15,25 +15,27 @@ class AABB:
   def from_points(cls, points: Iterable[Vector3]) -> 'AABB':
     """Construct an AABB from a list of Vector3 points."""
     aabb = cls()
-    aabb.extend(points)
+    aabb.expand(points)
 
     return aabb
 
-  def extend(self, objects: Iterable[Union[Vector3, 'AABB']]) -> None:
+  def expand(self, objects: Iterable[Union[Vector3, 'AABB']]) -> None:
+    """Expand the bounding box to include the passed objects."""
     # If the passed parameter looks iterable, try to break it up recursively
     if isinstance(objects, (list, tuple)):
-      list(map(lambda obj: self.extend(obj), objects))
+      for obj in objects:
+        self.expand(obj)
       return None
 
     if isinstance(objects, AABB):
-      # Extend the bounding box with the extreme points of the passed bounding box
-      self.extend([objects.min, objects.max])
+      # Expand the bounding box with the corner points
+      self.expand([objects.min, objects.max])
     elif isinstance(objects, Vector3):
       for index, value in enumerate(objects):
         self.min[index] = min(value, self.min[index])
         self.max[index] = max(value, self.max[index])
     else:
-      raise TypeError('Unexpected type passed to AABB.extend()')
+      raise TypeError('Unexpected type passed to AABB.expand()')
 
   def contains(self, element):
     if isinstance(element, Vector3):

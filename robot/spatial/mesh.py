@@ -50,7 +50,7 @@ class Mesh:
 
   def append(self, facet):
     '''Add a facet to the mesh.'''
-    self.aabb.extend(facet.vertices)
+    self.aabb.expand(facet.vertices)
 
     self.facets.append(facet)
 

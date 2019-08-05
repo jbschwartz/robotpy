@@ -16,7 +16,7 @@ class Scene(Observer):
     for entity in self.entities:
       try:
         # TODO: Maybe there's a better way to do this. Or at least I need to put an AABB on all entities (in the entity base class?)
-        aabb.extend(entity.aabb)
+        aabb.expand(entity.aabb)
       except AttributeError:
         pass
     return aabb
