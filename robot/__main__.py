@@ -92,19 +92,6 @@ if __name__ == "__main__":
   settings = vis.CameraSettings()
   camera_controller = vis.CameraController(camera, settings, bindings, scene, window)
 
-  window.register_observer(camera_controller, [
-    vis.WindowEvent.CLICK,
-    vis.WindowEvent.DRAG,
-    vis.WindowEvent.KEY,
-    vis.WindowEvent.RESET,
-    vis.WindowEvent.SCROLL,
-    vis.WindowEvent.WINDOW_RESIZE
-  ])
-
-  window.register_observer(triangle, [
-    vis.WindowEvent.CLICK
-  ])
-
   scene.entities.append(world_frame)
   scene.entities.append(grid)
   scene.entities.append(robot2)

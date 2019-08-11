@@ -4,8 +4,10 @@ from OpenGL.GL import GL_TRUE
 
 from robot.common.timer import Timer
 from robot.spatial      import Vector3
-from .window_event      import WindowEvent
+from .messaging.emitter import emitter
+from .messaging.event   import Event
 
+@emitter
 class Window():
   def __init__(self, width, height, title):
     self.width = width
@@ -53,7 +55,7 @@ class Window():
   def key_callback(self, window, key, scancode, action, mods):
     self.modifiers = mods
 
-    self.emit(WindowEvent.KEY, key, action, self.modifiers)
+    self.emit(Event.KEY, key, action, self.modifiers)
 
     # This may be better suited in some sort of simulation controller class
     if key == glfw.KEY_SPACE and action == glfw.PRESS:
@@ -62,10 +64,10 @@ class Window():
       self.show_fps = not self.show_fps
 
   def scroll_callback(self, window, x_direction, y_direction):
-    self.emit(WindowEvent.SCROLL, numpy.sign(x_direction), numpy.sign(y_direction))
+    self.emit(Event.SCROLL, numpy.sign(x_direction), numpy.sign(y_direction))
 
   def mouse_button_callback(self, window, button, action, mods):
-    self.emit(WindowEvent.CLICK, button, action, self.get_cursor())
+    self.emit(Event.CLICK, button, action, self.get_cursor())
 
     # Record which mouse button is being dragged
     self.dragging = button if action == glfw.PRESS else None
@@ -78,13 +80,13 @@ class Window():
 
     self.last_cursor_position = cursor
 
-    event = WindowEvent.DRAG if self.dragging is not None else WindowEvent.CURSOR
+    event = Event.DRAG if self.dragging is not None else Event.CURSOR
     self.emit(event, self.dragging, cursor, cursor_delta, self.modifiers)
 
   def window_callback(self, window, width, height):
     self.width = width
     self.height = height
-    self.emit(WindowEvent.WINDOW_RESIZE, width, height)
+    self.emit(Event.WINDOW_RESIZE, width, height)
 
   # TODO: Remove this function (in favor of a property?). It's probably not necessary since the cursor_pos callback is constantly updating last_cursor_position
   def get_cursor(self):
@@ -107,7 +109,7 @@ class Window():
     self.window_callback(self.window, *glfw.get_window_size(self.window))
 
     with Timer('START_RENDERER') as t:
-      self.emit(WindowEvent.START_RENDERER)
+      self.emit(Event.START_RENDERER)
 
     now = glfw.get_time()
     last_frame = now
@@ -131,21 +133,21 @@ class Window():
       last_update = now
 
       if not self.pause:
-        self.emit(WindowEvent.UPDATE, delta = delta_update)
+        self.emit(Event.UPDATE, delta = delta_update)
 
-      self.emit(WindowEvent.START_FRAME)
+      self.emit(Event.START_FRAME)
 
       delta_frame = now - last_frame
       if not fps_limit or (fps_limit and delta_frame >= frame_time):
-        self.emit(WindowEvent.DRAW)
+        self.emit(Event.DRAW)
         last_frame = now
 
-      self.emit(WindowEvent.END_FRAME)
+      self.emit(Event.END_FRAME)
 
       glfw.swap_buffers(self.window)
       glfw.poll_events()
 
-    self.emit(WindowEvent.END_RENDERER)
+    self.emit(Event.END_RENDERER)
 
 
 
