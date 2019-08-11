@@ -2,7 +2,8 @@ import math, numpy, glfw, statistics, sys
 
 from OpenGL.GL import GL_TRUE
 
-from robot.common.timer import Timer
+from robot.common       import Timer
+from robot.common       import logger
 from robot.spatial      import Vector3
 from .messaging.emitter import emitter
 from .messaging.event   import Event
@@ -127,7 +128,7 @@ class Window():
         FPS.append(1 / delta_update)
       else:
         if self.show_fps:
-          print('FPS: ', math.floor(statistics.mean(FPS)))
+          logger.info(f'FPS: {math.floor(statistics.mean(FPS))}')
         FPS = []
 
       last_update = now
