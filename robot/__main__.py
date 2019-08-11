@@ -101,6 +101,4 @@ if __name__ == "__main__":
     com = entities.COMEntity(link, com_program)
     scene.entities.append(com)
 
-  window.register_observer(scene)
-
   window.run()

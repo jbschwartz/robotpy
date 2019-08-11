@@ -13,7 +13,6 @@ class Window():
     self.width = width
     self.height = height
 
-    self.observers = []
     self.pause = False
     self.dragging = None
     self.modifiers = 0
@@ -94,15 +93,6 @@ class Window():
 
   def ndc(self, cursor):
     return Vector3(2 * cursor.x / self.width - 1, 1 - 2 * cursor.y / self.height)
-
-  def register_observer(self, observer, events = []):
-    # If valid_events is empty, subscribe the observer to all events
-    self.observers.append((observer, events))
-
-  def emit(self, event_type, *args, **kwargs):
-    for observer, valid_events in self.observers:
-      if not valid_events or event_type in valid_events:
-        observer.notify(event_type, *args, **kwargs)
 
   def run(self, fps_limit = None):
     # Send a window resize event so observers are provided the initial window size
