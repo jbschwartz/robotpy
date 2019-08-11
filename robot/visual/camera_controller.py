@@ -1,6 +1,6 @@
 import enum, json, math, glfw
 
-from robot.common.timer  import Timer
+from robot.common        import Timer
 from robot.spatial       import AABB, Ray, Transform, vector3
 from .camera             import Camera, OrbitType
 from .messaging.listener import listen, listener

@@ -1,2 +1,3 @@
-from .timer import Timer
-from .log   import logger
+from .bindings import Bindings
+from .log      import logger
+from .timer    import Timer

@@ -3,9 +3,7 @@ import json, math, sys
 from robot.spatial import vector3
 Vector3 = vector3.Vector3
 
-from robot.common.bindings import Bindings
-from robot.common.timer    import Timer
-from robot.common.log      import logger
+from robot.common          import Bindings, logger, Timer
 from robot.mech.serial     import Serial
 from robot.spatial.euler   import Axes, Order
 from robot.spatial         import Mesh, Transform, Quaternion
