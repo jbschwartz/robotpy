@@ -15,4 +15,4 @@ class Timer:
     self.elapsed = self.end - self.start
 
     if self.message:
-      logger.info(f'{self.message}: {self.elapsed}')
+      logger.info(f'{self.message}: {"{:.3f}".format(self.elapsed)}')
