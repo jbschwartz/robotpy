@@ -1,4 +1,6 @@
-import logging
+import logging, os
+
+os.system("color")
 
 logger = logging.getLogger('Print Logger')
 logger.setLevel(logging.DEBUG)
@@ -14,3 +16,17 @@ print_format = logging.Formatter('[%(levelname)s] %(message)s')
 print_handler.setFormatter(print_format)
 
 logger.addHandler(print_handler)
+
+def colorize(color):
+  def colorize_decorator(func):
+    def colorize_wrapper(message, *args, **kwargs):
+      return func(f'{color}{message}' + '\033[0m', *args, **kwargs)
+
+    return colorize_wrapper
+  return colorize_decorator
+
+grey   = colorize('\033[90m')
+yellow = colorize('\033[33m')
+
+logger.debug   = grey(logger.debug)
+logger.warning = yellow(logger.warning)
