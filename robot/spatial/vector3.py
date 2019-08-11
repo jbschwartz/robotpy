@@ -1,6 +1,6 @@
 import math
 
-from robot                  import utils
+from robot     import utils
 from .swizzler import Swizzler
 
 VECTOR_X = 0
