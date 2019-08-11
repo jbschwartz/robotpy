@@ -41,13 +41,12 @@ class AABB:
     """Return True if the AABB contains the point."""
     return all(low <= value <= high for low, value, high in zip(self.min, point, self.max))
 
-  def sphere_radius(self):
-    largest = 0
-    for corner in self.corners:
-      radius = self.center - corner
-      largest = max(radius.length(), largest)
-
-    return largest
+  def sphere_radius(self) -> float:
+    """Create a bounding sphere for the AABB and return its radius."""
+    return max([
+      (self.center - corner).length()
+      for corner in self.corners
+    ])
 
   def intersect(self, ray, min_t = 0, max_t = math.inf):
     t = [min_t, max_t]
