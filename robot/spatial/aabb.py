@@ -37,15 +37,9 @@ class AABB:
     else:
       raise TypeError('Unexpected type passed to AABB.expand()')
 
-  def contains(self, element):
-    if isinstance(element, Vector3):
-      return self.contains_point(element)
-
-  def contains_point(self, point):
-    for low, value, high in zip(self.min, point, self.max):
-      if not low <= value <= high:
-        return False
-    return True
+  def contains(self, point: Vector3) -> bool:
+    """Return True if the AABB contains the point."""
+    return all(low <= value <= high for low, value, high in zip(self.min, point, self.max))
 
   def sphere_radius(self):
     largest = 0
