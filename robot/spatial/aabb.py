@@ -1,52 +1,52 @@
 import math
 
-from robot.spatial.vector3 import Vector3
+from typing import Iterable, Union
+
+from .vector3   import Vector3
+from .transform import Transform
 
 class AABB:
-  def __init__(self, *elements):
-    self.min = Vector3(math.inf, math.inf, math.inf)
-    self.max = Vector3(-math.inf, -math.inf, -math.inf)
+  """Axis Aligned Bounding Box."""
+  def __init__(self, min_corner: Vector3 = None, max_corner: Vector3 = None) -> None:
+    self.min = min_corner or  Vector3(math.inf, math.inf, math.inf)
+    self.max = max_corner or -Vector3(math.inf, math.inf, math.inf)
 
-    self.extend(*elements)
+  @classmethod
+  def from_points(cls, points: Iterable[Vector3]) -> 'AABB':
+    """Construct an AABB from a list of Vector3 points."""
+    aabb = cls()
+    aabb.expand(points)
 
-  def transform(self, transform: 'Transform') -> 'AABB':
-    '''Return an AABB (in the new transformed space) of the transformed AABB.'''
-    return AABB(*[point.transform(transform, as_type="point") for point in self.corners])
+    return aabb
 
-  def extend(self, *args):
-    for other in args:
-      if isinstance(other, Vector3):
-        self._extend_vector(other)
-      elif isinstance(other, AABB):
-        self._extend_vector(other.min)
-        self._extend_vector(other.max)
-    # TODO: Extend with Facet
+  def expand(self, objects: Iterable[Union[Vector3, 'AABB']]) -> None:
+    """Expand the bounding box to include the passed objects."""
+    # If the passed parameter looks iterable, try to break it up recursively
+    if isinstance(objects, (list, tuple)):
+      for obj in objects:
+        self.expand(obj)
+      return None
 
-  # TODO: Rename this to extend_point (so we're consistent with contains)
-  def _extend_vector(self, v : Vector3):
-    for index, value in enumerate(v):
-      if value < self.min[index]:
-        self.min[index] = value
-      if value > self.max[index]:
-        self.max[index] = value
+    if isinstance(objects, AABB):
+      # Expand the bounding box with the corner points
+      self.expand([objects.min, objects.max])
+    elif isinstance(objects, Vector3):
+      for index, value in enumerate(objects):
+        self.min[index] = min(value, self.min[index])
+        self.max[index] = max(value, self.max[index])
+    else:
+      raise TypeError('Unexpected type passed to AABB.expand()')
 
-  def contains(self, element):
-    if isinstance(element, Vector3):
-      return self.contains_point(element)
+  def contains(self, point: Vector3) -> bool:
+    """Return True if the AABB contains the point."""
+    return all(low <= value <= high for low, value, high in zip(self.min, point, self.max))
 
-  def contains_point(self, point):
-    for low, value, high in zip(self.min, point, self.max):
-      if not low <= value <= high:
-        return False
-    return True
-
-  def sphere_radius(self):
-    largest = 0
-    for corner in self.corners:
-      radius = self.center - corner
-      largest = max(radius.length(), largest)
-
-    return largest
+  def sphere_radius(self) -> float:
+    """Create a bounding sphere for the AABB and return its radius."""
+    return max([
+      (self.center - corner).length()
+      for corner in self.corners
+    ])
 
   def intersect(self, ray, min_t = 0, max_t = math.inf):
     t = [min_t, max_t]

@@ -1,6 +1,6 @@
-from robot.spatial.dual       import Dual
-from robot.spatial.quaternion import conjugate, Quaternion
-from robot.spatial.transform  import Transform
+from .dual       import Dual
+from .quaternion import conjugate, Quaternion
+from .transform  import Transform
 
 class Matrix4:
   def __init__(self, construct_from = None):

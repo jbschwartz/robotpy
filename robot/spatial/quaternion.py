@@ -1,7 +1,7 @@
 import math
 
-from robot.spatial.euler    import Order
-from robot.spatial.swizzler import Swizzler
+from .euler    import Order
+from .swizzler import Swizzler
 
 class Quaternion(Swizzler):
   '''Quaternion of the form r + xi + yj + zk.'''

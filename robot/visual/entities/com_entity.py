@@ -2,10 +2,9 @@ import glfw
 
 from OpenGL.GL import *
 
-from robot.visual.observer       import Observer
 from robot.visual.shader_program import ShaderProgram
 
-class COMEntity(Observer):
+class COMEntity():
   def __init__(self, link, shader_program : ShaderProgram = None):
     self.vao = -1 if not bool(glGenVertexArrays) else glGenVertexArrays(1)
 

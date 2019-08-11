@@ -1,7 +1,8 @@
 import math, unittest
 
-from robot.spatial.quaternion import conjugate, Quaternion
-from robot.spatial.vector3 import Vector3
+from robot.spatial import quaternion, Quaternion, Vector3
+
+conjugate = quaternion.conjugate
 
 class TestQuaternion(unittest.TestCase):
   def setUp(self):

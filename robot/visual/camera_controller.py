@@ -1,12 +1,11 @@
 import enum, json, math, glfw
 
-from robot.common.timer      import Timer
-from robot.spatial           import vector3
-from robot.spatial.ray       import Ray
-from robot.spatial.transform import Transform
-from robot.visual.camera     import Camera, OrbitType
-from robot.visual.observer   import Observer
-from robot.visual.projection import OrthoProjection, PerspectiveProjection
+from robot.common.timer  import Timer
+from robot.spatial       import AABB, Ray, Transform, vector3
+from .camera             import Camera, OrbitType
+from .messaging.listener import listen, listener
+from .messaging.event    import Event
+from .projection         import OrthoProjection, PerspectiveProjection
 
 Vector3 = vector3.Vector3
 
@@ -59,8 +58,8 @@ class CameraSettings():
         settings['camera'][name] = value
       json.dump(settings, f, indent=2)
 
-
-class CameraController(Observer):
+@listener
+class CameraController():
   VIEWS = {
     'view_top':    { 'position': Vector3(0, 0,  1250), 'up': Vector3(0,  1, 0) },
     'view_bottom': { 'position': Vector3(0, 0, -1250), 'up': Vector3(0, -1, 0) },
@@ -81,6 +80,7 @@ class CameraController(Observer):
     self.is_selecting = None
     self.orbit_type = OrbitType.CONSTRAINED
 
+  @listen(Event.CLICK)
   def click(self, button, action, cursor):
     if button == glfw.MOUSE_BUTTON_LEFT:
       if action == glfw.PRESS:
@@ -103,6 +103,7 @@ class CameraController(Observer):
 
       self.camera.target = self.target
 
+  @listen(Event.DRAG)
   def drag(self, button, cursor, cursor_delta, modifiers):
     command = self.bindings.get_command((modifiers, button))
 
@@ -120,6 +121,7 @@ class CameraController(Observer):
       angle = self.settings.ORBIT_SPEED * vector3.normalize(cursor_delta)
       self.camera.orbit(self.target, angle.y, angle.x, self.orbit_type)
 
+  @listen(Event.KEY)
   def key(self, key, action, modifiers):
     if action == glfw.PRESS:
       return
@@ -166,12 +168,14 @@ class CameraController(Observer):
     elif command in ['view_front', 'view_back', 'view_right', 'view_left', 'view_top', 'view_bottom', 'view_iso']:
       self.view(command)
 
+  @listen(Event.SCROLL)
   def scroll(self, horizontal, vertical):
     if horizontal:
       self.camera.orbit(self.target, 0, self.settings.ORBIT_STEP * horizontal, self.orbit_type)
     if vertical:
       self.scale_to_cursor(self.window.get_cursor(), vertical * self.settings.SCALE_IN)
 
+  @listen(Event.WINDOW_RESIZE)
   def window_resize(self, width, height):
     if not math.isclose(height, 0):
       self.camera.projection.aspect = width / height
@@ -269,10 +273,16 @@ class CameraController(Observer):
 
     delta = self.camera.camera_space(delta_ndc)
 
+    # TODO: Move this calculation out to mouse_down event handler.
+    # This does not need to be called per mouse_drag event handler-- It's ruining frame rate.
     if isinstance(self.camera.projection, PerspectiveProjection):
       # This approximates the scene moving the same speed as the cursor but it isn't exactly correct for perspective projection.
       # I think perspective projection requires mouse picking to determine the correct z.
-      transformed_aabb = self.scene.aabb.transform(self.camera.world_to_camera)
+      transformed_aabb = AABB.from_points([
+        point.transform(self.camera.world_to_camera, as_type="point")
+        for point in self.scene.aabb.corners
+      ])
+
       delta *= -transformed_aabb.center.z
 
     self.camera.track(v = -delta)

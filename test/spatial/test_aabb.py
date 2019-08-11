@@ -1,9 +1,6 @@
 import unittest
 
-from robot.spatial.aabb    import AABB
-from robot.spatial.ray     import Ray
-from robot.spatial.vector3 import Vector3
-from robot.visual.facet    import Facet
+from robot.spatial import AABB, Facet, Ray, Vector3
 
 class TestAABB(unittest.TestCase):
   def setUp(self):
@@ -12,16 +9,16 @@ class TestAABB(unittest.TestCase):
     self.v3 = Vector3(0, 1, 2)
     self.v4 = Vector3(4, 4, 4)
 
-    self.aabb = AABB(self.v1, self.v2, self.v3)
+    self.aabb = AABB.from_points([self.v1, self.v2, self.v3])
 
-  def test_extend(self):
+  def test_expand(self):
     self.assertAlmostEqual(self.v2, self.aabb.min)
     self.assertAlmostEqual(self.v1, self.aabb.max)
 
-  def test_extend_aabb(self):
+  def test_expand_aabb(self):
     other_aabb = AABB(self.v3, self.v4)
 
-    self.aabb.extend(other_aabb)
+    self.aabb.expand(other_aabb)
 
     self.assertAlmostEqual(self.v2, self.aabb.min)
     self.assertAlmostEqual(self.v4, self.aabb.max)

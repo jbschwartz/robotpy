@@ -5,10 +5,7 @@ from OpenGL.GL import *
 
 from ctypes import c_void_p
 
-from robot.spatial.aabb           import AABB
-from robot.spatial.matrix4        import Matrix4
-from robot.spatial.transform      import Transform
-from robot.spatial.vector3        import Vector3
+from robot.spatial                import AABB, Matrix4, Transform, Vector3
 from robot.visual.entities.entity import Entity
 from robot.visual.shader_program  import ShaderProgram
 

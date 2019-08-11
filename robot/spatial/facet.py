@@ -2,9 +2,9 @@ import math
 
 from typing import Tuple
 
-from robot.spatial.aabb      import AABB
-from robot.spatial.vector3   import Vector3
-from robot.visual.exceptions import DegenerateTriangleError
+from .aabb       import AABB
+from .exceptions import DegenerateTriangleError
+from .vector3    import Vector3
 
 class Facet:
   def __init__(self, vertices = [], normal = Vector3()):
@@ -60,7 +60,7 @@ class Facet:
     self.vertices.append(vertex)
 
     if recompute:
-      self._aabb.extend(vertex)
+      self._aabb.expand(vertex)
 
       # Remove the last edge as it no longer exists
       # Insert two new edges created by new vertex
@@ -122,7 +122,7 @@ class Facet:
 
   def compute_aabb(self):
     '''Construct the AABB bounding the Facet from the Facet's current vertices.'''
-    self._aabb = AABB(*self.vertices)
+    self._aabb = AABB.from_points(self.vertices)
 
   def compute_normal(self):
     '''Compute the normal vector from the Facet's current vertices.'''

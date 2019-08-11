@@ -5,8 +5,7 @@ from OpenGL.GL import *
 from ctypes import c_void_p
 
 from robot.mech.serial                     import Serial
-from robot.spatial.frame                   import Frame
-from robot.spatial.matrix4                 import Matrix4
+from robot.spatial                         import Matrix4
 from robot.visual.entities.entity          import Entity
 from robot.visual.shader_program           import ShaderProgram
 
@@ -100,7 +99,7 @@ class RobotEntity(Entity):
     self.shader_program.light_color     = light.color
     self.shader_program.light_intensity = light.intensity
 
-    self.shader_program.model_matrices  = [frame.frame_to_world for frame in self.serial.poses()]
+    self.shader_program.model_matrices  = self.serial.poses()
     self.shader_program.use_link_colors = False
     self.shader_program.link_colors     = [link.color for link in self.serial.links]
     self.shader_program.robot_color     = self.color
@@ -116,16 +115,15 @@ class RobotEntity(Entity):
 
     if self.frame_entity:
       for link in self.serial.links:
-        self.frame_entity.draw(camera, light, Matrix4(link.frame.frame_to_world))
+        self.frame_entity.draw(camera, light, Matrix4(link.to_world))
 
       if self.serial.tool:
-        f = Frame(self.serial.tool.tip)
-        self.frame_entity.draw(camera, light, Matrix4(f.frame_to_world))
+        self.frame_entity.draw(camera, light, Matrix4(self.serial.tool.tip))
 
     if self.bounding_entity:
       for mesh, link in zip(self.meshes, self.serial.links):
         self.bounding_entity.aabb = mesh.aabb
-        self.bounding_entity.draw(camera, light, link.frame.transform)
+        self.bounding_entity.draw(camera, light, link.to_world)
 
       self.bounding_entity.aabb = self.serial.aabb
       self.bounding_entity.draw(camera, light)

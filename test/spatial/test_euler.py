@@ -1,8 +1,7 @@
 import math, unittest
 from operator import itemgetter
 
-from robot.spatial            import euler
-from robot.spatial.quaternion import Quaternion
+from robot.spatial import euler, Quaternion
 
 class TestEuler(unittest.TestCase):
   def setUp(self):

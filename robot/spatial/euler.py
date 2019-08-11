@@ -2,7 +2,7 @@ from typing import List
 
 import enum, functools, math
 
-from robot.spatial.vector3 import Vector3
+from .vector3 import Vector3
 
 # All of these functions convert quaternion representations to intrinsic euler angles
 # This is done by converting the quaternion representation to a partial matrix representation and then to an euler angle representation

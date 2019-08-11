@@ -1,8 +1,6 @@
 import math, unittest
 
-from robot.spatial.ray     import Ray
-from robot.spatial.vector3 import Vector3
-from robot.visual.facet    import Facet
+from robot.spatial import Facet, Ray, Vector3
 
 class TestFacet(unittest.TestCase):
   def setUp(self):

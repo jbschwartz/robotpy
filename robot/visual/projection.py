@@ -1,7 +1,6 @@
 import abc, enum, math
 
-from robot.spatial.matrix4 import Matrix4
-from robot.spatial.vector3 import Vector3
+from robot.spatial import Matrix4, Vector3
 
 class Projection(abc.ABC):
   def __init__(self, near_clip, far_clip):

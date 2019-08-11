@@ -1,10 +1,12 @@
 from OpenGL.GL import *
 
-from robot.spatial.aabb    import AABB
-from robot.visual.camera   import Camera
-from robot.visual.observer import Observer
+from robot.spatial       import AABB
+from .camera             import Camera
+from .messaging.listener import listen, listener
+from .messaging.event    import Event
 
-class Scene(Observer):
+@listener
+class Scene():
   def __init__(self, camera, light):
     self.camera = camera
     self.entities = []
@@ -16,7 +18,7 @@ class Scene(Observer):
     for entity in self.entities:
       try:
         # TODO: Maybe there's a better way to do this. Or at least I need to put an AABB on all entities (in the entity base class?)
-        aabb.extend(entity.aabb)
+        aabb.expand(entity.aabb)
       except AttributeError:
         pass
     return aabb
@@ -27,10 +29,12 @@ class Scene(Observer):
     else:
       return None
 
+  @listen(Event.WINDOW_RESIZE)
   def window_resize(self, width, height):
     if width and height:
       glViewport(0, 0, width, height)
 
+  @listen(Event.START_RENDERER)
   def start_renderer(self):
     glClearColor(1, 1, 1, 1)
 
@@ -46,15 +50,18 @@ class Scene(Observer):
     for entity in self.entities:
       entity.load()
 
+  @listen(Event.START_FRAME)
   def start_frame(self):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+  @listen(Event.UPDATE)
   def update(self, delta = 0):
     for entity in self.entities:
       entity.update(delta)
 
-    self.light.position = self.camera.position
+      self.light.position = self.camera.position
 
+  @listen(Event.DRAW)
   def draw(self):
     for entity in self.entities:
       entity.draw(self.camera, self.light)

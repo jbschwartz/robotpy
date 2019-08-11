@@ -1,10 +1,8 @@
 import math
 
-import robot.spatial.dual       as     dual
-import robot.spatial.quaternion as     quaternion
-
-from robot.spatial.euler   import Axes, Order
-from robot.spatial.vector3 import Vector3
+from .        import dual, quaternion
+from .euler   import Axes, Order
+from .vector3 import Vector3
 
 Quaternion = quaternion.Quaternion
 Dual       = dual.Dual

@@ -1,9 +1,8 @@
 import json
 
-from robot.mech.serial                     import Serial
-from robot.visual.entities                 import robot_entity
-from robot.visual.filetypes.stl.stl_parser import STLParser
-from robot.visual.mesh                     import Mesh
+from robot.mech    import Serial
+from robot.spatial import Mesh
+from robot.visual  import STLParser
 
 with open('./robot/mech/robots/abb_irb_120.json') as json_file:
   serial_dictionary = json.load(json_file)

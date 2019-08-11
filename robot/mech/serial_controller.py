@@ -1,14 +1,12 @@
 import glfw, math
 
-from robot.ik.angles          import solve_angles
-from robot.visual.observer    import Observer
-from robot.spatial.dual       import Dual
-from robot.spatial.frame      import Frame
-from robot.spatial.quaternion import Quaternion
-from robot.spatial.transform  import Transform
-from robot.spatial.vector3    import Vector3
+from robot.ik.angles                 import solve_angles
+from robot.spatial                   import Dual, Quaternion, Transform, Vector3
+from robot.visual.messaging.listener import listen, listener
+from robot.visual.messaging.event    import Event
 
-class SerialController(Observer):
+@listener
+class SerialController():
   def __init__(self, serial, frame_entity):
     self.serial = serial
     self._t = 0
@@ -29,11 +27,12 @@ class SerialController(Observer):
 
   def advance(self, step):
     self.serial.angles = self.serial.traj.advance(step)
-    self.frame_entity.frame = Frame(self.serial.tool.tip)
+    self.frame_entity.frame = self.serial.tool.tip
 
   def print_results(self):
     print(self.serial.angles)
 
+  @listen(Event.KEY)
   def key(self, key, action, modifiers):
     STEP = 0.1
     if action == glfw.RELEASE or glfw.REPEAT:

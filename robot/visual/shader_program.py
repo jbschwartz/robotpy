@@ -2,7 +2,7 @@ import enum
 
 from OpenGL.GL import *
 
-from robot.visual.uniform import Uniform
+from .uniform import Uniform
 
 # TODO: Need to handle other types of shaders I'm sure.
 class ShaderTypes(enum.Enum):

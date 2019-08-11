@@ -1,9 +1,7 @@
 import math, unittest
 
-from robot.spatial.euler      import Axes, Order
-from robot.spatial.quaternion import Quaternion
-from robot.spatial.transform  import Transform
-from robot.spatial.vector3    import Vector3
+from robot.spatial       import Quaternion, Transform, Vector3
+from robot.spatial.euler import Axes, Order
 
 class TestTransform(unittest.TestCase):
   def setUp(self):

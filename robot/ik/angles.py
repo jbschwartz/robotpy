@@ -1,8 +1,8 @@
 import math
 
-from robot.ik.arm        import solve_arm
-from robot.ik.wrist      import solve_wrist
-from robot.spatial.frame import Frame
+from robot.spatial import Transform
+from .arm          import solve_arm
+from .wrist        import solve_wrist
 
 def redundant_solutions(solutions, robot):
   # TODO: This can probably be more concise
@@ -23,7 +23,7 @@ def redundant_solutions(solutions, robot):
           additional_solutions.append(newLow)
   return additional_solutions
 
-def solve_angles(target : Frame, robot):
+def solve_angles(target : Transform, robot):
   '''
   Get joint angles from a given target (inverse kinematics)
 

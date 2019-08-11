@@ -3,13 +3,8 @@ import math
 from collections import namedtuple
 from typing      import Iterable, Union
 
-from robot.mech.joint        import Joint
-from robot.spatial.aabb      import AABB
-from robot.spatial.frame     import Frame
-from robot.spatial.ray       import Ray
-from robot.spatial.transform import Transform
-from robot.spatial.vector3   import Vector3
-from robot.visual.mesh       import Mesh
+from robot.spatial import AABB, Mesh, Ray, Transform, Vector3
+from .joint        import Joint
 
 PhysicalProperties = namedtuple('PhysicalProperties', 'com moments volume', defaults=(None, None, None))
 
@@ -43,13 +38,9 @@ class Link:
     return self.previous * self.joint.transform
 
   @property
-  def frame(self) -> Frame:
-    return Frame(self.to_world)
-
-  @property
   def aabb(self) -> AABB:
     """Return the Link Mesh's AABB in world space."""
-    return AABB(*[self.to_world(corner) for corner in self.mesh.aabb.corners])
+    return AABB.from_points([self.to_world(corner) for corner in self.mesh.aabb.corners])
 
   @property
   def properties(self) -> PhysicalProperties:

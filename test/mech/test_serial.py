@@ -1,9 +1,8 @@
 import math, unittest
 
-from robot.mech.joint      import Joint
-from robot.mech.robots     import ABB_IRB_120
-from robot.mech.serial     import Serial
-from robot.spatial.vector3 import Vector3
+from robot.mech        import Joint, Serial
+from robot.mech.robots import ABB_IRB_120
+from robot.spatial     import Vector3
 
 class TestSerial(unittest.TestCase):
   def setUp(self):
@@ -14,7 +13,7 @@ class TestSerial(unittest.TestCase):
     self.robot.angles = angles
     frame = self.robot.pose()
 
-    result = frame.position()
+    result = frame.translation()
     expected = Vector3(133.58578643, 184.49747468, 128.00714267)
 
     self.assertAlmostEqual(result, expected)
@@ -35,7 +34,7 @@ class TestSerial(unittest.TestCase):
 
     for index, (frame, expected) in enumerate(zip(frames, expecteds)):
       with self.subTest(f"Frame #{index + 1}"):
-        result = frame.position()
+        result = frame.translation()
         self.assertAlmostEqual(result, expected)
 
   def test_transform_to_robot(self):

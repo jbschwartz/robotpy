@@ -1,9 +1,8 @@
 import math
 
-from robot.spatial.aabb                    import AABB
-from robot.spatial.kdtree                  import KDTree
-from robot.spatial.ray                     import Ray
-from robot.visual.exceptions               import ParserError
+from .aabb   import AABB
+from .kdtree import KDTree
+from .ray    import Ray
 
 class Mesh:
   def __init__(self, name = None, facets = None):
@@ -17,12 +16,7 @@ class Mesh:
   def from_file(cls, file_parser, file_path) -> 'Mesh':
     # TODO: The parsers are responsible for actually constructing the Mesh object
     #   Should this be so? Or should it be here?
-
-    try:
-      meshes = file_parser.parse(file_path)
-    except ParserError as error:
-      print('\033[91m' + f'Parsing error on line {error.line}: {error}' + '\033[0m')
-      raise
+    meshes = file_parser.parse(file_path)
 
     for mesh in meshes:
       mesh.accelerator = KDTree
@@ -56,7 +50,7 @@ class Mesh:
 
   def append(self, facet):
     '''Add a facet to the mesh.'''
-    self.aabb.extend(*facet.vertices)
+    self.aabb.expand(facet.vertices)
 
     self.facets.append(facet)
 

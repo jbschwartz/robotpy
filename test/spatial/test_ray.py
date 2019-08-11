@@ -1,7 +1,6 @@
 import math, unittest
 
-from robot.spatial.ray     import Ray
-from robot.spatial         import vector3
+from robot.spatial import Ray, vector3
 
 Vector3 = vector3.Vector3
 

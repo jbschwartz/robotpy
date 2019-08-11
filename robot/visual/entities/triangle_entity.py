@@ -5,13 +5,13 @@ from OpenGL.GL import *
 
 from ctypes import c_void_p
 
-from robot.spatial.frame         import Frame
-from robot.spatial.matrix4       import Matrix4
-from robot.spatial.vector3       import Vector3
-from robot.visual.observer       import Observer
-from robot.visual.shader_program import ShaderProgram
+from robot.spatial                   import Matrix4, Vector3
+from robot.visual.shader_program     import ShaderProgram
+from robot.visual.messaging.listener import listen, listener
+from robot.visual.messaging.event    import Event
 
-class TriangleEntity(Observer):
+@listener
+class TriangleEntity():
   def __init__(self, shader_program : ShaderProgram = None, color = (0, 0.5, 1)):
     self.vao = -1 if not bool(glGenVertexArrays) else glGenVertexArrays(1)
     self.vbo = -1 if not bool(glGenBuffers) else glGenBuffers(1)
@@ -51,13 +51,14 @@ class TriangleEntity(Observer):
   def update(self, delta):
     pass
 
+  @listen(Event.CLICK)
   def click(self, button, action, cursor):
     if button == glfw.MOUSE_BUTTON_MIDDLE:
       self.show = action == glfw.PRESS
 
   def draw(self, camera, light):
     if self.link:
-      target = self.link.frame.transform(self.link.com)
+      target = self.link.to_world(self.link.com)
     else:
       if not self.show:
         return

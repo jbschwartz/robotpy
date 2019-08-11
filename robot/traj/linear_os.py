@@ -1,17 +1,11 @@
 import math
 
 from robot.ik.angles          import solve_angles
-from robot.spatial.frame      import Frame
-from robot.spatial.quaternion import Quaternion
-from robot.spatial.transform  import Transform
-from robot.spatial.dual       import Dual
-from robot.spatial            import vector3
+from robot.spatial            import Dual, Quaternion, Transform, Vector3
 from robot.traj.segment       import ArcSegment, LinearSegment
 from robot.traj.trajectory_js import TrajectoryJS
 from robot.traj.path          import PiecewisePath
 from robot.traj.utils         import interpolate
-
-Vector3 = vector3.Vector3
 
 class LinearOS():
   '''Linear trajectory in operational space.'''
@@ -20,7 +14,7 @@ class LinearOS():
     # TODO: Don't forget to handle the blending case when there is only one segment.
     self.path.blend(30)
 
-    self.target_orientation = robot.pose().orientation()
+    self.target_orientation = robot.pose().rotation()
 
     self.segment_duration = [segment.length / self.path.length * duration for segment in self.path.segments]
 
@@ -106,7 +100,7 @@ class LinearOS():
 
     world_position = self.path.evaluate(self.segment_index, self.t)
 
-    target = Frame.from_position_orientation(world_position, self.target_orientation)
+    target = Transform.from_orientation_translation(self.target_orientation, world_position)
 
     solutions = solve_angles(target, self.robot)
 
