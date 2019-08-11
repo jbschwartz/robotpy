@@ -2,7 +2,7 @@ import enum, math
 
 from robot         import utils
 from robot.spatial import vector3, Ray, Transform
-from .projection   import OrthoProjection, PerspectiveProjection
+from .projection   import OrthoProjection, PerspectiveProjection, Projection
 
 Vector3 = vector3.Vector3
 
@@ -14,8 +14,12 @@ class Camera():
   '''
   Camera model responsible for camera positioning and manipulation.
   '''
-  def __init__(self, position : Vector3, target : Vector3, up = Vector3.Z(), projection = PerspectiveProjection()):
-    self.projection = projection
+  def __init__(self, position: Vector3 = None, target: Vector3 = None, up: Vector3 = None, projection: Projection = None) -> None:
+    self.projection = projection or PerspectiveProjection()
+
+    position = position or Vector3.Y()
+    target   = target   or Vector3()
+    up       = up       or Vector3.Z()
     self.look_at(position, target, up)
 
   def look_at(self, position, target, up):
