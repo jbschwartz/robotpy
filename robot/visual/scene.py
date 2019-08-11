@@ -1,6 +1,10 @@
 from OpenGL.GL import *
 
-from robot.spatial       import AABB
+import numpy as np
+
+from ctypes import c_void_p
+
+from robot.spatial       import AABB, Matrix4
 from .camera             import Camera
 from .messaging.listener import listen, listener
 from .messaging.event    import Event
@@ -50,6 +54,24 @@ class Scene():
     for entity in self.entities:
       entity.load()
 
+    self.matrix_ubo = glGenBuffers(1)
+
+    glBindBuffer(GL_UNIFORM_BUFFER, self.matrix_ubo)
+    glBufferData(GL_UNIFORM_BUFFER, 128, None, GL_DYNAMIC_DRAW)
+    glBindBuffer(GL_UNIFORM_BUFFER, 0)
+
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, self.matrix_ubo)
+
+    data_buffer = np.array([*self.light.position, 0] + [*self.light.color, 0] + [0.3, 0, 0, 0], dtype=np.float32)
+    print(data_buffer, data_buffer.nbytes)
+
+    self.light_ubo = glGenBuffers(1)
+    glBindBuffer(GL_UNIFORM_BUFFER, self.light_ubo)
+    glBufferData(GL_UNIFORM_BUFFER, data_buffer.nbytes, None, GL_DYNAMIC_DRAW)
+    glBindBuffer(GL_UNIFORM_BUFFER, 0)
+
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, self.light_ubo)
+
   @listen(Event.START_FRAME)
   def start_frame(self):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -62,6 +84,22 @@ class Scene():
   @listen(Event.DRAW)
   def draw(self):
     self.light.position = self.camera.position
+
+    data_buffer = np.array([*self.light.position, 0] + [*self.light.color] + [self.light.intensity], dtype=np.float32)
+    glBindBuffer(GL_UNIFORM_BUFFER, self.light_ubo)
+    glBufferData(GL_UNIFORM_BUFFER, data_buffer.nbytes, data_buffer, GL_DYNAMIC_DRAW)
+    glBindBuffer(GL_UNIFORM_BUFFER, 0)
+
+
+    view = Matrix4.from_transform(self.camera.world_to_camera)
+    projection = self.camera.projection.matrix
+    data_list = projection.elements + view.elements
+
+    data_buffer = np.array(data_list, dtype=np.float32)
+
+    glBindBuffer(GL_UNIFORM_BUFFER, self.matrix_ubo)
+    glBufferData(GL_UNIFORM_BUFFER, data_buffer.nbytes, data_buffer, GL_DYNAMIC_DRAW)
+    glBindBuffer(GL_UNIFORM_BUFFER, 0)
 
     for entity in self.entities:
       entity.draw(self.camera, self.light)

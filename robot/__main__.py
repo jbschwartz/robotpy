@@ -1,4 +1,6 @@
 import json, math, sys
+import numpy as np
+from OpenGL.GL import *
 
 from robot.spatial import vector3
 Vector3 = vector3.Vector3
@@ -6,7 +8,7 @@ Vector3 = vector3.Vector3
 from robot.common          import Bindings, logger, Timer
 from robot.mech.serial     import Serial
 from robot.spatial.euler   import Axes, Order
-from robot.spatial         import Mesh, Transform, Quaternion
+from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
 from robot.traj.linear_os  import LinearOS
 
@@ -82,8 +84,13 @@ if __name__ == "__main__":
 
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
+  program.bind_ubo("Matrices")
+
   world_frame = entities.FrameEntity(Transform(), flat_program)
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
+
+
+  program.bind_ubo("Light")
 
   scene = vis.Scene(camera, light)
 

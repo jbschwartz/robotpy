@@ -92,12 +92,12 @@ class RobotEntity(Entity):
     # TODO: Use Uniform Buffer Objects to remove this duplicate code from each entity
     self.shader_program.use()
 
-    self.shader_program.proj_matrix = camera.projection.matrix
-    self.shader_program.view_matrix = camera.world_to_camera
+    # self.shader_program.projection = camera.projection.matrix
+    # self.shader_program.view = camera.world_to_camera
 
-    self.shader_program.light_position  = light.position
-    self.shader_program.light_color     = light.color
-    self.shader_program.light_intensity = light.intensity
+    # self.shader_program.light_position  = light.position
+    # self.shader_program.light_color     = light.color
+    # self.shader_program.light_intensity = light.intensity
 
     self.shader_program.model_matrices  = self.serial.poses()
     self.shader_program.use_link_colors = False
