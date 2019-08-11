@@ -1,7 +1,7 @@
 import enum, math
 
 from robot         import utils
-from robot.spatial import vector3, Ray, Transform
+from robot.spatial import AABB, vector3, Ray, Transform
 from .projection   import OrthoProjection, PerspectiveProjection, Projection
 
 Vector3 = vector3.Vector3
@@ -65,14 +65,11 @@ class Camera():
     self.camera_to_world = align_x * align_z # Step 10
 
   @property
-  def position(self):
+  def position(self) -> Vector3:
     return self.camera_to_world.translation()
 
-  def orbit(self, target: Vector3, pitch = 0, yaw = 0, orbit_type : OrbitType = OrbitType.FREE):
-    '''
-    Orbits the camera around the target point (with pitch and yaw)
-    '''
-
+  def orbit(self, target: Vector3, pitch: float = 0, yaw: float = 0, orbit_type: OrbitType = OrbitType.FREE) -> None:
+    """Orbit the camera around target point (with pitch and yaw)."""
     # Move target to the origin
     self.camera_to_world = Transform.from_axis_angle_translation(translation = -target) * self.camera_to_world
 
@@ -93,27 +90,21 @@ class Camera():
     # Move target back to position
     self.camera_to_world = Transform.from_axis_angle_translation(translation = target) * self.camera_to_world
 
-  def dolly(self, z):
-    '''
-    Move the camera in and out along the line of sight (z axis).
-    '''
+  def dolly(self, z: float) -> None:
+    """Move the camera along its line of sight (z axis)."""
     self.camera_to_world *= Transform.from_axis_angle_translation(translation = Vector3(0, 0, z))
 
-  def track(self, x = 0, y = 0, v = None):
-    '''
-    Move the camera vertically and horizontally.
-
-    x, y, and v are in camera space.
-    '''
+  def track(self, x: float = 0, y: float = 0, v: Vector3 = None) -> None:
+    """Move the camera vertically and horizontally in camera space."""
     # Accept vector input if it is provided. Makes calls a bit cleaner if the caller is using a vector already.
     v = Vector3(*v.xy) if v else Vector3(x, y)
 
     self.camera_to_world *= Transform.from_axis_angle_translation(translation = v)
 
-  def roll(self, angle):
+  def roll(self, angle: float) -> None:
     self.camera_to_world *= Transform.from_axis_angle_translation(axis = Vector3.Z(), angle = angle)
 
-  def fit(self, world_aabb, scale = 1):
+  def fit(self, world_aabb: AABB, scale: float = 1) -> None:
     '''
     Dolly and track the camera to fit the provided bounding box in world space.
 
@@ -210,10 +201,8 @@ class Camera():
     # Move the camera, remembering to adjust for the box being shifted off center
     self.camera_to_world *= Transform.from_axis_angle_translation(translation = Vector3(-delta_x, -delta_y, -delta_z))
 
-  def camera_space(self, ndc):
-    '''
-    Transform a point in NDC to camera space. Place all points on the near clipping plane.
-    '''
+  def camera_space(self, ndc: Vector3) -> Vector3:
+    """Transform a point in NDC to camera space. Place all points on the near clipping plane."""
     # TODO: Verify that this is working correctly (with a test?).
 
     # Partially unproject the position and normalize
@@ -223,7 +212,7 @@ class Camera():
 
     return Vector3(m11 * ndc.x, m22 * ndc.y, -self.projection.near_clip)
 
-  def cast_ray(self, ndc):
+  def cast_ray(self, ndc: Vector3) -> Ray:
     point_camera_space = self.camera_space(ndc)
 
     if isinstance(self.projection, PerspectiveProjection):
@@ -240,5 +229,5 @@ class Camera():
     return Ray(origin, self.camera_to_world(direction, as_type="vector"))
 
   @property
-  def world_to_camera(self):
+  def world_to_camera(self) -> Transform:
     return self.camera_to_world.inverse()
