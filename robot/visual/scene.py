@@ -59,10 +59,10 @@ class Scene():
     for entity in self.entities:
       entity.update(delta)
 
-      self.light.position = self.camera.position
-
   @listen(Event.DRAW)
   def draw(self):
+    self.light.position = self.camera.position
+
     for entity in self.entities:
       entity.draw(self.camera, self.light)
 
