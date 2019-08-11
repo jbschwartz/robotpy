@@ -87,8 +87,6 @@ class CameraController():
         self.is_selecting = self.window.ndc(cursor)
       else:
         end = self.window.ndc(cursor)
-        # print(f'Square from {self.is_selecting} to {end}')
-        # self.camera.fit_window(self.is_selecting, end)
         self.is_selecting = None
 
     if button == glfw.MOUSE_BUTTON_MIDDLE and action == glfw.PRESS:

@@ -21,7 +21,6 @@ class STLWriter():
       num_facets = 0
       mesh_id = 0
       for mesh in meshes:
-        print(len(mesh.facets))
         for facet in mesh.facets:
           buffer = [ *facet.normal, *facet.vertices[0], *facet.vertices[1], *facet.vertices[2], mesh_id ]
           file.write(struct.pack('<fff fff fff fff H', *buffer))

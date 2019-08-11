@@ -29,9 +29,6 @@ class SerialController():
     self.serial.angles = self.serial.traj.advance(step)
     self.frame_entity.frame = self.serial.tool.tip
 
-  def print_results(self):
-    print(self.serial.angles)
-
   @listen(Event.KEY)
   def key(self, key, action, modifiers):
     STEP = 0.1
