@@ -36,7 +36,7 @@ def matrix_decorator(gl_function):
     # This assumes it's always 4
     if not isinstance(transforms, list):
       if isinstance(transforms, Transform):
-        matrix = Matrix4(transforms)
+        matrix = Matrix4.from_transform(transforms)
       elif isinstance(transforms, Matrix4):
         matrix = transforms
 
@@ -44,7 +44,7 @@ def matrix_decorator(gl_function):
 
     assert all(map(lambda m: isinstance(m, (Transform, Matrix4)), transforms))
 
-    matrices = list(map(lambda t: Matrix4(t) if isinstance(t, Transform) else t, transforms))
+    matrices = list(map(lambda t: Matrix4.from_transform(t) if isinstance(t, Transform) else t, transforms))
 
     # OpenGL expects a flat list of matrix elements
     elements = [elem for m in matrices for elem in m.elements]

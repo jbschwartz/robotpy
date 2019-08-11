@@ -115,10 +115,10 @@ class RobotEntity(Entity):
 
     if self.frame_entity:
       for link in self.serial.links:
-        self.frame_entity.draw(camera, light, Matrix4(link.to_world))
+        self.frame_entity.draw(camera, light, Matrix4.from_transform(link.to_world))
 
       if self.serial.tool:
-        self.frame_entity.draw(camera, light, Matrix4(self.serial.tool.tip))
+        self.frame_entity.draw(camera, light, Matrix4.from_transform(self.serial.tool.tip))
 
     if self.bounding_entity:
       for mesh, link in zip(self.meshes, self.serial.links):
