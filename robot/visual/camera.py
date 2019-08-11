@@ -11,9 +11,7 @@ class OrbitType(enum.Enum):
   CONSTRAINED = enum.auto()
 
 class Camera():
-  '''
-  Camera model responsible for camera positioning and manipulation.
-  '''
+  """Basic camera model with positioning and manipulation."""
   def __init__(self, position: Vector3 = None, target: Vector3 = None, up: Vector3 = None, projection: Projection = None) -> None:
     self.projection = projection or PerspectiveProjection()
 
@@ -22,9 +20,8 @@ class Camera():
     up       = up       or Vector3.Z()
     self.look_at(position, target, up)
 
-  def look_at(self, position, target, up):
-    '''
-    Calcuate look-at transformation.
+  def look_at(self, position: Vector3, target: Vector3, up: Vector3) -> None:
+    """Calcuate look-at transformation.
 
     Uses a geometrically intuitive method with quaternions.
     (instead of a more efficient computation converting from a matrix directly)
@@ -42,7 +39,7 @@ class Camera():
       8.  Note, sometimes the intermediate x axis is already positioned correctly. So we just stop there.
       9.  Otherwise, we need to then calculate which direction to rotate the intermediate x to get to desired.
       10. Rotate around our desired z axis to complete the transformation
-    '''
+    """
 
     forward = (position - target).normalize()       # Step 2
     angle_z = math.acos(Vector3.Z() * forward) # Step 3
