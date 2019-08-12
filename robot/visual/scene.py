@@ -8,6 +8,7 @@ from robot.spatial       import AABB, Matrix4
 from .camera             import Camera
 from .messaging.listener import listen, listener
 from .messaging.event    import Event
+from .opengl.uniform_buffer import Mapping, UniformBuffer
 
 @listener
 class Scene():
@@ -54,6 +55,12 @@ class Scene():
     for entity in self.entities:
       entity.load()
 
+    self.light_ub = UniformBuffer()
+
+    self.light_ub.bind(Mapping(
+      self.light, ['position', 'color', 'intensity']
+    ))
+
     self.matrix_ubo = glGenBuffers(1)
 
     glBindBuffer(GL_UNIFORM_BUFFER, self.matrix_ubo)
@@ -64,13 +71,6 @@ class Scene():
 
     data_buffer = np.array([*self.light.position, 0] + [*self.light.color, 0] + [0.3, 0, 0, 0], dtype=np.float32)
     print(data_buffer, data_buffer.nbytes)
-
-    self.light_ubo = glGenBuffers(1)
-    glBindBuffer(GL_UNIFORM_BUFFER, self.light_ubo)
-    glBufferData(GL_UNIFORM_BUFFER, data_buffer.nbytes, None, GL_DYNAMIC_DRAW)
-    glBindBuffer(GL_UNIFORM_BUFFER, 0)
-
-    glBindBufferBase(GL_UNIFORM_BUFFER, 2, self.light_ubo)
 
   @listen(Event.START_FRAME)
   def start_frame(self):
@@ -85,11 +85,7 @@ class Scene():
   def draw(self):
     self.light.position = self.camera.position
 
-    data_buffer = np.array([*self.light.position, 0] + [*self.light.color] + [self.light.intensity], dtype=np.float32)
-    glBindBuffer(GL_UNIFORM_BUFFER, self.light_ubo)
-    glBufferData(GL_UNIFORM_BUFFER, data_buffer.nbytes, data_buffer, GL_DYNAMIC_DRAW)
-    glBindBuffer(GL_UNIFORM_BUFFER, 0)
-
+    self.light_ub.load()
 
     view = Matrix4.from_transform(self.camera.world_to_camera)
     projection = self.camera.projection.matrix

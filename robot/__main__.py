@@ -29,7 +29,6 @@ if __name__ == "__main__":
     bill_program = vis.ShaderProgram('billboard')
     com_program = vis.ShaderProgram('com')
 
-
   program.bind_ubo("Matrices")
   flat_program.bind_ubo("Matrices")
   grid_program.bind_ubo("Matrices")
