@@ -12,8 +12,6 @@ layout (std140) uniform Matrices
   mat4 view;
 };
 
-// uniform mat4 projection;
-// uniform mat4 view;
 uniform mat4 model_matrices[7];
 
 uniform bool use_link_colors;
