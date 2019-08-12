@@ -29,6 +29,15 @@ if __name__ == "__main__":
     bill_program = vis.ShaderProgram('billboard')
     com_program = vis.ShaderProgram('com')
 
+
+  program.bind_ubo("Matrices")
+  flat_program.bind_ubo("Matrices")
+  grid_program.bind_ubo("Matrices")
+  bill_program.bind_ubo("Matrices")
+  com_program.bind_ubo("Matrices")
+
+  program.bind_ubo("Light")
+
   ee_frame = entities.FrameEntity(Transform(), flat_program)
   bb = entities.BoundingEntity(flat_program)
   grid = entities.GridEntity(grid_program)
@@ -84,13 +93,8 @@ if __name__ == "__main__":
 
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
-  program.bind_ubo("Matrices")
-
   world_frame = entities.FrameEntity(Transform(), flat_program)
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
-
-
-  program.bind_ubo("Light")
 
   scene = vis.Scene(camera, light)
 

@@ -196,13 +196,6 @@ class FrameEntity(Entity):
 
     self.shader_program.use()
 
-    self.shader_program.proj_matrix = camera.projection.matrix
-    self.shader_program.view_matrix = camera.world_to_camera
-
-    self.shader_program.light_position  = light.position
-    self.shader_program.light_color     = light.color
-    self.shader_program.light_intensity = light.intensity
-
     self.shader_program.model_matrix = transform
     self.shader_program.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,

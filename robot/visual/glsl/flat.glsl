@@ -2,14 +2,18 @@
 
 in vec3 vin_position;
 
-uniform mat4 proj_matrix;
-uniform mat4 view_matrix;
+layout (std140) uniform Matrices
+{
+  mat4 projection;
+  mat4 view;
+};
+
 uniform mat4 model_matrix;
 uniform mat4 scale_matrix;
 
 void main()
 {
-  gl_Position = proj_matrix * view_matrix * model_matrix * scale_matrix * vec4(vin_position, 1.0);
+  gl_Position = projection * view * model_matrix * scale_matrix * vec4(vin_position, 1.0);
 }
 
 #elif defined(FRAGMENT)
