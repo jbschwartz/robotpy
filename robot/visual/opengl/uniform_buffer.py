@@ -1,5 +1,6 @@
 from collections import namedtuple
 from OpenGL.GL   import *
+from typing      import Iterable
 
 import numpy as np
 
@@ -26,28 +27,41 @@ class UniformBuffer():
     self.id = glGenBuffers(1)
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, self.id)
 
-  def bind(self, mapping: Mapping):
-    paddings = [0]
-    current = sizes[type(getattr(mapping.object, mapping.fields[0]))]
-    for field in mapping.fields[1:]:
-      value = type(getattr(mapping.object, field))
-      alignment = alignments[value]
-      mod = current % alignment
-      if mod == 0:
+  def get_types(self, mapping: Mapping):
+    return [type(getattr(mapping.object, field)) for field in mapping.fields]
+
+  def calculate_padding(self, mapping: Mapping) -> Iterable[float]:
+    """Return padding in bytes per field in Mapping."""
+    paddings = []
+    current = 0
+
+    for field_type in self.get_types(mapping):
+      alignment = alignments[field_type]
+      offset_to_boundary = current % alignment
+
+      size_in_bytes = sizes[field_type]
+      assert size_in_bytes % 4 == 0, "Field size must be divisible by 4 since we're assuming padding is always in 4-byte chunks"
+
+      if offset_to_boundary == 0:
         paddings.append(0)
+        current += size_in_bytes
       else:
-        paddings.append((alignment - mod) // 4)
-      current += sizes[value]
+        padding_bytes = alignment - offset_to_boundary
+        paddings.append(padding_bytes)
+        current += size_in_bytes + padding_bytes
 
-    print(paddings)
+    return paddings
 
+  def bind(self, mapping: Mapping):
     def fetcher():
       return [getattr(mapping.object, field) for field in mapping.fields]
+
+    paddings = self.calculate_padding(mapping)
 
     def builder():
       values = []
       for padding, value in zip(paddings, fetcher()):
-        values += [0] * padding
+        values += [0] * (padding // 4)
         if isinstance(value, Vector3):
           values += [*value]
         elif isinstance(value, Matrix4):
