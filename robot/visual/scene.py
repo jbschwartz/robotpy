@@ -55,7 +55,7 @@ class Scene():
     for entity in self.entities:
       entity.load()
 
-    self.light_ub = UniformBuffer()
+    self.light_ub = UniformBuffer("Light", 2)
 
     self.light_ub.bind(Mapping(
       self.light, ['position', 'color', 'intensity']

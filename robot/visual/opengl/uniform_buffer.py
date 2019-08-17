@@ -23,9 +23,9 @@ sizes = {
 }
 
 class UniformBuffer():
-  def __init__(self):
+  def __init__(self, name: str, block_index: int):
     self.id = glGenBuffers(1)
-    glBindBufferBase(GL_UNIFORM_BUFFER, 2, self.id)
+    glBindBufferBase(GL_UNIFORM_BUFFER, block_index, self.id)
 
   def get_types(self, mapping: Mapping):
     return [type(getattr(mapping.object, field)) for field in mapping.fields]
