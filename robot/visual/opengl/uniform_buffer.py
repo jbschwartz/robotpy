@@ -25,7 +25,8 @@ sizes = {
 }
 
 class UniformBuffer():
-  def __init__(self, name: str, block_index: int):
+  """OpenGL Uniform Buffer Object."""
+  def __init__(self, name: str, block_index: int) -> None:
     self.id = glGenBuffers(1)
     glBindBufferBase(GL_UNIFORM_BUFFER, block_index, self.id)
 
