@@ -4,22 +4,24 @@ from typing      import Iterable
 
 import numpy as np
 
-from robot.spatial import Matrix4, Vector3
+from robot.spatial import Matrix4, Transform, Vector3
 
 Mapping = namedtuple('Mapping', 'object fields')
 
 alignments = {
-  float:    4,
-  int:      4,
-  Matrix4: 16,
-  Vector3: 16
+  float:      4,
+  int:        4,
+  Matrix4:   16,
+  Transform: 16,
+  Vector3:   16
 }
 
 sizes = {
-  float:    4,
-  int:      4,
-  Matrix4: 64,
-  Vector3: 12
+  float:      4,
+  int:        4,
+  Matrix4:   64,
+  Transform: 64,
+  Vector3:   12
 }
 
 class UniformBuffer():
@@ -27,8 +29,15 @@ class UniformBuffer():
     self.id = glGenBuffers(1)
     glBindBufferBase(GL_UNIFORM_BUFFER, block_index, self.id)
 
+  def resolve_dot_notation(self, start_object, field):
+    current = start_object
+    for attr in field.split('.'):
+      current = getattr(current, attr)
+
+    return current
+
   def get_types(self, mapping: Mapping):
-    return [type(getattr(mapping.object, field)) for field in mapping.fields]
+    return [type(self.resolve_dot_notation(mapping.object, field)) for field in mapping.fields]
 
   def calculate_padding(self, mapping: Mapping) -> Iterable[float]:
     """Return padding in bytes per field in Mapping."""
@@ -54,7 +63,7 @@ class UniformBuffer():
 
   def bind(self, mapping: Mapping):
     def fetcher():
-      return [getattr(mapping.object, field) for field in mapping.fields]
+      return [self.resolve_dot_notation(mapping.object, field) for field in mapping.fields]
 
     paddings = self.calculate_padding(mapping)
 
@@ -66,6 +75,9 @@ class UniformBuffer():
           values += [*value]
         elif isinstance(value, Matrix4):
           values += [*(value.elements)]
+        elif isinstance(value, Transform):
+          matrix = Matrix4.from_transform(value)
+          values += [*(matrix.elements)]
         elif isinstance(value, (int, float)):
           values += [value]
       return values

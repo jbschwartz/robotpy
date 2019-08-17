@@ -61,16 +61,11 @@ class Scene():
       self.light, ['position', 'color', 'intensity']
     ))
 
-    self.matrix_ubo = glGenBuffers(1)
+    self.matrix_ub = UniformBuffer("Matrices", 1)
 
-    glBindBuffer(GL_UNIFORM_BUFFER, self.matrix_ubo)
-    glBufferData(GL_UNIFORM_BUFFER, 128, None, GL_DYNAMIC_DRAW)
-    glBindBuffer(GL_UNIFORM_BUFFER, 0)
-
-    glBindBufferBase(GL_UNIFORM_BUFFER, 1, self.matrix_ubo)
-
-    data_buffer = np.array([*self.light.position, 0] + [*self.light.color, 0] + [0.3, 0, 0, 0], dtype=np.float32)
-    print(data_buffer, data_buffer.nbytes)
+    self.matrix_ub.bind(Mapping(
+      self.camera, ['projection.matrix', 'world_to_camera']
+    ))
 
   @listen(Event.START_FRAME)
   def start_frame(self):
@@ -86,16 +81,7 @@ class Scene():
     self.light.position = self.camera.position
 
     self.light_ub.load()
-
-    view = Matrix4.from_transform(self.camera.world_to_camera)
-    projection = self.camera.projection.matrix
-    data_list = projection.elements + view.elements
-
-    data_buffer = np.array(data_list, dtype=np.float32)
-
-    glBindBuffer(GL_UNIFORM_BUFFER, self.matrix_ubo)
-    glBufferData(GL_UNIFORM_BUFFER, data_buffer.nbytes, data_buffer, GL_DYNAMIC_DRAW)
-    glBindBuffer(GL_UNIFORM_BUFFER, 0)
+    self.matrix_ub.load()
 
     for entity in self.entities:
       entity.draw(self.camera, self.light)
