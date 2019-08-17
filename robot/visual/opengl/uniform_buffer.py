@@ -7,6 +7,7 @@ import numpy as np
 from robot.spatial import Matrix4, Transform, Vector3
 
 Mapping = namedtuple('Mapping', 'object fields')
+Field   = namedtuple('Field', 'underlying_type alignment size_in_bytes')
 
 alignments = {
   float:      4,
@@ -37,28 +38,31 @@ class UniformBuffer():
 
     return current
 
-  def get_types(self, mapping: Mapping):
-    return [type(self.resolve_dot_notation(mapping.object, field)) for field in mapping.fields]
+  def fields(self, mapping: Mapping):
+    fields = []
+    for field in mapping.fields:
+      underlying_type = type(self.resolve_dot_notation(mapping.object, field))
+      fields.append(Field(underlying_type, alignments[underlying_type], sizes[underlying_type]))
+
+      assert fields[-1].size_in_bytes % 4 == 0, "Field size must be divisible by 4 since we're only padding with 4-byte floats"
+
+    return fields
 
   def calculate_padding(self, mapping: Mapping) -> Iterable[float]:
     """Return padding in bytes per field in Mapping."""
     paddings = []
     current = 0
 
-    for field_type in self.get_types(mapping):
-      alignment = alignments[field_type]
-      offset_to_boundary = current % alignment
-
-      size_in_bytes = sizes[field_type]
-      assert size_in_bytes % 4 == 0, "Field size must be divisible by 4 since we're assuming padding is always in 4-byte chunks"
+    for field in self.fields(mapping):
+      offset_to_boundary = current % field.alignment
+      current += field.size_in_bytes
 
       if offset_to_boundary == 0:
         paddings.append(0)
-        current += size_in_bytes
       else:
-        padding_bytes = alignment - offset_to_boundary
+        padding_bytes = field.alignment - offset_to_boundary
         paddings.append(padding_bytes)
-        current += size_in_bytes + padding_bytes
+        current += padding_bytes
 
     return paddings
 
