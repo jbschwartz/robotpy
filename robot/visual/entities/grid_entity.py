@@ -55,12 +55,6 @@ class GridEntity(Entity):
   def draw(self, camera, light):
     self.shader_program.use()
 
-    self.shader_program.proj_matrix = camera.projection.matrix
-    self.shader_program.view_matrix = camera.world_to_camera
-    # self.shader_program.model_matrix  = Matrix4()
-    # self.shader_program.light_position  = light.position
-    # self.shader_program.light_color     = light.color
-    # self.shader_program.light_intensity = light.intensity
     self.shader_program.step_size = 250.0
     self.shader_program.minor_step_size = 50.0
     self.shader_program.in_grid_color = Vector3(0.5, 0.5, 0.5)

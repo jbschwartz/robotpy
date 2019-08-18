@@ -1,9 +1,14 @@
 from OpenGL.GL import *
 
-from robot.spatial       import AABB
+import numpy as np
+
+from ctypes import c_void_p
+
+from robot.spatial       import AABB, Matrix4
 from .camera             import Camera
 from .messaging.listener import listen, listener
 from .messaging.event    import Event
+from .opengl.uniform_buffer import Mapping, UniformBuffer
 
 @listener
 class Scene():
@@ -50,6 +55,18 @@ class Scene():
     for entity in self.entities:
       entity.load()
 
+    self.matrix_ub = UniformBuffer("Matrices", 1)
+
+    self.matrix_ub.bind(Mapping(
+      self.camera, ['projection.matrix', 'world_to_camera']
+    ))
+
+    self.light_ub = UniformBuffer("Light", 2)
+
+    self.light_ub.bind(Mapping(
+      self.light, ['position', 'color', 'intensity']
+    ))
+
   @listen(Event.START_FRAME)
   def start_frame(self):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -62,6 +79,9 @@ class Scene():
   @listen(Event.DRAW)
   def draw(self):
     self.light.position = self.camera.position
+
+    self.light_ub.load()
+    self.matrix_ub.load()
 
     for entity in self.entities:
       entity.draw(self.camera, self.light)

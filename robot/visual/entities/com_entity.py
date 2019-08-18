@@ -24,8 +24,6 @@ class COMEntity():
     # TODO: This maybe could be a decorator to the draw function inside the entity
     self.shader_program.use()
 
-    self.shader_program.proj_matrix = camera.projection.matrix
-
     # TODO: Issue a warning (exception?) if assigning to a uniform that does not exist in the shader
     self.shader_program.radius   = self.radius
     self.shader_program.position = center_of_mass

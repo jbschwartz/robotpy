@@ -6,8 +6,12 @@ out vec3 vout_color;
 out vec3 vout_normal;
 out vec3 frag_pos;
 
-uniform mat4 proj_matrix;
-uniform mat4 view_matrix;
+layout (std140) uniform Matrices
+{
+  mat4 projection;
+  mat4 view;
+};
+
 uniform mat4 model_matrices[7];
 
 uniform bool use_link_colors;
@@ -26,5 +30,5 @@ void main(void)
 
   vout_normal = vec3(model_matrix * vec4(vin_normal, 0));
   frag_pos =  vec3(model_matrix * vec4(vin_position, 1));
-  gl_Position = proj_matrix * view_matrix * model_matrix * vec4(vin_position, 1.0);
+  gl_Position = projection * view * model_matrix * vec4(vin_position, 1.0);
 }

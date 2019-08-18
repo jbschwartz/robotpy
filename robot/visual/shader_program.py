@@ -102,6 +102,17 @@ class ShaderProgram():
 
       self.uniforms[uniform.name] = uniform
 
+  def get_uniform_block(self, name: str) -> int:
+    result = glGetUniformBlockIndex(self.id, name)
+
+    return result if result != GL_INVALID_INDEX else None
+
+  def bind_ubo(self, name, binding_index):
+    result = self.get_uniform_block(name)
+
+    if result is not None:
+      glUniformBlockBinding(self.id, result, binding_index)
+
   def attach_shaders(self, shaders : dict):
     get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
 

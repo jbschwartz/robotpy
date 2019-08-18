@@ -1,7 +1,11 @@
 #if defined(VERTEX)
 out vec2 mapping;
 
-uniform mat4 proj_matrix;
+layout (std140) uniform Matrices
+{
+  mat4 projection;
+  mat4 view;
+};
 
 // Ultimate position and radius (in camera space) of our drawn circle
 uniform float radius;
@@ -27,7 +31,7 @@ void main()
   vec4 camera_corner_pos = vec4(position, 1.0);
   camera_corner_pos.xy += radius * mapping;
 
-  gl_Position = proj_matrix * camera_corner_pos;
+  gl_Position = projection * camera_corner_pos;
   gl_Position.z = -1;
 }
 
