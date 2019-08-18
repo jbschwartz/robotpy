@@ -15,7 +15,7 @@ layout (std140) uniform Matrices
 uniform mat4 model_matrices[7];
 
 uniform bool use_link_colors;
-uniform vec3 link_colors[8];
+uniform vec3 link_colors[7];
 uniform vec3 robot_color;
 
 void main(void)
