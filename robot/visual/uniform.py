@@ -86,7 +86,7 @@ class Uniform:
     return self.ascii_list_to_string(glGetProgramResourceName(self.program_id, GL_UNIFORM, self.index, length))
 
   def ascii_list_to_string(self, ascii_list):
-    return ''.join(list(map(chr, ascii_list))).strip('\x00').strip('[0]')
+    return ''.join(map(chr, ascii_list)).strip('\x00').strip('[0]')
 
   @property
   def value(self, ):
