@@ -44,7 +44,7 @@ if __name__ == "__main__":
   welder = tool_entity.load('./robot/mech/tools/welder.json')
   welder.shader_program = program
 
-  with Timer('Load Robot JSON') as t:
+  with Timer('Load Robot and Construct Mesh') as t:
     with open('./robot/mech/robots/abb_irb_120.json') as json_file:
       serial_dictionary = json.load(json_file)
 
