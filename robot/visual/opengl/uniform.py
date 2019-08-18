@@ -6,12 +6,6 @@ from OpenGL.GL import *
 
 from robot.spatial import Matrix4, Transform, Vector3
 
-def scalar_decorator(gl_function):
-  def wrapper(location, *args):
-    return gl_function(location, *args)
-
-  return wrapper
-
 def vector_decorator(gl_function):
   def wrapper(location, vectors):
     # TODO: Better type/size checking
@@ -57,9 +51,9 @@ def matrix_decorator(gl_function):
   return wrapper
 
 GL_TYPE_UNIFORM_FN = {
-  GL_INT:        scalar_decorator(glUniform1iv),
-  GL_FLOAT:      scalar_decorator(glUniform1f),
-  GL_BOOL:       scalar_decorator(glUniform1i),
+  GL_INT:        glUniform1iv,
+  GL_FLOAT:      glUniform1f,
+  GL_BOOL:       glUniform1i,
   GL_FLOAT_VEC3: vector_decorator(glUniform3fv),
   GL_FLOAT_MAT4: matrix_decorator(glUniformMatrix4fv),
   GL_SAMPLER_2D: None
