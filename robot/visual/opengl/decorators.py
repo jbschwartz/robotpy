@@ -42,12 +42,10 @@ def primative(gl_function: int) -> Callable:
   def array_wrapper(array_size: int) -> Callable:
     def wrapper(location: int, values: Iterable) -> None:
       if isinstance(values, Number):
-        assert array_size == 1
-        gl_function(location, 1, [values])
-      else:
-        assert len(values) == array_size
-        gl_function(location, array_size, values)
+        values = [values]
 
+      assert len(values) == array_size
+      gl_function(location, array_size, values)
     return wrapper
   return array_wrapper
 
