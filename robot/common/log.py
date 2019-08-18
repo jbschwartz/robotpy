@@ -26,7 +26,9 @@ def colorize(color):
   return colorize_decorator
 
 grey   = colorize('\033[90m')
+red    = colorize('\033[31m')
 yellow = colorize('\033[33m')
 
 logger.debug   = grey(logger.debug)
+logger.error = red(logger.error)
 logger.warning = yellow(logger.warning)
