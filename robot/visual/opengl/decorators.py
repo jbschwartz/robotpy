@@ -47,28 +47,38 @@ def vector(gl_function: int, vector_size: int) -> Callable:
     return wrapper
   return array_wrapper
 
-def matrix(gl_function) -> Callable:
+def matrix(gl_function: int, matrix_size: int) -> Callable:
+  # TODO: Implement non-square matricies
+  # TODO: Implement glUniformMatrix[2,3]fv functions
+  assert matrix_size == 4, "Only matricies of size 4 are implemented"
+
   def array_wrapper(array_size: int) -> Callable:
-    def wrapper(location, transforms):
-      # TODO: Better type/size checking
-      # This entire function is actually broken since there are glUniformMatrix[1,2,3,4]x functions
-      # This assumes it's always 4
-      if not isinstance(transforms, list):
-        if isinstance(transforms, Transform):
-          matrix = Matrix4.from_transform(transforms)
-        elif isinstance(transforms, Matrix4):
-          matrix = transforms
+    def wrapper(location: int, values: Union[Iterable, Matrix4, Transform]) -> None:
+      # Handle `= Matrix4()`, `= Transform()`, Handle `= [1, 2, ..., 16]`
+      if isinstance(values, (Matrix4, Transform)) or isinstance(values[0], Number):
+        values = [values]
 
-        return gl_function(location, 1, False, np.array(matrix.elements, dtype=np.float32))
+      assert isinstance(values, (list, tuple))
+      assert len(values) == array_size, f"Incorrect number of matricies passed. Got {len(values)}, expected {array_size}"
 
-      assert all(map(lambda m: isinstance(m, (Transform, Matrix4)), transforms))
+      elements = []
 
-      matrices = list(map(lambda t: Matrix4.from_transform(t) if isinstance(t, Transform) else t, transforms))
+      for value in values:
+        if isinstance(value, Transform):
+          matrix = Matrix4.from_transform(value)
+          components = matrix.elements
+        elif isinstance(value, Matrix4):
+          components = value.elements
+        elif isinstance(value[0], Number):
+          components = value
+        else:
+          raise TypeError(f'Unexpected type {type(value)} given to Matrix Array')
 
-      # OpenGL expects a flat list of matrix elements
-      elements = [elem for m in matrices for elem in m.elements]
+        assert len(components) == 16
+        elements.extend(components)
+
       # Matrix4 stores elements column-major so transposing is never necessary for OpenGL
-      return gl_function(location, len(matrices), False, elements)
+      return gl_function(location, array_size, False, elements)
 
     return wrapper
   return array_wrapper
