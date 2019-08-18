@@ -3,12 +3,13 @@ from typing  import Callable
 from OpenGL.GL import *
 
 from robot.common  import logger
+from .exceptions import UniformArraySizeError, UniformTypeError, UniformSizeError
 import robot.visual.opengl.decorators as decorators
 
 GL_TYPE_UNIFORM_FN = {
-  GL_INT:        decorators.primative(glUniform1iv),
-  GL_FLOAT:      decorators.primative(glUniform1fv),
-  GL_BOOL:       decorators.primative(glUniform1iv),
+  GL_INT:        decorators.primative(glUniform1iv, int),
+  GL_FLOAT:      decorators.primative(glUniform1fv, float),
+  GL_BOOL:       decorators.primative(glUniform1iv, bool),
   GL_FLOAT_VEC3: decorators.vector(glUniform3fv, 3),
   GL_FLOAT_MAT4: decorators.matrix(glUniformMatrix4fv, 4),
   GL_SAMPLER_2D: None
@@ -28,6 +29,8 @@ class Uniform:
     self.location     = location
     self.set_value    = set_value
     self._value       = None
+
+    self.logged = {}
 
   @classmethod
   def from_program_index(cls, program_id: int, index: int) -> 'Uniform':
@@ -68,5 +71,11 @@ class Uniform:
     self._value = value
     try:
       self.set_value(self.location, value)
-    except TypeError:
-      logger.error(f'When setting Uniform {self.name}, unknown type {type(value)} given.')
+    except UniformTypeError as e:
+      if self.logged.get(type(e), None) is None:
+        self.logged[type(e)] = True
+        logger.error(f'When setting `{self.name}` uniform: {e.args[0]}')
+    except (UniformArraySizeError, UniformSizeError) as e:
+      if self.logged.get(type(e), None) is None:
+        self.logged[type(e)] = True
+        logger.warning(f'When setting `{self.name}` uniform: {e.args[0]}')
