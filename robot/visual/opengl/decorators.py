@@ -19,10 +19,10 @@ def primative(gl_function: int) -> Callable:
   return array_wrapper
 
 def vector(gl_function: int, vector_size: int) -> Callable:
-  def array_wrapper(array_size: int) -> Callable:
-    # TODO: Implement glUniform[1,2,4]xv functions
-    assert vector_size == 3, "Only vectors of size 3 are implemented"
+  # TODO: Implement glUniform[1,2,4]xv functions
+  assert vector_size == 3, "Only vectors of size 3 are implemented"
 
+  def array_wrapper(array_size: int) -> Callable:
     def wrapper(location: int, values: Union[Vector3, Iterable]) -> None:
       if array_size == 1:
         if isinstance(values, Vector3):
