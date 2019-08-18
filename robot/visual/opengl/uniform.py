@@ -21,7 +21,7 @@ class Uniform:
   def __init__(self, name: str, location: int, set_value: Callable) -> None:
     self.name         = name
     self.location     = location
-    self.set_value = set_value
+    self.set_value    = set_value
     self._value       = None
 
   @classmethod
