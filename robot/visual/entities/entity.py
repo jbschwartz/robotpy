@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 
-from robot.visual.shader_program import ShaderProgram
+from robot.visual.opengl.shader_program import ShaderProgram
 
 class Entity:
   def __init__(self, shader_program : ShaderProgram = None, color = (1, 1, 1)):

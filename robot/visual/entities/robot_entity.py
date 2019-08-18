@@ -7,7 +7,7 @@ from ctypes import c_void_p
 from robot.mech.serial                     import Serial
 from robot.spatial                         import Matrix4
 from robot.visual.entities.entity          import Entity
-from robot.visual.shader_program           import ShaderProgram
+from robot.visual.opengl.shader_program           import ShaderProgram
 
 class RobotEntity(Entity):
   def __init__(self, serial : Serial, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):
@@ -89,15 +89,7 @@ class RobotEntity(Entity):
       self.tool_entity.update(delta)
 
   def draw(self, camera, light):
-    # TODO: Use Uniform Buffer Objects to remove this duplicate code from each entity
     self.shader_program.use()
-
-    self.shader_program.proj_matrix = camera.projection.matrix
-    self.shader_program.view_matrix = camera.world_to_camera
-
-    self.shader_program.light_position  = light.position
-    self.shader_program.light_color     = light.color
-    self.shader_program.light_intensity = light.intensity
 
     self.shader_program.model_matrices  = self.serial.poses()
     self.shader_program.use_link_colors = False
@@ -115,10 +107,10 @@ class RobotEntity(Entity):
 
     if self.frame_entity:
       for link in self.serial.links:
-        self.frame_entity.draw(camera, light, Matrix4(link.to_world))
+        self.frame_entity.draw(camera, light, Matrix4.from_transform(link.to_world))
 
       if self.serial.tool:
-        self.frame_entity.draw(camera, light, Matrix4(self.serial.tool.tip))
+        self.frame_entity.draw(camera, light, Matrix4.from_transform(self.serial.tool.tip))
 
     if self.bounding_entity:
       for mesh, link in zip(self.meshes, self.serial.links):

@@ -6,7 +6,7 @@ from OpenGL.GL import *
 from ctypes import c_void_p
 
 from robot.spatial                   import Matrix4, Vector3
-from robot.visual.shader_program     import ShaderProgram
+from robot.visual.opengl.shader_program     import ShaderProgram
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
 
@@ -77,13 +77,6 @@ class TriangleEntity():
 
     # TODO: This maybe could be a decorator to the draw function inside the entity
     self.shader_program.use()
-
-    self.shader_program.proj_matrix = camera.projection.matrix
-    self.shader_program.view_matrix = camera.world_to_camera
-
-    self.shader_program.light_position  = light.position
-    self.shader_program.light_color     = light.color
-    self.shader_program.light_intensity = light.intensity
 
     self.shader_program.model_matrix  = self.transform
     self.shader_program.scale_matrix = Matrix4([

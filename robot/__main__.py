@@ -1,15 +1,17 @@
-import json, math
+import json, math, sys
+import numpy as np
+from OpenGL.GL import *
 
 from robot.spatial import vector3
 Vector3 = vector3.Vector3
 
-from robot.common.bindings import Bindings
-from robot.common.timer    import Timer
+from robot.common          import Bindings, logger, Timer
 from robot.mech.serial     import Serial
 from robot.spatial.euler   import Axes, Order
-from robot.spatial         import Mesh, Transform, Quaternion
+from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
 from robot.traj.linear_os  import LinearOS
+from robot.visual.opengl.shader_program import ShaderProgram
 
 import robot.visual as vis
 
@@ -22,11 +24,19 @@ if __name__ == "__main__":
     window = vis.Window(750, 750, "robotpy")
 
   with Timer('Initialize Shaders') as t:
-    program = vis.ShaderProgram(vertex='serial_v', fragment='serial_f')
-    flat_program = vis.ShaderProgram('flat')
-    grid_program = vis.ShaderProgram('grid')
-    bill_program = vis.ShaderProgram('billboard')
-    com_program = vis.ShaderProgram('com')
+    program = ShaderProgram(vertex='serial_v', fragment='serial_f')
+    flat_program = ShaderProgram('flat')
+    grid_program = ShaderProgram('grid')
+    bill_program = ShaderProgram('billboard')
+    com_program = ShaderProgram('com')
+
+  program.bind_ubo("Matrices", 1)
+  flat_program.bind_ubo("Matrices", 1)
+  grid_program.bind_ubo("Matrices", 1)
+  bill_program.bind_ubo("Matrices", 1)
+  com_program.bind_ubo("Matrices", 1)
+
+  program.bind_ubo("Light", 2)
 
   ee_frame = entities.FrameEntity(Transform(), flat_program)
   bb = entities.BoundingEntity(flat_program)
@@ -34,7 +44,7 @@ if __name__ == "__main__":
   welder = tool_entity.load('./robot/mech/tools/welder.json')
   welder.shader_program = program
 
-  with Timer('Load Robot JSON') as t:
+  with Timer('Load Robot and Construct Mesh') as t:
     with open('./robot/mech/robots/abb_irb_120.json') as json_file:
       serial_dictionary = json.load(json_file)
 
@@ -101,7 +111,5 @@ if __name__ == "__main__":
   for link in robot.serial.links:
     com = entities.COMEntity(link, com_program)
     scene.entities.append(com)
-
-  window.register_observer(scene)
 
   window.run()

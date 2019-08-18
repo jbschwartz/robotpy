@@ -23,3 +23,7 @@ def safe_acos(value):
     return math.pi
   else:
     return math.acos(value)
+
+def raise_if(should_raise: bool, exception_type: Exception):
+  if should_raise:
+    raise exception_type

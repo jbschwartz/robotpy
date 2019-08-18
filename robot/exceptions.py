@@ -1,5 +1,6 @@
 class RobotError(Exception):
-  pass
+  def __init__(self, message = None):
+    super().__init__(message)
 
 class ParserError(RobotError):
   def __init__(self, msg, line):

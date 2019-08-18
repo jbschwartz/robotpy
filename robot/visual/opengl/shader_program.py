@@ -97,10 +97,21 @@ class ShaderProgram():
 
     num_uniforms = glGetProgramInterfaceiv(self.id, GL_UNIFORM, GL_ACTIVE_RESOURCES)
 
-    for uniform_index in range(0, num_uniforms):
-      uniform = Uniform(self.id, uniform_index)
+    for uniform_index in range(num_uniforms):
+      uniform = Uniform.from_program_index(self.id, uniform_index)
 
       self.uniforms[uniform.name] = uniform
+
+  def get_uniform_block(self, name: str) -> int:
+    result = glGetUniformBlockIndex(self.id, name)
+
+    return result if result != GL_INVALID_INDEX else None
+
+  def bind_ubo(self, name, binding_index):
+    result = self.get_uniform_block(name)
+
+    if result is not None:
+      glUniformBlockBinding(self.id, result, binding_index)
 
   def attach_shaders(self, shaders : dict):
     get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION

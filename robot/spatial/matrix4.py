@@ -1,37 +1,51 @@
+from typing import Iterable
+
 from .dual       import Dual
 from .quaternion import conjugate, Quaternion
 from .transform  import Transform
 
 class Matrix4:
-  def __init__(self, construct_from = None):
-    '''
-    4x4 Matrix in _column-major_ order.
+  def __init__(self, elements: Iterable[float] = None) -> None:
+    """4x4 Matrix in _column-major_ order.
 
     That is: contiguous elements in the list form columns (e.g. self.elements[0:4] is the first column of the matrix)
-    '''
-    self.elements = [0.0] * 16
-    for diag_index in [0, 5, 10, 15]:
-      self.elements[diag_index]  = 1.0
+    """
+    if elements:
+      if len(elements) != 16:
+        raise TypeError('Matrix4 requires 16 floating point elements')
 
-    if isinstance(construct_from, Dual):
-      self.construct_from_dual(construct_from)
-    elif isinstance(construct_from, Transform):
-      self.construct_from_dual(construct_from.dual)
-    elif isinstance(construct_from, list) and len(construct_from) == 16:
-      self.elements = construct_from
+      self.elements = elements
+    else:
+      self.elements = [
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+      ]
 
-  def construct_from_dual(self, d : Dual):
-    self.elements = []
+  @classmethod
+  def from_transform(cls, transform: Transform) -> 'Matrix4':
+    """Construct a Matrix4 from a Transform."""
+    return cls.from_dual(transform.dual)
 
-    r_star = conjugate(d.r)
+  @classmethod
+  def from_dual(cls, dual : Dual) -> 'Matrix4':
+    """Construct a Matrix4 from a Dual Quaternion."""
+    elements = []
+
+    r_star = conjugate(dual.r)
     for basis in [(0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)]:
-      transformed_basis = d.r * Quaternion(*basis) * r_star
-      self.elements.extend([*transformed_basis.xyz, 0])
+      transformed_basis = dual.r * Quaternion(*basis) * r_star
+      elements.extend([*transformed_basis.xyz, 0])
 
-    translation = 2 * d.d * r_star
-    self.elements.extend([*translation.xyz, 1])
+    translation = 2 * dual.d * r_star
+    elements.extend([*translation.xyz, 1])
 
-  def __str__(self):
+    assert len(elements) == 16
+
+    return cls(elements)
+
+  def __str__(self) -> str:
     # Get the width of "widest" floating point number
     longest = max(map(len, map('{:.4f}'.format, self.elements)))
     # Pad the left of each element to the widest number found

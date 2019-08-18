@@ -1,6 +1,6 @@
 import enum, json, math, glfw
 
-from robot.common.timer  import Timer
+from robot.common        import logger, Timer
 from robot.spatial       import AABB, Ray, Transform, vector3
 from .camera             import Camera, OrbitType
 from .messaging.listener import listen, listener
@@ -8,9 +8,6 @@ from .messaging.event    import Event
 from .projection         import OrthoProjection, PerspectiveProjection
 
 Vector3 = vector3.Vector3
-
-# TODO: Mouse picking on all actions
-# This is what makes most CAD cameras feel very natural (I think)
 
 class CameraSettings():
   class Defaults(enum.Enum):
@@ -87,8 +84,6 @@ class CameraController():
         self.is_selecting = self.window.ndc(cursor)
       else:
         end = self.window.ndc(cursor)
-        # print(f'Square from {self.is_selecting} to {end}')
-        # self.camera.fit_window(self.is_selecting, end)
         self.is_selecting = None
 
     if button == glfw.MOUSE_BUTTON_MIDDLE and action == glfw.PRESS:
@@ -273,17 +268,8 @@ class CameraController():
 
     delta = self.camera.camera_space(delta_ndc)
 
-    # TODO: Move this calculation out to mouse_down event handler.
-    # This does not need to be called per mouse_drag event handler-- It's ruining frame rate.
     if isinstance(self.camera.projection, PerspectiveProjection):
-      # This approximates the scene moving the same speed as the cursor but it isn't exactly correct for perspective projection.
-      # I think perspective projection requires mouse picking to determine the correct z.
-      transformed_aabb = AABB.from_points([
-        point.transform(self.camera.world_to_camera, as_type="point")
-        for point in self.scene.aabb.corners
-      ])
-
-      delta *= -transformed_aabb.center.z
+      delta *= -self.camera.world_to_camera(self.camera.target).z
 
     self.camera.track(v = -delta)
 

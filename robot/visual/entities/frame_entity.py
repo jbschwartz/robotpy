@@ -7,7 +7,7 @@ from ctypes import c_void_p
 
 from robot.spatial                import Matrix4, Transform, Vector3
 from robot.visual.entities.entity import Entity
-from robot.visual.shader_program  import ShaderProgram
+from robot.visual.opengl.shader_program  import ShaderProgram
 
 class FrameEntity(Entity):
   def __init__(self, frame = Transform(), shader_program : ShaderProgram = None):
@@ -196,13 +196,6 @@ class FrameEntity(Entity):
 
     self.shader_program.use()
 
-    self.shader_program.proj_matrix = camera.projection.matrix
-    self.shader_program.view_matrix = camera.world_to_camera
-
-    self.shader_program.light_position  = light.position
-    self.shader_program.light_color     = light.color
-    self.shader_program.light_intensity = light.intensity
-
     self.shader_program.model_matrix = transform
     self.shader_program.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,
@@ -210,7 +203,7 @@ class FrameEntity(Entity):
       0, 0, self.scale, 0,
       0, 0, 0, 1
     ])
-    self.shader_program.in_opacity = 1
+    self.shader_program.in_opacity = 1.
 
     glBindVertexArray(self.vao)
 
