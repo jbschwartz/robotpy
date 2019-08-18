@@ -5,6 +5,39 @@ from typing  import Callable, Iterable, Union
 
 from robot.spatial import Matrix4, Transform, Vector3
 
+def flatten_elements(element) -> Iterable[Number]:
+  if isinstance(element, Vector3):
+    return element.xyz
+  elif isinstance(element, Transform):
+    matrix = Matrix4.from_transform(element)
+    return matrix.elements
+  elif isinstance(element, Matrix4):
+    return element.elements
+  elif isinstance(element, (list, tuple)) and isinstance(element[0], Number):
+    return element
+  else:
+    raise TypeError(f'Unexpected type {type(element)} given Uniform setter')
+
+def flatten(iterable: Iterable, iterable_size: int, element_size: int, acceptable_types: Iterable) -> Iterable[Number]:
+  if isinstance(iterable, acceptable_types) or (isinstance(iterable, (list, tuple)) and isinstance(iterable[0], Number)):
+    iterable = [iterable]
+
+  assert len(iterable) == iterable_size
+
+  numbers = []
+  for element in iterable:
+    assert isinstance(element, acceptable_types) or isinstance(element, (list, tuple))
+
+    values = flatten_elements(element)
+
+    assert len(values) == element_size
+    numbers.extend(values)
+
+  assert len(numbers) == (iterable_size * element_size)
+  assert all([isinstance(number, Number) for number in numbers])
+
+  return numbers
+
 def primative(gl_function: int) -> Callable:
   def array_wrapper(array_size: int) -> Callable:
     def wrapper(location: int, values: Iterable) -> None:
@@ -22,28 +55,12 @@ def vector(gl_function: int, vector_size: int) -> Callable:
   # TODO: Implement glUniform[1,2,4]xv functions
   assert vector_size == 3, "Only vectors of size 3 are implemented"
 
+  acceptable_types = (Vector3)
+
   def array_wrapper(array_size: int) -> Callable:
     def wrapper(location: int, values: Union[Vector3, Iterable]) -> None:
-      if array_size == 1:
-        if isinstance(values, Vector3):
-          return gl_function(location, 1, [*values])
-        else:
-          assert len(values) == vector_size, "Wrong vector size"
-          return gl_function(location, 1, values)
-
-      assert len(values) == array_size, f"Incorrect number of vectors passed. Got {len(values)}, expected {array_size}"
-      assert isinstance(values, (list, tuple)), "Vector array must be passed a list or tuple"
-
-      components = []
-      for value in values:
-        assert len(value) == vector_size, "Incorrect vector size"
-        assert all([isinstance(component, Number) for component in value]), "All components must be numeric"
-
-        # The type of value must support unpacking
-        components.extend([*value])
-
-      gl_function(location, len(values), components)
-
+      numbers = flatten(values, array_size, vector_size, acceptable_types)
+      gl_function(location, array_size, numbers)
     return wrapper
   return array_wrapper
 
@@ -52,33 +69,12 @@ def matrix(gl_function: int, matrix_size: int) -> Callable:
   # TODO: Implement glUniformMatrix[2,3]fv functions
   assert matrix_size == 4, "Only matricies of size 4 are implemented"
 
+  acceptable_types = (Matrix4, Transform)
+
   def array_wrapper(array_size: int) -> Callable:
     def wrapper(location: int, values: Union[Iterable, Matrix4, Transform]) -> None:
-      # Handle `= Matrix4()`, `= Transform()`, Handle `= [1, 2, ..., 16]`
-      if isinstance(values, (Matrix4, Transform)) or isinstance(values[0], Number):
-        values = [values]
-
-      assert isinstance(values, (list, tuple))
-      assert len(values) == array_size, f"Incorrect number of matricies passed. Got {len(values)}, expected {array_size}"
-
-      elements = []
-
-      for value in values:
-        if isinstance(value, Transform):
-          matrix = Matrix4.from_transform(value)
-          components = matrix.elements
-        elif isinstance(value, Matrix4):
-          components = value.elements
-        elif isinstance(value[0], Number):
-          components = value
-        else:
-          raise TypeError(f'Unexpected type {type(value)} given to Matrix Array')
-
-        assert len(components) == 16
-        elements.extend(components)
-
+      elements = flatten(values, array_size, matrix_size ** 2, acceptable_types)
       # Matrix4 stores elements column-major so transposing is never necessary for OpenGL
-      return gl_function(location, array_size, False, elements)
-
+      gl_function(location, array_size, False, elements)
     return wrapper
   return array_wrapper
