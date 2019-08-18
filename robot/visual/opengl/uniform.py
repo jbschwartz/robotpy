@@ -9,8 +9,8 @@ GL_TYPE_UNIFORM_FN = {
   GL_INT:        glUniform1i,
   GL_FLOAT:      glUniform1f,
   GL_BOOL:       glUniform1i,
-  GL_FLOAT_VEC3: decorators.vector_decorator(glUniform3fv, 3),
-  GL_FLOAT_MAT4: decorators.matrix_decorator(glUniformMatrix4fv),
+  GL_FLOAT_VEC3: decorators.vector(glUniform3fv, 3),
+  GL_FLOAT_MAT4: decorators.matrix(glUniformMatrix4fv),
   GL_SAMPLER_2D: None
 }
 

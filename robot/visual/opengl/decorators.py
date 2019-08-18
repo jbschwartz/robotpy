@@ -5,7 +5,7 @@ from typing  import Callable, Iterable, Union
 
 from robot.spatial import Matrix4, Transform, Vector3
 
-def vector_decorator(gl_function: int, vector_size: int) -> Callable:
+def vector(gl_function: int, vector_size: int) -> Callable:
   # TODO: Implement glUniform[1,2,4]xv functions
   assert vector_size == 3, "Only vectors of size 3 are implemented"
 
@@ -29,7 +29,7 @@ def vector_decorator(gl_function: int, vector_size: int) -> Callable:
 
   return wrapper
 
-def matrix_decorator(gl_function):
+def matrix(gl_function):
   def wrapper(location, transforms):
     # TODO: Better type/size checking
     # This entire function is actually broken since there are glUniformMatrix[1,2,3,4]x functions
