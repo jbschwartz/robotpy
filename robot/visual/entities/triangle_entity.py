@@ -6,7 +6,7 @@ from OpenGL.GL import *
 from ctypes import c_void_p
 
 from robot.spatial                   import Matrix4, Vector3
-from robot.visual.shader_program     import ShaderProgram
+from robot.visual.opengl.shader_program     import ShaderProgram
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
 

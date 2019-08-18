@@ -7,7 +7,7 @@ from ctypes import c_void_p
 from robot.mech.serial                     import Serial
 from robot.spatial                         import Matrix4
 from robot.visual.entities.entity          import Entity
-from robot.visual.shader_program           import ShaderProgram
+from robot.visual.opengl.shader_program           import ShaderProgram
 
 class RobotEntity(Entity):
   def __init__(self, serial : Serial, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):

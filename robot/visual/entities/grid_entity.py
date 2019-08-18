@@ -7,7 +7,7 @@ from ctypes import c_void_p
 
 from robot.spatial                import Vector3, Matrix4
 from robot.visual.entities.entity import Entity
-from robot.visual.shader_program  import ShaderProgram
+from robot.visual.opengl.shader_program  import ShaderProgram
 
 class GridEntity(Entity):
   def __init__(self, shader_program : ShaderProgram = None):

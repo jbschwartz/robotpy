@@ -11,6 +11,7 @@ from robot.spatial.euler   import Axes, Order
 from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
 from robot.traj.linear_os  import LinearOS
+from robot.visual.opengl.shader_program import ShaderProgram
 
 import robot.visual as vis
 
@@ -23,11 +24,11 @@ if __name__ == "__main__":
     window = vis.Window(750, 750, "robotpy")
 
   with Timer('Initialize Shaders') as t:
-    program = vis.ShaderProgram(vertex='serial_v', fragment='serial_f')
-    flat_program = vis.ShaderProgram('flat')
-    grid_program = vis.ShaderProgram('grid')
-    bill_program = vis.ShaderProgram('billboard')
-    com_program = vis.ShaderProgram('com')
+    program = ShaderProgram(vertex='serial_v', fragment='serial_f')
+    flat_program = ShaderProgram('flat')
+    grid_program = ShaderProgram('grid')
+    bill_program = ShaderProgram('billboard')
+    com_program = ShaderProgram('com')
 
   program.bind_ubo("Matrices", 1)
   flat_program.bind_ubo("Matrices", 1)

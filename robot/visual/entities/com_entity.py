@@ -2,7 +2,7 @@ import glfw
 
 from OpenGL.GL import *
 
-from robot.visual.shader_program import ShaderProgram
+from robot.visual.opengl.shader_program import ShaderProgram
 
 class COMEntity():
   def __init__(self, link, shader_program : ShaderProgram = None):
