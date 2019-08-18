@@ -55,16 +55,16 @@ class Scene():
     for entity in self.entities:
       entity.load()
 
-    self.light_ub = UniformBuffer("Light", 2)
-
-    self.light_ub.bind(Mapping(
-      self.light, ['position', 'color', 'intensity']
-    ))
-
     self.matrix_ub = UniformBuffer("Matrices", 1)
 
     self.matrix_ub.bind(Mapping(
       self.camera, ['projection.matrix', 'world_to_camera']
+    ))
+
+    self.light_ub = UniformBuffer("Light", 2)
+
+    self.light_ub.bind(Mapping(
+      self.light, ['position', 'color', 'intensity']
     ))
 
   @listen(Event.START_FRAME)
