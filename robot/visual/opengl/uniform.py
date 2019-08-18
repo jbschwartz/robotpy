@@ -6,16 +6,18 @@ from robot.common  import logger
 import robot.visual.opengl.decorators as decorators
 
 GL_TYPE_UNIFORM_FN = {
-  GL_INT:        glUniform1i,
-  GL_FLOAT:      glUniform1f,
-  GL_BOOL:       glUniform1i,
+  GL_INT:        decorators.primative(glUniform1iv),
+  GL_FLOAT:      decorators.primative(glUniform1fv),
+  GL_BOOL:       decorators.primative(glUniform1iv),
   GL_FLOAT_VEC3: decorators.vector(glUniform3fv, 3),
   GL_FLOAT_MAT4: decorators.matrix(glUniformMatrix4fv),
   GL_SAMPLER_2D: None
 }
 
 def setter_factory(gl_type: int, array_size: int) -> Callable:
-  return GL_TYPE_UNIFORM_FN[gl_type]
+  array_decorator = GL_TYPE_UNIFORM_FN[gl_type]
+
+  return array_decorator(array_size)
 
 class Uniform:
   def __init__(self, name: str, location: int, set_value: Callable) -> None:
