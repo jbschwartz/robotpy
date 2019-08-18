@@ -203,7 +203,7 @@ class FrameEntity(Entity):
       0, 0, self.scale, 0,
       0, 0, 0, 1
     ])
-    self.shader_program.in_opacity = 1
+    self.shader_program.in_opacity = 1.
 
     glBindVertexArray(self.vao)
 

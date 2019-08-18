@@ -9,7 +9,7 @@ class COMEntity():
     self.vao = -1 if not bool(glGenVertexArrays) else glGenVertexArrays(1)
 
     self.link = link
-    self.radius = 25
+    self.radius = 25.
     self.shader_program = shader_program
 
   def load(self):
