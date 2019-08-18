@@ -1,4 +1,7 @@
 import numpy as np
+
+from typing import Callable
+
 from OpenGL.GL import *
 
 from robot.spatial import Matrix4, Transform, Vector3
@@ -63,33 +66,41 @@ GL_TYPE_UNIFORM_FN = {
 }
 
 class Uniform:
-  def __init__(self, program_id, index):
-    self._value = None
-    self.program_id = program_id
-    self.index = index
+  def __init__(self, name: str, location: int, set_function: Callable) -> None:
+    self.name         = name
+    self.location     = location
+    self.set_function = set_function
+    self._value       = None
 
-    uniform_props = [GL_TYPE, GL_NAME_LENGTH, GL_LOCATION, GL_ARRAY_SIZE]
-    props_length = len(uniform_props)
+  @classmethod
+  def from_program_index(cls, program_id: int, index: int) -> 'Uniform':
+    """Construct a Uniform from the shader program id and the Uniform index."""
+    properties = [GL_TYPE, GL_NAME_LENGTH, GL_LOCATION]
 
-    values = glGetProgramResourceiv(self.program_id, GL_UNIFORM, self.index, props_length, uniform_props, props_length)
-    self.gl_type = values[0]
-    self.name = self.get_name(values[1])
-    self.location = values[2]
-    self.array_size = values[3]
+    gl_type, name_length, location = glGetProgramResourceiv(
+      program_id,
+      GL_UNIFORM,
+      index,
+      len(properties),
+      properties,
+      len(properties)
+    )
+
+    # Returns a list of ascii values including NUL terminator and [0] for uniform arrays
+    name_ascii = glGetProgramResourceName(program_id, GL_UNIFORM, index, name_length)
+
+    # Format the name as a useful string
+    name = ''.join(chr(c) for c in name_ascii).strip('\x00').strip('[0]')
 
     try:
-      self.set_function = GL_TYPE_UNIFORM_FN[self.gl_type]
+      set_function = GL_TYPE_UNIFORM_FN[gl_type]
     except KeyError:
-      raise Exception(f'Unknown uniform GL_TYPE value: {self.gl_type} ({self.name})')
+      raise KeyError(f'For {name}, unknown uniform type: {gl_type}')
 
-  def get_name(self, length):
-    return self.ascii_list_to_string(glGetProgramResourceName(self.program_id, GL_UNIFORM, self.index, length))
-
-  def ascii_list_to_string(self, ascii_list):
-    return ''.join(map(chr, ascii_list)).strip('\x00').strip('[0]')
+    return cls(name, location, set_function)
 
   @property
-  def value(self, ):
+  def value(self):
     return self._value
 
   @value.setter

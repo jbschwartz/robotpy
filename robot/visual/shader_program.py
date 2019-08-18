@@ -97,8 +97,8 @@ class ShaderProgram():
 
     num_uniforms = glGetProgramInterfaceiv(self.id, GL_UNIFORM, GL_ACTIVE_RESOURCES)
 
-    for uniform_index in range(0, num_uniforms):
-      uniform = Uniform(self.id, uniform_index)
+    for uniform_index in range(num_uniforms):
+      uniform = Uniform.from_program_index(self.id, uniform_index)
 
       self.uniforms[uniform.name] = uniform
 
