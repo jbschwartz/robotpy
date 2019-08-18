@@ -15,9 +15,12 @@ GL_TYPE_UNIFORM_FN = {
 }
 
 def setter_factory(gl_type: int, array_size: int) -> Callable:
-  array_decorator = GL_TYPE_UNIFORM_FN[gl_type]
+  array_decorator = GL_TYPE_UNIFORM_FN.get(gl_type, None)
 
-  return array_decorator(array_size)
+  if array_decorator is not None:
+    return array_decorator(array_size)
+  else:
+    return None
 
 class Uniform:
   def __init__(self, name: str, location: int, set_value: Callable) -> None:
@@ -59,6 +62,9 @@ class Uniform:
 
   @value.setter
   def value(self, value):
+    if self.set_value is None:
+      return logger.error(f'Setting a value on unsettable Uniform {self.name}')
+
     self._value = value
     try:
       self.set_value(self.location, value)
