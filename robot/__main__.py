@@ -29,13 +29,13 @@ if __name__ == "__main__":
     bill_program = vis.ShaderProgram('billboard')
     com_program = vis.ShaderProgram('com')
 
-  program.bind_ubo("Matrices")
-  flat_program.bind_ubo("Matrices")
-  grid_program.bind_ubo("Matrices")
-  bill_program.bind_ubo("Matrices")
-  com_program.bind_ubo("Matrices")
+  program.bind_ubo("Matrices", 1)
+  flat_program.bind_ubo("Matrices", 1)
+  grid_program.bind_ubo("Matrices", 1)
+  bill_program.bind_ubo("Matrices", 1)
+  com_program.bind_ubo("Matrices", 1)
 
-  program.bind_ubo("Light")
+  program.bind_ubo("Light", 2)
 
   ee_frame = entities.FrameEntity(Transform(), flat_program)
   bb = entities.BoundingEntity(flat_program)
