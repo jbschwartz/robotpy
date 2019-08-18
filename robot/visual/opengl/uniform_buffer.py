@@ -48,12 +48,12 @@ class UniformBuffer():
 
     return fields
 
-  def calculate_padding(self, mapping: Mapping) -> Iterable[float]:
-    """Return padding in bytes per field in Mapping."""
+  def calculate_padding(self, fields: Iterable[Field]) -> Iterable[float]:
+    """Return padding in bytes per field based on alignment requirements."""
     paddings = []
     current = 0
 
-    for field in self.fields(mapping):
+    for field in fields:
       offset_to_boundary = current % field.alignment
       current += field.size_in_bytes
 
@@ -70,7 +70,7 @@ class UniformBuffer():
     def fetcher():
       return [self.resolve_dot_notation(mapping.object, field) for field in mapping.fields]
 
-    paddings = self.calculate_padding(mapping)
+    paddings = self.calculate_padding(self.fields(mapping))
 
     def builder():
       values = []
