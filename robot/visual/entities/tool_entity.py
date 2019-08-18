@@ -75,7 +75,6 @@ class ToolEntity(Entity):
 
     self.shader_program.model_matrices  = self.tool.tool_to_world
     self.shader_program.use_link_colors = False
-    self.shader_program.link_colors     = self.color
     self.shader_program.robot_color     = self.color
 
     glBindVertexArray(self.vao)
