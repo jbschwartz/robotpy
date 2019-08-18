@@ -81,6 +81,9 @@ class Vector3(Swizzler):
     components = ['x', 'y', 'z']
     setattr(self, components[index], value)
 
+  def __len__(self) -> int:
+    return 3
+
   def transform(self, transform, as_type: str = "point") -> 'Vector3':
     return transform(self, as_type=as_type)
 
