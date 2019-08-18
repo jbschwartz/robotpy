@@ -69,10 +69,10 @@ def setter_factory(gl_type: int, array_size: int) -> Callable:
   return GL_TYPE_UNIFORM_FN[gl_type]
 
 class Uniform:
-  def __init__(self, name: str, location: int, set_function: Callable) -> None:
+  def __init__(self, name: str, location: int, set_value: Callable) -> None:
     self.name         = name
     self.location     = location
-    self.set_function = set_function
+    self.set_value = set_value
     self._value       = None
 
   @classmethod
@@ -96,11 +96,11 @@ class Uniform:
     name = ''.join(chr(c) for c in name_ascii).strip('\x00').strip('[0]')
 
     try:
-      set_function = setter_factory(gl_type, array_size)
+      set_value = setter_factory(gl_type, array_size)
     except KeyError:
       raise KeyError(f'For {name}, unknown uniform type: {gl_type}')
 
-    return cls(name, location, set_function)
+    return cls(name, location, set_value)
 
   @property
   def value(self):
@@ -110,6 +110,6 @@ class Uniform:
   def value(self, value):
     self._value = value
     try:
-      self.set_function(self.location, value)
+      self.set_value(self.location, value)
     except TypeError:
       logger.error(f'When setting Uniform {self.name}, unknown type {type(value)} given.')
