@@ -77,7 +77,7 @@ class ToolEntity(Entity):
     # It would be better to have a similar shader that handles individual objects
     # (instead of faking individual objects into "serial chains").
     self.shader_program.model_matrices  = [self.tool.tool_to_world] + [Transform()] * 6
-    self.shader_program.use_link_colors = [False, True]
+    self.shader_program.use_link_colors = False
     self.shader_program.robot_color     = self.color
 
     glBindVertexArray(self.vao)
