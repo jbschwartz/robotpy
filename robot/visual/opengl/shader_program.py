@@ -10,7 +10,7 @@ class ShaderTypes(enum.Enum):
   FRAGMENT = GL_FRAGMENT_SHADER
 
 class Shader():
-  def __init__(self, shader_type, path, version = 430):
+  def __init__(self, shader_type: ShaderTypes, path: str, version: int = 430) -> None:
     self.id          = None
     self.path        = path
     self.shader_type = shader_type
@@ -21,10 +21,10 @@ class Shader():
   def __del__(self):
     glDeleteShader(self.id)
 
-  def create(self):
+  def create(self) -> None:
     self.id = glCreateShader(self.shader_type.value)
 
-  def source(self):
+  def source(self) -> None:
     with open(self.path) as file:
       source = file.read()
 
@@ -33,7 +33,7 @@ class Shader():
 
     glShaderSource(self.id, '\n'.join([version_str, define_str, source]))
 
-  def load(self):
+  def load(self) -> None:
     self.create()
     self.source()
 
@@ -47,7 +47,7 @@ class ShaderProgram():
   DEFAULT_FOLDER = './robot/visual/glsl/'
   DEFAULT_EXTENSION = '.glsl'
 
-  def __init__(self, name=None, **names):
+  def __init__(self, name:str = None, **names):
     # self.uniforms must be declared before any other properties
     # TODO: Make this not so
     self.uniforms = []
@@ -74,13 +74,13 @@ class ShaderProgram():
 
     return self.uniforms[attribute]
 
-  def __setattr__(self, attribute, value):
+  def __setattr__(self, attribute, value) -> None:
     if attribute == 'uniforms' or attribute not in self.uniforms:
       super(ShaderProgram, self).__setattr__(attribute, value)
     else:
       self.uniforms[attribute].value = value
 
-  def link(self, shader_names):
+  def link(self, shader_names: dict):
     self.attach_shaders(shader_names)
 
     glLinkProgram(self.id)
@@ -89,10 +89,10 @@ class ShaderProgram():
       msg = glGetProgramInfoLog(self.id).decode('unicode_escape')
       raise RuntimeError(f'Error linking program: {msg}')
 
-  def use(self):
+  def use(self) -> None:
     glUseProgram(self.id)
 
-  def get_uniforms(self):
+  def get_uniforms(self) -> None:
     self.uniforms = {}
 
     num_uniforms = glGetProgramInterfaceiv(self.id, GL_UNIFORM, GL_ACTIVE_RESOURCES)
@@ -107,13 +107,13 @@ class ShaderProgram():
 
     return result if result != GL_INVALID_INDEX else None
 
-  def bind_ubo(self, name, binding_index):
+  def bind_ubo(self, name: str, binding_index: int) -> None:
     result = self.get_uniform_block(name)
 
     if result is not None:
       glUniformBlockBinding(self.id, result, binding_index)
 
-  def attach_shaders(self, shaders : dict):
+  def attach_shaders(self, shaders : dict) -> None:
     get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
 
     files = {k: get_path(name) for k, name in shaders.items()}
@@ -122,5 +122,5 @@ class ShaderProgram():
       shader = Shader(shader_type, file_path)
       glAttachShader(self.id, shader.id)
 
-  def attribute_location(self, name):
+  def attribute_location(self, name: str) -> int:
     return glGetAttribLocation(self.id, name)
