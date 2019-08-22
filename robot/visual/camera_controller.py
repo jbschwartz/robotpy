@@ -96,6 +96,9 @@ class CameraController():
       else:
         self.target = self.scene.aabb.center
 
+      assert self.target is not None, "There must always be a valid camera target."
+      assert isinstance(self.target, Vector3), "Camera target must be a Vector3."
+
       self.camera.target = self.target
 
   @listen(Event.DRAG)
