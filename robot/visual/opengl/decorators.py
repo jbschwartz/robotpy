@@ -1,5 +1,3 @@
-import numpy as np
-
 from numbers import Number
 from typing  import Callable, Iterable, Union
 

@@ -1,5 +1,5 @@
 import json, math, sys
-import numpy as np
+
 from OpenGL.GL import *
 
 from robot.spatial import vector3

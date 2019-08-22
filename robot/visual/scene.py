@@ -1,7 +1,5 @@
 from OpenGL.GL import *
 
-import numpy as np
-
 from ctypes import c_void_p
 
 from robot.spatial       import AABB, Matrix4
