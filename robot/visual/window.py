@@ -3,6 +3,7 @@ import math, numpy, glfw, statistics, sys
 from OpenGL.GL import GL_TRUE
 
 from robot.common       import logger, Timer
+from robot.utils        import sign
 from robot.spatial      import Vector3
 from .messaging.emitter import emitter
 from .messaging.event   import Event
@@ -63,7 +64,7 @@ class Window():
       self.show_fps = not self.show_fps
 
   def scroll_callback(self, window, x_direction, y_direction):
-    self.emit(Event.SCROLL, numpy.sign(x_direction), numpy.sign(y_direction))
+    self.emit(Event.SCROLL, sign(x_direction), sign(y_direction))
 
   def mouse_button_callback(self, window, button, action, mods):
     self.emit(Event.CLICK, button, action, self.get_cursor())
