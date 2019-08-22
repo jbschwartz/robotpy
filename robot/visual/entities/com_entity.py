@@ -24,9 +24,8 @@ class COMEntity():
     # TODO: This maybe could be a decorator to the draw function inside the entity
     self.shader_program.use()
 
-    # TODO: Issue a warning (exception?) if assigning to a uniform that does not exist in the shader
-    self.shader_program.radius   = self.radius
-    self.shader_program.position = center_of_mass
+    self.shader_program.uniforms.radius   = self.radius
+    self.shader_program.uniforms.position = center_of_mass
 
     glBindVertexArray(self.vao)
 

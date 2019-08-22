@@ -196,26 +196,26 @@ class FrameEntity(Entity):
 
     self.shader_program.use()
 
-    self.shader_program.model_matrix = transform
-    self.shader_program.scale_matrix = Matrix4([
+    self.shader_program.uniforms.model_matrix = transform
+    self.shader_program.uniforms.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,
       0, self.scale, 0, 0,
       0, 0, self.scale, 0,
       0, 0, 0, 1
     ])
-    self.shader_program.in_opacity = 1.
+    self.shader_program.uniforms.in_opacity = 1.
 
     glBindVertexArray(self.vao)
 
     # TODO: This is a very hacky way to handle coloring
-    self.shader_program.color_in     = Vector3(0.5, 0, 0)
+    self.shader_program.uniforms.color_in     = Vector3(0.5, 0, 0)
     glDrawArrays(GL_TRIANGLES, 0, 36)
-    self.shader_program.color_in     = Vector3(0, 0.5, 0)
+    self.shader_program.uniforms.color_in     = Vector3(0, 0.5, 0)
     glDrawArrays(GL_TRIANGLES, 36, 36)
-    self.shader_program.color_in     = Vector3(0, 0, 0.5)
+    self.shader_program.uniforms.color_in     = Vector3(0, 0, 0.5)
     glDrawArrays(GL_TRIANGLES, 72, 36)
 
-    self.shader_program.color_in     = Vector3(1, 1, 0)
+    self.shader_program.uniforms.color_in     = Vector3(1, 1, 0)
     glDrawArrays(GL_TRIANGLES, 108, 18)
 
     glBindVertexArray(0)

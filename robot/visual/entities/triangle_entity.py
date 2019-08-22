@@ -78,15 +78,15 @@ class TriangleEntity():
     # TODO: This maybe could be a decorator to the draw function inside the entity
     self.shader_program.use()
 
-    self.shader_program.model_matrix  = self.transform
-    self.shader_program.scale_matrix = Matrix4([
+    self.shader_program.uniforms.model_matrix  = self.transform
+    self.shader_program.uniforms.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,
       0, self.scale, 0, 0,
       0, 0, self.scale, 0,
       0, 0, 0, 1
     ])
-    self.shader_program.color_in     = self.color
-    self.shader_program.in_opacity = 0.5
+    self.shader_program.uniforms.color_in     = self.color
+    self.shader_program.uniforms.in_opacity = 0.5
 
     glBindVertexArray(self.vao)
 

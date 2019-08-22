@@ -55,12 +55,12 @@ class GridEntity(Entity):
   def draw(self, camera, light):
     self.shader_program.use()
 
-    self.shader_program.step_size = 250.0
-    self.shader_program.minor_step_size = 50.0
-    self.shader_program.in_grid_color = Vector3(0.5, 0.5, 0.5)
-    self.shader_program.in_minor_grid_color = Vector3(0.15, 0.15, 0.15)
+    self.shader_program.uniforms.step_size = 250.0
+    self.shader_program.uniforms.minor_step_size = 50.0
+    self.shader_program.uniforms.in_grid_color = Vector3(0.5, 0.5, 0.5)
+    self.shader_program.uniforms.in_minor_grid_color = Vector3(0.15, 0.15, 0.15)
 
-    self.shader_program.scale_matrix = Matrix4([
+    self.shader_program.uniforms.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,
       0, self.scale, 0, 0,
       0, 0, self.scale, 0,

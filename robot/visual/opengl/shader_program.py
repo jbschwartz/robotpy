@@ -1,17 +1,44 @@
 from OpenGL.GL import *
 
-from .shader  import Shader, ShaderTypes
-from .uniform import Uniform
+from robot.common  import FrozenDict, logger
+from .shader       import Shader, ShaderTypes
+from .uniform      import Uniform
+
+class UniformDict():
+  def __init__(self, d: dict) -> None:
+    self.__dict__['_uniforms']       = FrozenDict(d)
+    self.__dict__['_already_logged'] = []
+
+  @classmethod
+  def from_program(cls, program_id: int) -> 'UniformDict':
+    uniforms = {}
+
+    num_uniforms = glGetProgramInterfaceiv(program_id, GL_UNIFORM, GL_ACTIVE_RESOURCES)
+
+    for uniform_index in range(num_uniforms):
+      uniform = Uniform.from_program_index(program_id, uniform_index)
+
+      uniforms[uniform.name] = uniform
+
+    return cls(uniforms)
+
+  def __getattr__(self, name):
+    return getattr(self._uniforms, name)
+
+  def __setattr__(self, name, value):
+    try:
+      uniform = getattr(self._uniforms, name)
+      uniform.value = value
+    except AttributeError:
+      if name not in self._already_logged:
+        self._already_logged.append(name)
+        logger.warning(f'Setting uniform {name} that does not exist')
 
 class ShaderProgram():
   DEFAULT_FOLDER = './robot/visual/glsl/'
   DEFAULT_EXTENSION = '.glsl'
 
   def __init__(self, name:str = None, **names):
-    # self.uniforms must be declared before any other properties
-    # TODO: Make this not so
-    self.uniforms = []
-
     self.id = glCreateProgram()
 
     # Use `name` for all shaders by default, replacing any specifically passed in
@@ -21,24 +48,15 @@ class ShaderProgram():
       **{ShaderTypes[k.upper()]: name for k, name in names.items()}
     }
 
+    #  Used for warning/error messaging
+    self.name = name or '/'.join(shader_names.values())
+
     self.link(shader_names)
 
-    self.get_uniforms()
+    self.uniforms = UniformDict.from_program(self.id)
 
   def __del__(self):
     glDeleteProgram(self.id)
-
-  def __getattr__(self, attribute):
-    if attribute != 'uniforms' and attribute not in self.uniforms:
-      raise AttributeError
-
-    return self.uniforms[attribute]
-
-  def __setattr__(self, attribute, value) -> None:
-    if attribute == 'uniforms' or attribute not in self.uniforms:
-      super(ShaderProgram, self).__setattr__(attribute, value)
-    else:
-      self.uniforms[attribute].value = value
 
   def link(self, shader_names: dict):
     self.attach_shaders(shader_names)
@@ -51,16 +69,6 @@ class ShaderProgram():
 
   def use(self) -> None:
     glUseProgram(self.id)
-
-  def get_uniforms(self) -> None:
-    self.uniforms = {}
-
-    num_uniforms = glGetProgramInterfaceiv(self.id, GL_UNIFORM, GL_ACTIVE_RESOURCES)
-
-    for uniform_index in range(num_uniforms):
-      uniform = Uniform.from_program_index(self.id, uniform_index)
-
-      self.uniforms[uniform.name] = uniform
 
   def get_uniform_block(self, name: str) -> int:
     result = glGetUniformBlockIndex(self.id, name)

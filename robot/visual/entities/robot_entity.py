@@ -91,10 +91,10 @@ class RobotEntity(Entity):
   def draw(self, camera, light):
     self.shader_program.use()
 
-    self.shader_program.model_matrices  = self.serial.poses()
-    self.shader_program.use_link_colors = False
-    self.shader_program.link_colors     = [link.color for link in self.serial.links]
-    self.shader_program.robot_color     = self.color
+    self.shader_program.uniforms.model_matrices  = self.serial.poses()
+    self.shader_program.uniforms.use_link_colors = False
+    self.shader_program.uniforms.link_colors     = [link.color for link in self.serial.links]
+    self.shader_program.uniforms.robot_color     = self.color
 
     glBindVertexArray(self.vao)
 
