@@ -190,13 +190,10 @@ class FrameEntity(Entity):
   def update(self, delta):
     pass
 
-  def draw(self, camera, light, transform = None):
-    if not transform:
-      transform = self.frame
-
+  def draw(self):
     self.shader_program.use()
 
-    self.shader_program.uniforms.model_matrix = transform
+    self.shader_program.uniforms.model_matrix = self.frame
     self.shader_program.uniforms.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,
       0, self.scale, 0, 0,

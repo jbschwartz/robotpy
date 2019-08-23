@@ -88,7 +88,6 @@ if __name__ == "__main__":
     ],
     3)
 
-  triangle = entities.TriangleEntity(bill_program)
 
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
@@ -100,6 +99,7 @@ if __name__ == "__main__":
   bindings = Bindings()
   settings = vis.CameraSettings()
   camera_controller = vis.CameraController(camera, settings, bindings, scene, window)
+  triangle = entities.TriangleEntity(camera_controller, bill_program)
 
   scene.entities.append(world_frame)
   scene.entities.append(grid)
@@ -108,7 +108,7 @@ if __name__ == "__main__":
   scene.entities.append(triangle)
 
   for link in robot.serial.links:
-    com = entities.COMEntity(link, com_program)
+    com = entities.COMEntity(link, camera, com_program)
     scene.entities.append(com)
 
   window.run()

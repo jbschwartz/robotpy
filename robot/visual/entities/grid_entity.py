@@ -52,7 +52,7 @@ class GridEntity(Entity):
   def update(self, delta):
     pass
 
-  def draw(self, camera, light):
+  def draw(self):
     self.shader_program.use()
 
     self.shader_program.uniforms.step_size = 250.0

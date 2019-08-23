@@ -82,6 +82,6 @@ class Scene():
     self.matrix_ub.load()
 
     for entity in self.entities:
-      entity.draw(self.camera, self.light)
+      entity.draw()
 
       glUseProgram(0)

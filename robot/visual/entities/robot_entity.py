@@ -13,7 +13,6 @@ class RobotEntity(Entity):
   def __init__(self, serial : Serial, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):
     self.serial = serial
     self.frame_entity = None
-    self.bounding_entity = None
     self.tool_entity = None
 
     Entity.__init__(self, shader_program, color)
@@ -52,9 +51,6 @@ class RobotEntity(Entity):
     if self.frame_entity:
       self.frame_entity.load()
 
-    if self.bounding_entity:
-      self.bounding_entity.load()
-
     self.build_buffer()
 
     glBindVertexArray(self.vao)
@@ -88,7 +84,7 @@ class RobotEntity(Entity):
     if self.tool_entity:
       self.tool_entity.update(delta)
 
-  def draw(self, camera, light):
+  def draw(self):
     self.shader_program.use()
 
     self.shader_program.uniforms.model_matrices  = self.serial.poses()
@@ -103,19 +99,13 @@ class RobotEntity(Entity):
     glBindVertexArray(0)
 
     if self.tool_entity:
-      self.tool_entity.draw(camera, light)
+      self.tool_entity.draw()
 
     if self.frame_entity:
       for link in self.serial.links:
-        self.frame_entity.draw(camera, light, Matrix4.from_transform(link.to_world))
+        self.frame_entity.frame = link.to_world
+        self.frame_entity.draw()
 
       if self.serial.tool:
-        self.frame_entity.draw(camera, light, Matrix4.from_transform(self.serial.tool.tip))
-
-    if self.bounding_entity:
-      for mesh, link in zip(self.meshes, self.serial.links):
-        self.bounding_entity.aabb = mesh.aabb
-        self.bounding_entity.draw(camera, light, link.to_world)
-
-      self.bounding_entity.aabb = self.serial.aabb
-      self.bounding_entity.draw(camera, light)
+        self.frame_entity.frame = self.serial.tool.tip
+        self.frame_entity.draw()

@@ -69,7 +69,7 @@ class ToolEntity(Entity):
   def update(self, delta):
     pass
 
-  def draw(self, camera, light):
+  def draw(self):
     # TODO: Use Uniform Buffer Objects to remove this duplicate code from each entity
     self.shader_program.use()
 

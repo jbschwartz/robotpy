@@ -12,7 +12,7 @@ from robot.visual.messaging.event    import Event
 
 @listener
 class TriangleEntity():
-  def __init__(self, shader_program : ShaderProgram = None, color = (0, 0.5, 1)):
+  def __init__(self, camera, shader_program : ShaderProgram = None, color = (0, 0.5, 1)):
     self.vao = -1 if not bool(glGenVertexArrays) else glGenVertexArrays(1)
     self.vbo = -1 if not bool(glGenBuffers) else glGenBuffers(1)
     self.buffer = []
@@ -21,6 +21,7 @@ class TriangleEntity():
     self.scale = 20
     self.link = None
     self.show = False
+    self.camera = camera
 
   def use_shader(self, shader_program):
     self.shader_program = shader_program
@@ -56,17 +57,11 @@ class TriangleEntity():
     if button == glfw.MOUSE_BUTTON_MIDDLE:
       self.show = action == glfw.PRESS
 
-  def draw(self, camera, light):
-    if self.link:
-      target = self.link.to_world(self.link.com)
-    else:
-      if not self.show:
-        return
+  def draw(self):
+    if not self.show:
+      return
 
-      try:
-        target = Vector3(*camera.target)
-      except:
-        return
+    target = Vector3(*self.camera.target)
 
     self.transform = Matrix4([
       1, 0, 0, 0,
@@ -78,7 +73,7 @@ class TriangleEntity():
     # TODO: This maybe could be a decorator to the draw function inside the entity
     self.shader_program.use()
 
-    self.shader_program.uniforms.model_matrix  = self.transform
+    self.shader_program.uniforms.model_matrix = self.transform
     self.shader_program.uniforms.scale_matrix = Matrix4([
       self.scale, 0, 0, 0,
       0, self.scale, 0, 0,
