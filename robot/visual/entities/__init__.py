@@ -1,4 +1,3 @@
-from .bounding_entity import BoundingEntity
 from .com_entity import COMEntity
 from .frame_entity import FrameEntity
 from .grid_entity import GridEntity

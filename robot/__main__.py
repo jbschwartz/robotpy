@@ -39,7 +39,6 @@ if __name__ == "__main__":
   program.bind_ubo("Light", 2)
 
   ee_frame = entities.FrameEntity(Transform(), flat_program)
-  bb = entities.BoundingEntity(flat_program)
   grid = entities.GridEntity(grid_program)
   welder = tool_entity.load('./robot/mech/tools/welder.json')
   welder.shader_program = program
