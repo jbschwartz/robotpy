@@ -81,7 +81,6 @@ class ShaderProgram():
 
     return cls(shader_name, shaders)
 
-
   def __del__(self):
     glDeleteProgram(self.id)
 
