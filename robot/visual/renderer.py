@@ -1,13 +1,19 @@
 from typing import Iterable
 
-from robot.common           import Timer
+from robot.common                    import Timer
+from robot.visual.messaging.listener import listen, listener
+from robot.visual.messaging.event    import Event
+
+from .messaging.event    import Event
+
 from .opengl.shader_program import ShaderProgram
 from .opengl.shader         import ShaderType
 from .opengl.uniform_buffer import UniformBuffer
-
+@listener
 class Renderer():
   def __init__(self):
     self.shaders = {}
+    self.ubos = []
 
   def initialize_shaders(self, shader_names: Iterable[str]) -> None:
     self.shaders = {}
@@ -30,7 +36,12 @@ class Renderer():
             # TODO: Log this and wait to throw until we know it is being used?
             pass
 
-  def bind_buffer_objects(self, ubos: Iterable[UniformBuffer]) -> None:
-    for ubo in ubos:
+  @listen(Event.START_FRAME)
+  def load_buffer_objects(self):
+    for ubo in self.ubos:
+      ubo.load()
+
+  def bind_buffer_objects(self) -> None:
+    for ubo in self.ubos:
       for shader in self.shaders.values():
         shader.bind_ubo(ubo)

@@ -14,7 +14,6 @@ class Scene():
     self.camera = camera
     self.entities = []
     self.light = light
-    self.ubos = []
 
   @property
   def aabb(self):
@@ -66,9 +65,6 @@ class Scene():
   @listen(Event.DRAW)
   def draw(self):
     self.light.position = self.camera.position
-
-    for ubo in self.ubos:
-      ubo.load()
 
     for entity in self.entities:
       entity.draw()

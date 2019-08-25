@@ -121,9 +121,9 @@ if __name__ == "__main__":
     light, ['position', 'color', 'intensity']
   ))
 
-  scene.ubos.append(matrix_ub)
-  scene.ubos.append(light_ub)
+  renderer.ubos.append(matrix_ub)
+  renderer.ubos.append(light_ub)
 
-  renderer.bind_buffer_objects(scene.ubos)
+  renderer.bind_buffer_objects()
 
   window.run()
