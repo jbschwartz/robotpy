@@ -44,11 +44,15 @@ class Link:
 
   @property
   def properties(self) -> PhysicalProperties:
-    """Return the computed physical Link properties (e.g., center of mass, volume)."""
+    """Return the computed physical Link properties (e.g., center of mass, volume) in world space."""
     if any([value is None for value in self._properties]):
       self.calculate_properties()
 
-    return self._properties
+    return PhysicalProperties(
+      com     = self.to_world(self._properties.com),
+      moments = self._properties.moments,
+      volume  = self._properties.volume
+    )
 
   def calculate_properties(self) -> None:
     """Calculate the center of mass, moments, and volume of the Mesh.

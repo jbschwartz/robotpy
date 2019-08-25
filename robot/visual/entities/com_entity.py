@@ -19,11 +19,9 @@ class COMEntity():
     pass
 
   def draw(self):
-    center_of_mass = self.link.to_world(self.link.properties.com)
-
     with self.shader_program as sp:
       sp.uniforms.radius   = self.radius
-      sp.uniforms.position = center_of_mass
+      sp.uniforms.position = self.link.properties.com
 
       glBindVertexArray(self.vao)
 
