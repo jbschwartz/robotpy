@@ -28,7 +28,7 @@ void main()
   case 3: // Bottom-right
     mapping = vec2(1.0, -1.0);  break;
   }
-  vec4 camera_corner_pos = vec4(position, 1.0);
+  vec4 camera_corner_pos = view * vec4(position, 1.0);
   camera_corner_pos.xy += radius * mapping;
 
   gl_Position = projection * camera_corner_pos;

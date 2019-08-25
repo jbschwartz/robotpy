@@ -99,7 +99,7 @@ if __name__ == "__main__":
   scene.entities.append(triangle)
 
   for link in robot.serial.links:
-    com = entities.COMEntity(link, camera, renderer.shaders.get('com'))
+    com = entities.COMEntity(link, renderer.shaders.get('com'))
     scene.entities.append(com)
 
   matrix_ub = UniformBuffer("Matrices", 1)
