@@ -23,12 +23,17 @@ if __name__ == "__main__":
   with Timer('Initialize Window') as t:
     window = vis.Window(750, 750, "robotpy")
 
-  with Timer('Initialize Shaders') as t:
-    program = ShaderProgram(vertex='serial_v', fragment='serial_f')
-    flat_program = ShaderProgram('flat')
-    grid_program = ShaderProgram('grid')
-    bill_program = ShaderProgram('billboard')
-    com_program = ShaderProgram('com')
+  renderer = vis.Renderer()
+  renderer.initialize_shaders([
+    'serial', 'flat', 'grid', 'billboard', 'com'
+  ])
+
+  # with Timer('Initialize Shaders') as t:
+  program      = renderer.shaders.get('serial') # ShaderProgram(vertex='serial_v', fragment='serial_f')
+  flat_program = renderer.shaders.get('flat') # ShaderProgram('flat')
+  grid_program = renderer.shaders.get('grid') # ShaderProgram('grid')
+  bill_program = renderer.shaders.get('billboard') # ShaderProgram('billboard')
+  com_program  = renderer.shaders.get('com') # ShaderProgram('com')
 
   program.bind_ubo("Matrices", 1)
   flat_program.bind_ubo("Matrices", 1)

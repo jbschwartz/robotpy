@@ -3,37 +3,25 @@ import enum
 from OpenGL.GL import *
 
 # TODO: Need to handle other types of shaders I'm sure.
-class ShaderTypes(enum.Enum):
+class ShaderType(enum.Enum):
   VERTEX   = GL_VERTEX_SHADER
   FRAGMENT = GL_FRAGMENT_SHADER
+  # TODO: Add GEOMETRY and see what happens.
 
 class Shader():
-  def __init__(self, shader_type: ShaderTypes, path: str, version: int = 430) -> None:
-    self.id          = None
-    self.path        = path
-    self.shader_type = shader_type
-    self.version     = version
+  def __init__(self, shader_type: ShaderType, full_source: str, version: int = 430) -> None:
+    self.id = glCreateShader(shader_type.value)
 
-    self.load()
+    self.compile_shader(shader_type.name, full_source, version)
 
   def __del__(self):
     glDeleteShader(self.id)
 
-  def create(self) -> None:
-    self.id = glCreateShader(self.shader_type.value)
+  def compile_shader(self, shader_type: str, full_source: str, version: int) -> None:
+    version_str = f'#version {version}'
+    define_str  = f'#define {shader_type}'
 
-  def source(self) -> None:
-    with open(self.path) as file:
-      source = file.read()
-
-    version_str = f'#version {self.version}'
-    define_str  = f'#define {self.shader_type.name}'
-
-    glShaderSource(self.id, '\n'.join([version_str, define_str, source]))
-
-  def load(self) -> None:
-    self.create()
-    self.source()
+    glShaderSource(self.id, '\n'.join([version_str, define_str, full_source]))
 
     glCompileShader(self.id)
 

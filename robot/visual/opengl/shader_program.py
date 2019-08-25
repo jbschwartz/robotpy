@@ -1,7 +1,9 @@
 from OpenGL.GL import *
 
+from typing import Iterable
+
 from robot.common  import FrozenDict, logger
-from .shader       import Shader, ShaderTypes
+from .shader       import Shader, ShaderType
 from .uniform      import Uniform
 
 class UniformDict():
@@ -38,29 +40,51 @@ class ShaderProgram():
   DEFAULT_FOLDER = './robot/visual/glsl/'
   DEFAULT_EXTENSION = '.glsl'
 
-  def __init__(self, name:str = None, **names):
+  def __init__(self, name, shaders: Iterable[Shader]) -> None:
     self.id = glCreateProgram()
 
-    # Use `name` for all shaders by default, replacing any specifically passed in
-    # Also re-key the dictionary with ShaderType enum objects
-    shader_names = {
-      **{k: name for k in ShaderTypes},
-      **{ShaderTypes[k.upper()]: name for k, name in names.items()}
-    }
-
     #  Used for warning/error messaging
-    self.name = name or '/'.join(shader_names.values())
+    self.name = name
 
-    self.link(shader_names)
+    for shader in shaders:
+      glAttachShader(self.id, shader.id)
+
+    self.link()
 
     self.uniforms = UniformDict.from_program(self.id)
+
+  @classmethod
+  def get_shader_file_path(cls, file_name: str) -> str:
+    return cls.DEFAULT_FOLDER + file_name + cls.DEFAULT_EXTENSION
+
+  @classmethod
+  def from_file_name(cls, file_name: str) -> 'ShaderProgram':
+    """Open a glsl file with the given file name and create a ShaderProgram."""
+    with open(cls.get_shader_file_path(file_name)) as file:
+      source = file.read()
+
+    shaders = [Shader(shader_type, source) for shader_type in ShaderType]
+
+    return cls(file_name, shaders)
+
+  @classmethod
+  def from_file_names(cls, shader_name: str, file_names_by_type: dict) -> 'ShaderProgram':
+    shaders = []
+    for shader_type, file_name in file_names_by_type.items():
+      with open(cls.get_shader_file_path(file_name)) as file:
+        source = file.read()
+
+      shaders.append(
+        Shader(shader_type, source)
+      )
+
+    return cls(shader_name, shaders)
+
 
   def __del__(self):
     glDeleteProgram(self.id)
 
-  def link(self, shader_names: dict):
-    self.attach_shaders(shader_names)
-
+  def link(self):
     glLinkProgram(self.id)
 
     if glGetProgramiv(self.id, GL_LINK_STATUS) != GL_TRUE:
@@ -81,14 +105,14 @@ class ShaderProgram():
     if result is not None:
       glUniformBlockBinding(self.id, result, binding_index)
 
-  def attach_shaders(self, shaders : dict) -> None:
-    get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
+  # def attach_shaders(self, shaders : dict) -> None:
+  #   get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
 
-    files = {k: get_path(name) for k, name in shaders.items()}
+  #   files = {k: get_path(name) for k, name in shaders.items()}
 
-    for shader_type, file_path in files.items():
-      shader = Shader(shader_type, file_path)
-      glAttachShader(self.id, shader.id)
+  #   for shader_type, file_path in files.items():
+  #     shader = Shader(shader_type, file_path)
+  #     glAttachShader(self.id, shader.id)
 
   def attribute_location(self, name: str) -> int:
     return glGetAttribLocation(self.id, name)
