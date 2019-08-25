@@ -70,7 +70,6 @@ class ToolEntity(Entity):
     pass
 
   def draw(self):
-    # TODO: Use Uniform Buffer Objects to remove this duplicate code from each entity
     self.shader_program.use()
 
     # TODO: This probably shouldn't be using the Serial shader.
