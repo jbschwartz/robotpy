@@ -29,17 +29,10 @@ if __name__ == "__main__":
     'serial', 'flat', 'grid', 'billboard', 'com'
   ])
 
-  # with Timer('Initialize Shaders') as t:
-  program      = renderer.shaders.get('serial') # ShaderProgram(vertex='serial_v', fragment='serial_f')
-  flat_program = renderer.shaders.get('flat') # ShaderProgram('flat')
-  grid_program = renderer.shaders.get('grid') # ShaderProgram('grid')
-  bill_program = renderer.shaders.get('billboard') # ShaderProgram('billboard')
-  com_program  = renderer.shaders.get('com') # ShaderProgram('com')
-
-  ee_frame = entities.FrameEntity(Transform(), flat_program)
-  grid = entities.GridEntity(grid_program)
+  ee_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
+  grid = entities.GridEntity(renderer.shaders.get('grid'))
   welder = tool_entity.load('./robot/mech/tools/welder.json')
-  welder.shader_program = program
+  welder.shader_program = renderer.shaders.get('serial')
 
   with Timer('Load Robot and Construct Mesh') as t:
     with open('./robot/mech/robots/abb_irb_120.json') as json_file:
@@ -50,7 +43,7 @@ if __name__ == "__main__":
 
       serials = [Serial.from_dict_meshes(serial_dictionary, meshes or []) for _ in range(2)]
 
-  robot, robot2 = [entities.RobotEntity(serial, program) for serial in serials]
+  robot, robot2 = [entities.RobotEntity(serial, renderer.shaders.get('serial')) for serial in serials]
   robot.frame_entity  = ee_frame
   robot2.frame_entity = ee_frame
 
@@ -89,7 +82,7 @@ if __name__ == "__main__":
 
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
-  world_frame = entities.FrameEntity(Transform(), flat_program)
+  world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
 
   scene = vis.Scene(camera, light)
@@ -97,7 +90,7 @@ if __name__ == "__main__":
   bindings = Bindings()
   settings = vis.CameraSettings()
   camera_controller = vis.CameraController(camera, settings, bindings, scene, window)
-  triangle = entities.TriangleEntity(camera_controller, bill_program)
+  triangle = entities.TriangleEntity(camera_controller, renderer.shaders.get('billboard'))
 
   scene.entities.append(world_frame)
   scene.entities.append(grid)
@@ -106,7 +99,7 @@ if __name__ == "__main__":
   scene.entities.append(triangle)
 
   for link in robot.serial.links:
-    com = entities.COMEntity(link, camera, com_program)
+    com = entities.COMEntity(link, camera, renderer.shaders.get('com'))
     scene.entities.append(com)
 
   matrix_ub = UniformBuffer("Matrices", 1)
