@@ -4,16 +4,15 @@ from robot.common                    import Timer
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
 
-from .messaging.event    import Event
-
 from .opengl.shader_program import ShaderProgram
 from .opengl.shader         import ShaderType
 from .opengl.uniform_buffer import UniformBuffer
+
 @listener
 class Renderer():
   def __init__(self):
     self.shaders = {}
-    self.ubos = []
+    self.ubos    = []
 
   def initialize_shaders(self, shader_names: Iterable[str]) -> None:
     self.shaders = {}
