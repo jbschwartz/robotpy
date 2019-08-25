@@ -14,6 +14,7 @@ class Scene():
     self.camera = camera
     self.entities = []
     self.light = light
+    self.ubos = []
 
   @property
   def aabb(self):
@@ -53,18 +54,6 @@ class Scene():
     for entity in self.entities:
       entity.load()
 
-    self.matrix_ub = UniformBuffer("Matrices", 1)
-
-    self.matrix_ub.bind(Mapping(
-      self.camera, ['projection.matrix', 'world_to_camera']
-    ))
-
-    self.light_ub = UniformBuffer("Light", 2)
-
-    self.light_ub.bind(Mapping(
-      self.light, ['position', 'color', 'intensity']
-    ))
-
   @listen(Event.START_FRAME)
   def start_frame(self):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -78,8 +67,8 @@ class Scene():
   def draw(self):
     self.light.position = self.camera.position
 
-    self.light_ub.load()
-    self.matrix_ub.load()
+    for ubo in self.ubos:
+      ubo.load()
 
     for entity in self.entities:
       entity.draw()

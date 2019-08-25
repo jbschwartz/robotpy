@@ -12,6 +12,7 @@ from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
 from robot.traj.linear_os  import LinearOS
 from robot.visual.opengl.shader_program import ShaderProgram
+from robot.visual.opengl.uniform_buffer import Mapping, UniformBuffer
 
 import robot.visual as vis
 
@@ -115,5 +116,20 @@ if __name__ == "__main__":
   for link in robot.serial.links:
     com = entities.COMEntity(link, camera, com_program)
     scene.entities.append(com)
+
+  matrix_ub = UniformBuffer("Matrices", 1)
+
+  matrix_ub.bind(Mapping(
+    camera, ['projection.matrix', 'world_to_camera']
+  ))
+
+  light_ub = UniformBuffer("Light", 2)
+
+  light_ub.bind(Mapping(
+    light, ['position', 'color', 'intensity']
+  ))
+
+  scene.ubos.append(matrix_ub)
+  scene.ubos.append(light_ub)
 
   window.run()
