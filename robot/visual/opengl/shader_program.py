@@ -2,9 +2,10 @@ from OpenGL.GL import *
 
 from typing import Iterable
 
-from robot.common  import FrozenDict, logger
-from .shader       import Shader, ShaderType
-from .uniform      import Uniform
+from robot.common    import FrozenDict, logger
+from .shader         import Shader, ShaderType
+from .uniform        import Uniform
+from .uniform_buffer import UniformBuffer
 
 class UniformDict():
   def __init__(self, d: dict) -> None:
@@ -94,16 +95,15 @@ class ShaderProgram():
   def use(self) -> None:
     glUseProgram(self.id)
 
-  def get_uniform_block(self, name: str) -> int:
-    result = glGetUniformBlockIndex(self.id, name)
+  def bind_ubo(self, ubo: UniformBuffer) -> None:
+    """Set the ShaderProgram's uniform block to the binding index provided by the Uniform Buffer.
 
-    return result if result != GL_INVALID_INDEX else None
+    If the ShaderProgram doesn't use the UniformBuffer, just ignore it.
+    """
+    block_index = glGetUniformBlockIndex(self.id, ubo.name)
 
-  def bind_ubo(self, name: str, binding_index: int) -> None:
-    result = self.get_uniform_block(name)
-
-    if result is not None:
-      glUniformBlockBinding(self.id, result, binding_index)
+    if block_index != GL_INVALID_INDEX:
+      glUniformBlockBinding(self.id, block_index, ubo.binding_index)
 
   def attribute_location(self, name: str) -> int:
     return glGetAttribLocation(self.id, name)

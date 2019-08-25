@@ -3,6 +3,7 @@ from typing import Iterable
 from robot.common           import Timer
 from .opengl.shader_program import ShaderProgram
 from .opengl.shader         import ShaderType
+from .opengl.uniform_buffer import UniformBuffer
 
 class Renderer():
   def __init__(self):
@@ -29,3 +30,7 @@ class Renderer():
             # TODO: Log this and wait to throw until we know it is being used?
             pass
 
+  def bind_buffer_objects(self, ubos: Iterable[UniformBuffer]) -> None:
+    for ubo in ubos:
+      for shader in self.shaders.values():
+        shader.bind_ubo(ubo)

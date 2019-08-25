@@ -36,14 +36,6 @@ if __name__ == "__main__":
   bill_program = renderer.shaders.get('billboard') # ShaderProgram('billboard')
   com_program  = renderer.shaders.get('com') # ShaderProgram('com')
 
-  program.bind_ubo("Matrices", 1)
-  flat_program.bind_ubo("Matrices", 1)
-  grid_program.bind_ubo("Matrices", 1)
-  bill_program.bind_ubo("Matrices", 1)
-  com_program.bind_ubo("Matrices", 1)
-
-  program.bind_ubo("Light", 2)
-
   ee_frame = entities.FrameEntity(Transform(), flat_program)
   grid = entities.GridEntity(grid_program)
   welder = tool_entity.load('./robot/mech/tools/welder.json')
@@ -131,5 +123,7 @@ if __name__ == "__main__":
 
   scene.ubos.append(matrix_ub)
   scene.ubos.append(light_ub)
+
+  renderer.bind_buffer_objects(scene.ubos)
 
   window.run()
