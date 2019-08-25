@@ -99,8 +99,7 @@ class Window():
     # Send a window resize event so observers are provided the initial window size
     self.window_callback(self.window, *glfw.get_window_size(self.window))
 
-    with Timer('START_RENDERER') as t:
-      self.emit(Event.START_RENDERER)
+    self.emit(Event.START_RENDERER)
 
     now = glfw.get_time()
     last_frame = now
