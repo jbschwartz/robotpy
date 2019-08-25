@@ -105,14 +105,5 @@ class ShaderProgram():
     if result is not None:
       glUniformBlockBinding(self.id, result, binding_index)
 
-  # def attach_shaders(self, shaders : dict) -> None:
-  #   get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
-
-  #   files = {k: get_path(name) for k, name in shaders.items()}
-
-  #   for shader_type, file_path in files.items():
-  #     shader = Shader(shader_type, file_path)
-  #     glAttachShader(self.id, shader.id)
-
   def attribute_location(self, name: str) -> int:
     return glGetAttribLocation(self.id, name)
