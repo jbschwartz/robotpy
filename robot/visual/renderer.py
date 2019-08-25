@@ -40,6 +40,7 @@ class Renderer():
     for ubo in self.ubos:
       ubo.load()
 
+  @listen(Event.START_RENDERER)
   def bind_buffer_objects(self) -> None:
     for ubo in self.ubos:
       for shader in self.shaders.values():

@@ -121,9 +121,6 @@ if __name__ == "__main__":
     light, ['position', 'color', 'intensity']
   ))
 
-  renderer.ubos.append(matrix_ub)
-  renderer.ubos.append(light_ub)
-
-  renderer.bind_buffer_objects()
+  renderer.ubos = [matrix_ub, light_ub]
 
   window.run()
