@@ -7,7 +7,8 @@ from ctypes import c_void_p
 from robot.mech.serial                     import Serial
 from robot.spatial                         import Matrix4
 from robot.visual.entities.entity          import Entity
-from robot.visual.opengl.shader_program           import ShaderProgram
+from robot.visual.opengl.shader_program    import ShaderProgram
+from robot.visual.opengl.buffer            import Buffer
 
 class RobotEntity(Entity):
   def __init__(self, serial : Serial, shader_program : ShaderProgram = None, color = (1, 0.5, 0)):
@@ -16,6 +17,9 @@ class RobotEntity(Entity):
     self.tool_entity = None
 
     Entity.__init__(self, shader_program, color)
+
+    # TODO: Notice that this has to be after the Entity.__init__ call because I am replacing self.buffer
+    self.buffer = Buffer.from_meshes(self.meshes)
 
   @property
   def meshes(self):
@@ -33,14 +37,6 @@ class RobotEntity(Entity):
   def intersect(self, ray):
     return self.serial.intersect(ray)
 
-  def build_buffer(self):
-    data = np.array([], dtype=[('', np.float32, 6),('', np.int32, 1)])
-    for index, link in enumerate(self.serial.links):
-      mesh = link.mesh.get_buffer_data(index)
-      data = np.concatenate((data, mesh), axis=0)
-
-    self.buffer = data
-
   def load(self):
     if self.tool_entity:
       self.tool_entity.load()
@@ -48,24 +44,8 @@ class RobotEntity(Entity):
     if self.frame_entity:
       self.frame_entity.load()
 
-    self.build_buffer()
-
-    glBindVertexArray(self.vao)
-
-    glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-    glBufferData(GL_ARRAY_BUFFER, self.buffer.nbytes, self.buffer, GL_STATIC_DRAW)
-
-    glVertexAttribPointer(self.shader_program.attribute_location('vin_position'), 3, GL_FLOAT, GL_FALSE, 28, None)
-    glEnableVertexAttribArray(self.shader_program.attribute_location('vin_position'))
-
-    glVertexAttribPointer(self.shader_program.attribute_location('vin_normal'), 3, GL_FLOAT, GL_FALSE, 28, c_void_p(12))
-    glEnableVertexAttribArray(self.shader_program.attribute_location('vin_normal'))
-
-    glVertexAttribIPointer(self.shader_program.attribute_location('vin_mesh_index'), 1, GL_INT, 28, c_void_p(24))
-    glEnableVertexAttribArray(self.shader_program.attribute_location('vin_mesh_index'))
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
-    glBindVertexArray(0)
+    self.buffer.set_attribute_locations(self.shader_program)
+    self.buffer.load()
 
   def update(self, delta):
     # TODO: Move to more "direct" function calls, e.g.:
@@ -82,17 +62,13 @@ class RobotEntity(Entity):
       self.tool_entity.update(delta)
 
   def draw(self):
-    with self.shader_program as sp:
+    with self.shader_program as sp, self.buffer:
       sp.uniforms.model_matrices  = self.serial.poses()
       sp.uniforms.use_link_colors = False
       sp.uniforms.link_colors     = [link.color for link in self.serial.links]
       sp.uniforms.robot_color     = self.color
 
-      glBindVertexArray(self.vao)
-
-      glDrawArrays(GL_TRIANGLES, 0, self.buffer.size)
-
-      glBindVertexArray(0)
+      glDrawArrays(GL_TRIANGLES, 0, len(self.buffer))
 
       if self.tool_entity:
         self.tool_entity.draw()
