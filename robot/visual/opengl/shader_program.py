@@ -3,6 +3,7 @@ from OpenGL.GL import *
 from typing import Iterable
 
 from robot.common    import FrozenDict, logger
+from robot.utils     import raise_if
 from .shader         import Shader, ShaderType
 from .uniform        import Uniform
 from .uniform_buffer import UniformBuffer
@@ -109,4 +110,8 @@ class ShaderProgram():
       glUniformBlockBinding(self.id, block_index, ubo.binding_index)
 
   def attribute_location(self, name: str) -> int:
-    return glGetAttribLocation(self.id, name)
+    result = glGetAttribLocation(self.id, name)
+
+    raise_if(result == -1, AttributeError)
+
+    return result
