@@ -34,15 +34,12 @@ class RobotEntity(Entity):
     return self.serial.intersect(ray)
 
   def build_buffer(self):
-    data_list = []
-    for index, mesh in enumerate(self.meshes):
-      for facet in mesh.facets:
-        for vertex in facet.vertices:
-          float_data = [*vertex, *(facet.normal)]
+    data = np.array([], dtype=[('', np.float32, 6),('', np.int32, 1)])
+    for index, link in enumerate(self.serial.links):
+      mesh = link.mesh.get_buffer_data(index)
+      data = np.concatenate((data, mesh), axis=0)
 
-          data_list.append((float_data, index))
-
-    self.buffer = np.array(data_list, dtype=[('', np.float32, 6),('', np.int32, 1)])
+    self.buffer = data
 
   def load(self):
     if self.tool_entity:
