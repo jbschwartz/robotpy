@@ -68,5 +68,3 @@ class Scene():
 
     for entity in self.entities:
       entity.draw()
-
-      glUseProgram(0)

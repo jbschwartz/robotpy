@@ -53,22 +53,21 @@ class GridEntity(Entity):
     pass
 
   def draw(self):
-    self.shader_program.use()
+    with self.shader_program as sp:
+      sp.uniforms.step_size = 250.0
+      sp.uniforms.minor_step_size = 50.0
+      sp.uniforms.in_grid_color = Vector3(0.5, 0.5, 0.5)
+      sp.uniforms.in_minor_grid_color = Vector3(0.15, 0.15, 0.15)
 
-    self.shader_program.uniforms.step_size = 250.0
-    self.shader_program.uniforms.minor_step_size = 50.0
-    self.shader_program.uniforms.in_grid_color = Vector3(0.5, 0.5, 0.5)
-    self.shader_program.uniforms.in_minor_grid_color = Vector3(0.15, 0.15, 0.15)
+      sp.uniforms.scale_matrix = Matrix4([
+        self.scale, 0, 0, 0,
+        0, self.scale, 0, 0,
+        0, 0, self.scale, 0,
+        0, 0, 0, 1
+      ])
 
-    self.shader_program.uniforms.scale_matrix = Matrix4([
-      self.scale, 0, 0, 0,
-      0, self.scale, 0, 0,
-      0, 0, self.scale, 0,
-      0, 0, 0, 1
-    ])
+      glBindVertexArray(self.vao)
 
-    glBindVertexArray(self.vao)
+      glDrawArrays(GL_TRIANGLES, 0, 6)
 
-    glDrawArrays(GL_TRIANGLES, 0, 6)
-
-    glBindVertexArray(0)
+      glBindVertexArray(0)

@@ -85,27 +85,26 @@ class RobotEntity(Entity):
       self.tool_entity.update(delta)
 
   def draw(self):
-    self.shader_program.use()
+    with self.shader_program as sp:
+      sp.uniforms.model_matrices  = self.serial.poses()
+      sp.uniforms.use_link_colors = False
+      sp.uniforms.link_colors     = [link.color for link in self.serial.links]
+      sp.uniforms.robot_color     = self.color
 
-    self.shader_program.uniforms.model_matrices  = self.serial.poses()
-    self.shader_program.uniforms.use_link_colors = False
-    self.shader_program.uniforms.link_colors     = [link.color for link in self.serial.links]
-    self.shader_program.uniforms.robot_color     = self.color
+      glBindVertexArray(self.vao)
 
-    glBindVertexArray(self.vao)
+      glDrawArrays(GL_TRIANGLES, 0, self.buffer.size)
 
-    glDrawArrays(GL_TRIANGLES, 0, self.buffer.size)
+      glBindVertexArray(0)
 
-    glBindVertexArray(0)
+      if self.tool_entity:
+        self.tool_entity.draw()
 
-    if self.tool_entity:
-      self.tool_entity.draw()
+      if self.frame_entity:
+        for link in self.serial.links:
+          self.frame_entity.frame = link.to_world
+          self.frame_entity.draw()
 
-    if self.frame_entity:
-      for link in self.serial.links:
-        self.frame_entity.frame = link.to_world
-        self.frame_entity.draw()
-
-      if self.serial.tool:
-        self.frame_entity.frame = self.serial.tool.tip
-        self.frame_entity.draw()
+        if self.serial.tool:
+          self.frame_entity.frame = self.serial.tool.tip
+          self.frame_entity.draw()

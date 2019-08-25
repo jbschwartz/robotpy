@@ -22,14 +22,12 @@ class COMEntity():
   def draw(self):
     center_of_mass = self.camera.world_to_camera(self.link.to_world(self.link.properties.com))
 
-    # TODO: This maybe could be a decorator to the draw function inside the entity
-    self.shader_program.use()
+    with self.shader_program as sp:
+      sp.uniforms.radius   = self.radius
+      sp.uniforms.position = center_of_mass
 
-    self.shader_program.uniforms.radius   = self.radius
-    self.shader_program.uniforms.position = center_of_mass
+      glBindVertexArray(self.vao)
 
-    glBindVertexArray(self.vao)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-
-    glBindVertexArray(0)
+      glBindVertexArray(0)

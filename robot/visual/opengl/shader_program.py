@@ -85,15 +85,19 @@ class ShaderProgram():
   def __del__(self):
     glDeleteProgram(self.id)
 
+  def __enter__(self) -> 'ShaderProgram':
+    glUseProgram(self.id)
+    return self
+
+  def __exit__(self, exc_type, exc_value, exc_traceback) -> None:
+    glUseProgram(0)
+
   def link(self):
     glLinkProgram(self.id)
 
     if glGetProgramiv(self.id, GL_LINK_STATUS) != GL_TRUE:
       msg = glGetProgramInfoLog(self.id).decode('unicode_escape')
       raise RuntimeError(f'Error linking program: {msg}')
-
-  def use(self) -> None:
-    glUseProgram(self.id)
 
   def bind_ubo(self, ubo: UniformBuffer) -> None:
     """Set the ShaderProgram's uniform block to the binding index provided by the Uniform Buffer.
