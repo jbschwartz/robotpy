@@ -76,11 +76,8 @@ class Buffer():
 
   @property
   def stride(self) -> int:
-    # TODO: Do not assume that all buffer values are four bytes
-    return 4 * sum([
-      parameters['number_of_components']
-      for parameters in self.attributes.values()
-    ])
+    # np.itemsize gets the size of one element (read: vertex) in the data array
+    return self.data.itemsize
 
   def set_attribute_locations(self, sp: ShaderProgram) -> None:
     for attribute_name in self.attributes.keys():
