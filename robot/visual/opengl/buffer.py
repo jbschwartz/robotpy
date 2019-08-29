@@ -2,6 +2,7 @@ import enum
 
 import numpy as np
 
+from copy   import deepcopy
 from ctypes import c_void_p
 from typing import Iterable
 
@@ -57,7 +58,8 @@ class Buffer():
   def from_mesh(cls, mesh: Mesh) -> 'Buffer':
     """Create a Buffer from a Mesh."""
     data = np.array(mesh.get_buffer_data(), dtype=[('', np.float32, 6),('', np.int32, 1)])
-    return cls(data, MESH_BUFFER_ATTRS)
+    # TODO: Maybe there is something better than a deepcopy
+    return cls(data, deepcopy(MESH_BUFFER_ATTRS))
 
   @classmethod
   def from_meshes(cls, meshes: Iterable[Mesh]) -> 'Buffer':
@@ -67,7 +69,8 @@ class Buffer():
       mesh_data = mesh.get_buffer_data(mesh_index)
       data = np.concatenate((data, mesh_data), axis=0)
 
-    return cls(data, MESH_BUFFER_ATTRS)
+    # TODO: Maybe there is something better than a deepcopy
+    return cls(data, deepcopy(MESH_BUFFER_ATTRS))
 
   @classmethod
   def Procedural(cls, size) -> 'Buffer':
@@ -82,7 +85,6 @@ class Buffer():
   def set_attribute_locations(self, sp: ShaderProgram) -> None:
     for attribute_name in self.attributes.keys():
       try:
-        # TODO: This is probably _very_ bad. We shouldn't be mutating the MESH_BUFFER_ATTRS dictionary
         self.attributes[attribute_name]['location'] = sp.attribute_location(f'vin_{attribute_name}')
       except AttributeError:
         logger.warn(f'Attribute `vin_{attribute_name}` not found in shader program `{sp.name}`')
