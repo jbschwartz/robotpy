@@ -2,6 +2,7 @@ import glfw
 
 from OpenGL.GL import *
 
+from robot.visual.opengl.buffer         import Buffer
 from robot.visual.opengl.shader_program import ShaderProgram
 
 class COMEntity():
@@ -12,6 +13,8 @@ class COMEntity():
     self.radius = 25.
     self.shader_program = shader_program
 
+    self.buffer = Buffer.Procedural(4)
+
   def load(self):
     pass
 
@@ -19,12 +22,8 @@ class COMEntity():
     pass
 
   def draw(self):
-    with self.shader_program as sp:
+    with self.shader_program as sp, self.buffer:
       sp.uniforms.radius   = self.radius
       sp.uniforms.position = self.link.properties.com
 
-      glBindVertexArray(self.vao)
-
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-
-      glBindVertexArray(0)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, len(self.buffer))
