@@ -118,8 +118,13 @@ class Facet:
 
   def compute_edges(self) -> None:
     '''Construct a list of edges from the Facet's current vertices.'''
-    self._edges =  [(v2 - v1) for v1, v2 in zip(self.vertices, self.vertices[1:])]
+    self._edges = [v2 - v1 for v1, v2 in zip(self.vertices, self.vertices[1:])]
     self._edges.append(self.vertices[0] - self.vertices[-1])
+
+    assert all([
+      isinstance(edge, Vector3)
+      for edge in self._edges
+    ]), "All edges must be of Vector3 type"
 
   def compute_aabb(self) -> None:
     '''Construct the AABB bounding the Facet from the Facet's current vertices.'''
