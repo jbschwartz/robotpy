@@ -42,7 +42,7 @@ class Buffer():
 
   def __len__(self) -> int:
     """Return the number of elements in the buffer."""
-    if self.data is not None:
+    if hasattr(self, 'data'):
       return len(self.data)
     else:
       return self._size
