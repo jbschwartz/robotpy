@@ -16,7 +16,7 @@ class Facet:
     self._edges           = None
 
     self.vertices = vertices or []
-    self.normal   = normal   or Vector3
+    self.normal   = normal
 
   @property
   def aabb(self) -> AABB:
