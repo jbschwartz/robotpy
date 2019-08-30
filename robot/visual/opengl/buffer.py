@@ -90,7 +90,7 @@ class Buffer():
         logger.warn(f'Attribute `vin_{attribute_name}` not found in shader program `{sp.name}`')
 
   def load(self) -> None:
-    assert all(
+    assert any(
       [
         'location' in parameters
         for parameters in self.attributes.values()
@@ -104,6 +104,9 @@ class Buffer():
 
     offset = 0
     for parameters in self.attributes.values():
+      if parameters.get('location', None) is None:
+        continue
+
       if parameters['type'] in ATTRIBI_TYPES:
         glVertexAttribIPointer(
           parameters['location'],
