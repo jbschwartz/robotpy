@@ -11,6 +11,7 @@ from robot.spatial.euler   import Axes, Order
 from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
 from robot.traj.linear_os  import LinearOS
+from robot.visual.opengl.buffer         import Buffer
 from robot.visual.opengl.shader_program import ShaderProgram
 from robot.visual.opengl.uniform_buffer import Mapping, UniformBuffer
 
@@ -42,6 +43,31 @@ if __name__ == "__main__":
         meshes = Mesh.from_file(vis.STLParser(), f'./robot/mech/robots/meshes/{serial_dictionary["mesh_file"]}')
 
       serials = [Serial.from_dict_meshes(serial_dictionary, meshes or []) for _ in range(2)]
+
+  serial_buffer = Buffer.from_meshes(meshes)
+
+  def serial_per_instance(serial: Serial, sp: ShaderProgram, color = None):
+    color = color or [1, 1, 1]
+
+    sp.uniforms.model_matrices  = serial.poses()
+    sp.uniforms.use_link_colors = False
+    sp.uniforms.link_colors     = [link.color for link in serial.links]
+    sp.uniforms.robot_color     = color
+
+  renderer.register_entity_type(
+    name         = 'serial',
+    shader_name  = 'serial',
+    buffer       = serial_buffer,
+    per_instance = serial_per_instance
+    # adder        = adder_function
+  )
+
+  # buffer_instance.set_attribute_locations(sp)
+
+
+  # robot_1 = renderer.add_many('serial', serial, parent)
+  # coms = renderer.add_many('com', serials[0].links, robot_1)
+  # frames = renderer.add_many('frames', serials.links, robot_1)
 
   robot, robot2 = [entities.RobotEntity(serial, renderer.shaders.get('serial')) for serial in serials]
   robot.frame_entity  = ee_frame
@@ -79,6 +105,7 @@ if __name__ == "__main__":
     ],
     3)
 
+  renderer.add('serial', serials[1], None, color=[0.5, 1, 0])
 
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
@@ -94,7 +121,7 @@ if __name__ == "__main__":
 
   scene.entities.append(world_frame)
   scene.entities.append(grid)
-  scene.entities.append(robot2)
+  # scene.entities.append(robot2)
   scene.entities.append(robot)
   scene.entities.append(triangle)
 
