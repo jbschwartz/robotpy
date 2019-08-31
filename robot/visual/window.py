@@ -1,5 +1,7 @@
 import math, numpy, glfw, sys
 
+from typing import Optional
+
 from OpenGL.GL import GL_TRUE
 
 from robot.common       import logger, Timer
@@ -86,29 +88,25 @@ class Window():
   def ndc(self, cursor):
     return Vector3(2 * cursor.x / self.width - 1, 1 - 2 * cursor.y / self.height)
 
-  def run(self, fps_limit = None):
+  def run(self, fps_limit: Optional[int] = None):
     # Send a window resize event so observers are provided the initial window size
     self.window_callback(self.window, *glfw.get_window_size(self.window))
 
+    period = (1 / fps_limit) if fps_limit else 0
+
+    update = Timer()
+    frame  = Timer(period = period)
+
     self.emit(Event.START_RENDERER)
 
-    now = glfw.get_time()
-    last_frame = now
-    last_update = now
-
-    frame_time = 0 if not fps_limit else 1 / fps_limit
-
     while not glfw.window_should_close(self.window):
-      now = glfw.get_time()
+      with update:
+        self.emit(Event.UPDATE, delta = update.time_since_last)
 
-      self.emit(Event.UPDATE, delta = now - last_update)
-      last_update = now
+      with frame:
+        if frame.ready:
+          self.emit(Event.START_FRAME)
+          self.emit(Event.DRAW)
 
-      delta_frame = now - last_frame
-      if not fps_limit or (fps_limit and delta_frame >= frame_time):
-        self.emit(Event.START_FRAME)
-        self.emit(Event.DRAW)
-        last_frame = now
-
-        glfw.swap_buffers(self.window)
-        glfw.poll_events()
+          glfw.swap_buffers(self.window)
+          glfw.poll_events()
