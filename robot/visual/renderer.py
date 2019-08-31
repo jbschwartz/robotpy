@@ -12,7 +12,7 @@ from .opengl.shader_program import ShaderProgram
 from .opengl.shader         import ShaderType
 from .opengl.uniform_buffer import UniformBuffer
 
-Entity = namedtuple('Entity', 'name shader buffer instances per_instance')
+Entity = namedtuple('Entity', 'name shader draw_mode buffer instances per_instance')
 
 @listener
 class Renderer():
@@ -70,7 +70,7 @@ class Renderer():
       kwargs
     ))
 
-  def register_entity_type(self, name: str, shader_name: str, buffer: Buffer, per_instance: Callable) -> None:
+  def register_entity_type(self, name: str, shader_name: str, buffer: Buffer, per_instance: Callable, draw_mode: int = None) -> None:
     if self.entities.get(name, None) is not None:
       return logger.warn(f'Entity type `{name}` already registered.')
 
@@ -81,6 +81,7 @@ class Renderer():
     self.entities[name] = Entity(
       name         = name,
       shader       = shader,
+      draw_mode    = draw_mode or GL_TRIANGLES,
       buffer       = buffer,
       instances    = [],
       per_instance = per_instance
@@ -93,4 +94,4 @@ class Renderer():
         for instance, kwargs in entity.instances:
           entity.per_instance(instance, sp, **kwargs)
 
-          glDrawArrays(GL_TRIANGLES, 0, len(entity.buffer))
+          glDrawArrays(entity.draw_mode, 0, len(entity.buffer))

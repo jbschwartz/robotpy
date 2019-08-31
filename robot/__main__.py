@@ -72,6 +72,10 @@ if __name__ == "__main__":
     ])
     sp.uniforms.in_opacity = opacity
 
+  def com_per_instance(link: Link, sp: ShaderProgram, radius: float = 25.):
+    sp.uniforms.radius   = radius
+    sp.uniforms.position = link.properties.com
+
   renderer.register_entity_type(
     name         = 'serial',
     shader_name  = 'serial',
@@ -85,6 +89,15 @@ if __name__ == "__main__":
     shader_name  = 'flat',
     buffer       = frame_buffer,
     per_instance = frame_per_instance
+    # adder        = adder_function
+  )
+
+  renderer.register_entity_type(
+    name         = 'com',
+    shader_name  = 'com',
+    buffer       = Buffer.Procedural(4),
+    per_instance = com_per_instance,
+    draw_mode    = GL_TRIANGLE_STRIP
     # adder        = adder_function
   )
 
@@ -150,8 +163,7 @@ if __name__ == "__main__":
   scene.entities.append(triangle)
 
   for link in serials[0].links:
-    com = entities.COMEntity(link, renderer.shaders.get('com'))
-    scene.entities.append(com)
+    renderer.add('com', link, None)
 
   matrix_ub = UniformBuffer("Matrices", 1)
 
