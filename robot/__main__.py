@@ -31,7 +31,6 @@ if __name__ == "__main__":
     'serial', 'flat', 'grid', 'billboard', 'com'
   ])
 
-  grid = entities.GridEntity(renderer.shaders.get('grid'))
   welder = tool_entity.load('./robot/mech/tools/welder.json')
   welder.shader_program = renderer.shaders.get('serial')
 
@@ -221,7 +220,6 @@ if __name__ == "__main__":
   settings = vis.CameraSettings()
   camera_controller = vis.CameraController(camera, settings, bindings, scene, window)
 
-  scene.entities.append(grid)
   scene.entities.append(serials[0])
   scene.entities.append(serials[1])
 
