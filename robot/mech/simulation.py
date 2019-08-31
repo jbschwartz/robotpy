@@ -44,10 +44,10 @@ class Simulation():
   @listen(Event.UPDATE)
   def update(self, delta: float = 0) -> None:
     """Step the simulation forward by a `delta` timestep."""
-    self.tick_samples.append(1 / delta)
-
-    if self.is_paused:
+    if self.is_paused or delta <= 0:
       return
+
+    self.tick_samples.append(1 / delta)
 
     for entity in self.entities:
       if entity.traj:
