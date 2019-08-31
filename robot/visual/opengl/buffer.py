@@ -42,10 +42,10 @@ class Buffer():
 
   def __len__(self) -> int:
     """Return the number of elements in the buffer."""
-    if hasattr(self, 'data'):
-      return len(self.data)
-    else:
+    if self.is_procedural:
       return self._size
+    else:
+      return len(self.data)
 
   def __enter__(self) -> 'Buffer':
     glBindVertexArray(self.vao)
@@ -78,11 +78,18 @@ class Buffer():
     return cls(None, None, size)
 
   @property
+  def is_procedural(self) -> bool:
+    return not (hasattr(self, 'data') and hasattr(self, 'attributes'))
+
+  @property
   def stride(self) -> int:
     # np.itemsize gets the size of one element (read: vertex) in the data array
     return self.data.itemsize
 
   def set_attribute_locations(self, sp: ShaderProgram) -> None:
+    if self.is_procedural:
+      return
+
     for attribute_name in self.attributes.keys():
       try:
         self.attributes[attribute_name]['location'] = sp.attribute_location(f'vin_{attribute_name}')
@@ -90,6 +97,9 @@ class Buffer():
         logger.warn(f'Attribute `vin_{attribute_name}` not found in shader program `{sp.name}`')
 
   def load(self) -> None:
+    if self.is_procedural:
+      return
+
     assert any(
       [
         'location' in parameters

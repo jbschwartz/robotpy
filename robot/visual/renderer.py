@@ -56,8 +56,9 @@ class Renderer():
   @listen(Event.START_RENDERER)
   def load_buffers(self):
     for entity in self.entities.values():
-      entity.buffer.set_attribute_locations(entity.shader)
-      entity.buffer.load()
+      if not entity.buffer.is_procedural:
+        entity.buffer.set_attribute_locations(entity.shader)
+        entity.buffer.load()
 
   def add(self, entity_type: str, instance, parent = None, **kwargs) -> None:
     entity = self.entities.get(entity_type, None)
