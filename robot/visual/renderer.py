@@ -21,27 +21,6 @@ class Renderer():
     self.shaders  = {}
     self.ubos     = []
 
-  def initialize_shader(self, shader_name: str) -> None:
-    if shader_name in self.shaders:
-      return
-
-    try:
-      self.shaders[shader_name] = ShaderProgram.from_file_name(shader_name)
-    except FileNotFoundError:
-      # Single file not found. Instead look for individual files.
-      abbreviation = lambda type_name: type_name[0].lower()
-
-      file_names = {
-        shader_type: f"{shader_name}_{abbreviation(shader_type.name)}"
-        for shader_type in ShaderType
-      }
-
-      try:
-        self.shaders[shader_name] = ShaderProgram.from_file_names(shader_name, file_names)
-      except FileNotFoundError:
-        logger.error(f'Shader program `{shader_name}` not found')
-        raise
-
   @listen(Event.START_FRAME)
   def start_frame(self):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -79,15 +58,40 @@ class Renderer():
         entity.buffer.set_attribute_locations(entity.shader)
         entity.buffer.load()
 
-  def add(self, entity_type: str, instance, parent = None, **kwargs) -> None:
-    entity = self.entities.get(entity_type, None)
-    if entity is None:
-      return logger.error(f'No entity type `{entity_type}` found when adding entity')
+  @listen(Event.DRAW)
+  def draw(self):
+    for entity in self.entities.values():
+      with entity.shader as sp, entity.buffer:
+        for instance, kwargs in entity.instances:
+          entity.per_instance(instance, sp, **kwargs)
 
-    entity.instances.append((
-      instance,
-      kwargs
-    ))
+          glDrawArrays(entity.draw_mode, 0, len(entity.buffer))
+
+  @listen(Event.WINDOW_RESIZE)
+  def window_resize(self, width, height):
+    if width and height:
+      glViewport(0, 0, width, height)
+
+  def initialize_shader(self, shader_name: str) -> None:
+    if shader_name in self.shaders:
+      return
+
+    try:
+      self.shaders[shader_name] = ShaderProgram.from_file_name(shader_name)
+    except FileNotFoundError:
+      # Single file not found. Instead look for individual files.
+      abbreviation = lambda type_name: type_name[0].lower()
+
+      file_names = {
+        shader_type: f"{shader_name}_{abbreviation(shader_type.name)}"
+        for shader_type in ShaderType
+      }
+
+      try:
+        self.shaders[shader_name] = ShaderProgram.from_file_names(shader_name, file_names)
+      except FileNotFoundError:
+        logger.error(f'Shader program `{shader_name}` not found')
+        raise
 
   def register_entity_type(self, name: str, buffer: Buffer, per_instance: Callable, shader_name: str = None, draw_mode: int = None) -> None:
     if self.entities.get(name, None) is not None:
@@ -110,16 +114,12 @@ class Renderer():
       per_instance = per_instance
     )
 
-  @listen(Event.DRAW)
-  def draw(self):
-    for entity in self.entities.values():
-      with entity.shader as sp, entity.buffer:
-        for instance, kwargs in entity.instances:
-          entity.per_instance(instance, sp, **kwargs)
+  def add(self, entity_type: str, instance, parent = None, **kwargs) -> None:
+    entity = self.entities.get(entity_type, None)
+    if entity is None:
+      return logger.error(f'No entity type `{entity_type}` found when adding entity')
 
-          glDrawArrays(entity.draw_mode, 0, len(entity.buffer))
-
-  @listen(Event.WINDOW_RESIZE)
-  def window_resize(self, width, height):
-    if width and height:
-      glViewport(0, 0, width, height)
+    entity.instances.append((
+      instance,
+      kwargs
+    ))
