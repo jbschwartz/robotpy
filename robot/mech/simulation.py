@@ -1,6 +1,7 @@
 from numbers import Number
+from typing  import Optional
 
-from robot.spatial                   import AABB
+from robot.spatial                   import AABB, Ray
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
 
@@ -10,7 +11,8 @@ class Simulation():
     self.entities = []
 
   @property
-  def aabb(self):
+  def aabb(self) -> AABB:
+    """Get the AABB for all simulation entities."""
     aabbs = [
       entity.aabb
       for entity in self.entities
@@ -19,7 +21,8 @@ class Simulation():
 
     return AABB.from_aabbs(aabbs)
 
-  def intersect(self, ray):
+  def intersect(self, ray: Ray) -> Optional[float]:
+    """Return the parametric distance along the ray to intersection with the nearest simulation entity, if any."""
     if not self.aabb.intersect(ray):
       return None
 
