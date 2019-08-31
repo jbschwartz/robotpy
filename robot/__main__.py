@@ -12,9 +12,10 @@ from robot.spatial.euler   import Axes, Order
 from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
 from robot.traj.linear_os  import LinearOS
-from robot.visual.opengl.buffer         import Buffer
-from robot.visual.opengl.shader_program import ShaderProgram
-from robot.visual.opengl.uniform_buffer import Mapping, UniformBuffer
+from robot.visual.filetypes.stl.stl_parser import STLParser
+from robot.visual.opengl.buffer            import Buffer
+from robot.visual.opengl.shader_program    import ShaderProgram
+from robot.visual.opengl.uniform_buffer    import Mapping, UniformBuffer
 
 import robot.visual as vis
 
@@ -51,6 +52,10 @@ if __name__ == "__main__":
 
   serial_buffer = Buffer.from_meshes(meshes)
 
+  p = STLParser()
+  mesh = Mesh.from_file(p, './robot/visual/meshes/frame.stl')
+  frame_buffer = Buffer.from_meshes(mesh)
+
   def serial_per_instance(serial: Serial, sp: ShaderProgram, color = None):
     color = color or [1, 1, 1]
 
@@ -59,11 +64,29 @@ if __name__ == "__main__":
     sp.uniforms.link_colors     = [link.color for link in serial.links]
     sp.uniforms.robot_color     = color
 
+  def frame_per_instance(serial: Serial, sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
+    sp.uniforms.model_matrix = serial.pose()
+    sp.uniforms.scale_matrix = Matrix4([
+      scale, 0, 0, 0,
+      0, scale, 0, 0,
+      0, 0, scale, 0,
+      0, 0, 0, 1
+    ])
+    sp.uniforms.in_opacity = opacity
+
   renderer.register_entity_type(
     name         = 'serial',
     shader_name  = 'serial',
     buffer       = serial_buffer,
     per_instance = serial_per_instance
+    # adder        = adder_function
+  )
+
+  renderer.register_entity_type(
+    name         = 'frame',
+    shader_name  = 'flat',
+    buffer       = frame_buffer,
+    per_instance = frame_per_instance
     # adder        = adder_function
   )
 
@@ -110,6 +133,9 @@ if __name__ == "__main__":
 
   renderer.add('serial', serials[0], None, color=[1, 0.5, 0])
   renderer.add('serial', serials[1], None, color=[0.5, 1, 0])
+
+  renderer.add('frame', serials[0], None, scale=15)
+  renderer.add('frame', serials[1], None, scale=15)
 
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
