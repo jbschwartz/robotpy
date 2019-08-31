@@ -1,6 +1,6 @@
 import json, math, sys
 
-from OpenGL.GL import *
+import OpenGL.GL as gl
 
 from robot.spatial import vector3
 Vector3 = vector3.Vector3
@@ -17,7 +17,7 @@ from robot.visual.opengl.buffer            import Buffer
 from robot.visual.opengl.shader_program    import ShaderProgram
 from robot.visual.opengl.uniform_buffer    import Mapping, UniformBuffer
 
-from .instance_functions import *
+import robot.instance_functions as pif
 
 import robot.visual as vis
 
@@ -70,42 +70,42 @@ if __name__ == "__main__":
   renderer.register_entity_type(
     name         = 'serial',
     buffer       = serial_buffer,
-    per_instance = serial_per_instance,
-    add_children = serial_add_children
+    per_instance = pif.serial,
+    add_children = pif.serial_add_children
   )
 
   renderer.register_entity_type(
     name         = 'frame',
     shader_name  = 'flat',
     buffer       = frame_buffer,
-    per_instance = frame_per_instance
+    per_instance = pif.frame
   )
 
   renderer.register_entity_type(
     name         = 'com',
     buffer       = Buffer.Procedural(4),
-    per_instance = com_per_instance,
-    draw_mode    = GL_TRIANGLE_STRIP
+    per_instance = pif.com,
+    draw_mode    = gl.GL_TRIANGLE_STRIP
   )
 
   renderer.register_entity_type(
     name         = 'triangle',
     shader_name  = 'billboard',
     buffer       = triangle_buffer,
-    per_instance = triangle_per_instance
+    per_instance = pif.triangle
   )
 
   renderer.register_entity_type(
     name         = 'grid',
     buffer       = grid_buffer,
-    per_instance = grid_per_instance
+    per_instance = pif.grid
   )
 
   renderer.register_entity_type(
     name         = 'tool',
     shader_name  = 'serial',
     buffer       = tool_buffer,
-    per_instance = tool_per_instance
+    per_instance = pif.tool
   )
 
   serials[0].to_world = Transform.from_orientation_translation(

@@ -3,7 +3,7 @@ from robot.spatial                      import Matrix4, Transform
 from robot.visual                       import Camera, Renderer
 from robot.visual.opengl.shader_program import ShaderProgram
 
-def serial_per_instance(serial: Serial, sp: ShaderProgram, color = None):
+def serial(serial: Serial, sp: ShaderProgram, color = None):
   color = color or [1, 1, 1]
 
   sp.uniforms.model_matrices  = serial.poses()
@@ -18,7 +18,7 @@ def serial_add_children(renderer: Renderer, serial: Serial):
   if serial.tool is not None:
     renderer.add('tool', serial.tool, None)
 
-def frame_per_instance(serial: Serial, sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
+def frame(serial: Serial, sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
   sp.uniforms.model_matrix = serial.pose()
   # TODO: Make this happen at the buffer level so this does not need to be called per frame
   # Unless we actually want per frame scaling (often times we don't)
@@ -30,11 +30,11 @@ def frame_per_instance(serial: Serial, sp: ShaderProgram, scale: float = 1., opa
   ])
   sp.uniforms.in_opacity = opacity
 
-def com_per_instance(link: Link, sp: ShaderProgram, radius: float = 25.):
+def com(link: Link, sp: ShaderProgram, radius: float = 25.):
   sp.uniforms.radius   = radius
   sp.uniforms.position = link.properties.com
 
-def triangle_per_instance(camera: Camera, sp: ShaderProgram, scale: float = 1., opacity: float = 0.5, color = None):
+def triangle(camera: Camera, sp: ShaderProgram, scale: float = 1., opacity: float = 0.5, color = None):
   if not hasattr(camera, 'target'):
     return
 
@@ -60,7 +60,7 @@ def triangle_per_instance(camera: Camera, sp: ShaderProgram, scale: float = 1., 
   sp.uniforms.color_in   = color
   sp.uniforms.in_opacity = opacity
 
-def grid_per_instance(placeholder, sp: ShaderProgram, scale: float = 1.):
+def grid(placeholder, sp: ShaderProgram, scale: float = 1.):
   sp.uniforms.scale_matrix = Matrix4([
     scale, 0, 0, 0,
     0, scale, 0, 0,
@@ -68,7 +68,7 @@ def grid_per_instance(placeholder, sp: ShaderProgram, scale: float = 1.):
     0, 0, 0, 1
   ])
 
-def tool_per_instance(tool, sp: ShaderProgram):
+def tool(tool, sp: ShaderProgram):
   # TODO: This probably shouldn't be using the Serial shader.
   # It would be better to have a similar shader that handles individual objects
   # (instead of faking individual objects into "serial chains").
