@@ -6,7 +6,8 @@ from robot.spatial import vector3
 Vector3 = vector3.Vector3
 
 from robot.common          import Bindings, logger, Timer
-from robot.mech            import Link, Serial, Simulation
+from robot.mech            import Link, Serial, Simulation, Tool
+from robot.mech            import tool
 from robot.spatial.euler   import Axes, Order
 from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
@@ -65,7 +66,7 @@ if __name__ == "__main__":
     Vector3( 0.5,  0.5,  0,)
   ])
 
-  welder = tool_entity.load('./robot/mech/tools/welder.json')
+  welder = tool.load('./robot/mech/tools/welder.json')
   tool_buffer = Buffer.from_mesh(welder.mesh)
 
   def serial_per_instance(serial: Serial, sp: ShaderProgram, color = None):
