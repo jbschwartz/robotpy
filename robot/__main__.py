@@ -147,7 +147,6 @@ if __name__ == "__main__":
     shader_name  = 'flat',
     buffer       = frame_buffer,
     per_instance = frame_per_instance
-    # adder        = adder_function
   )
 
   renderer.register_entity_type(
@@ -155,7 +154,6 @@ if __name__ == "__main__":
     buffer       = Buffer.Procedural(4),
     per_instance = com_per_instance,
     draw_mode    = GL_TRIANGLE_STRIP
-    # adder        = adder_function
   )
 
   renderer.register_entity_type(
