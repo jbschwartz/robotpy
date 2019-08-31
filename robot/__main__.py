@@ -78,7 +78,6 @@ if __name__ == "__main__":
 
   renderer.register_entity_type(
     name         = 'serial',
-    shader_name  = 'serial',
     buffer       = serial_buffer,
     per_instance = serial_per_instance
     # adder        = adder_function
@@ -94,7 +93,6 @@ if __name__ == "__main__":
 
   renderer.register_entity_type(
     name         = 'com',
-    shader_name  = 'com',
     buffer       = Buffer.Procedural(4),
     per_instance = com_per_instance,
     draw_mode    = GL_TRIANGLE_STRIP

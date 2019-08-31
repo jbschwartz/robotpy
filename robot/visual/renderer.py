@@ -70,10 +70,11 @@ class Renderer():
       kwargs
     ))
 
-  def register_entity_type(self, name: str, shader_name: str, buffer: Buffer, per_instance: Callable, draw_mode: int = None) -> None:
+  def register_entity_type(self, name: str, buffer: Buffer, per_instance: Callable, shader_name: str = None, draw_mode: int = None) -> None:
     if self.entities.get(name, None) is not None:
       return logger.warn(f'Entity type `{name}` already registered.')
 
+    shader_name = shader_name or name
     shader = self.shaders.get(shader_name, None)
     if shader is None:
       return logger.error(f'Shader program `{shader_name}` not found when registering entity type `{name}`')
