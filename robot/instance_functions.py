@@ -1,0 +1,77 @@
+from robot.mech                         import Link, Serial
+from robot.spatial                      import Matrix4, Transform
+from robot.visual                       import Camera, Renderer
+from robot.visual.opengl.shader_program import ShaderProgram
+
+def serial_per_instance(serial: Serial, sp: ShaderProgram, color = None):
+  color = color or [1, 1, 1]
+
+  sp.uniforms.model_matrices  = serial.poses()
+  sp.uniforms.use_link_colors = False
+  sp.uniforms.link_colors     = [link.color for link in serial.links]
+  sp.uniforms.robot_color     = color
+
+def serial_add_children(renderer: Renderer, serial: Serial):
+  renderer.add('frame', serial, None, scale=15)
+  renderer.add_many('com', serial.links, None)
+
+  if serial.tool is not None:
+    renderer.add('tool', serial.tool, None)
+
+def frame_per_instance(serial: Serial, sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
+  sp.uniforms.model_matrix = serial.pose()
+  # TODO: Make this happen at the buffer level so this does not need to be called per frame
+  # Unless we actually want per frame scaling (often times we don't)
+  sp.uniforms.scale_matrix = Matrix4([
+    scale, 0, 0, 0,
+    0, scale, 0, 0,
+    0, 0, scale, 0,
+    0, 0, 0, 1
+  ])
+  sp.uniforms.in_opacity = opacity
+
+def com_per_instance(link: Link, sp: ShaderProgram, radius: float = 25.):
+  sp.uniforms.radius   = radius
+  sp.uniforms.position = link.properties.com
+
+def triangle_per_instance(camera: Camera, sp: ShaderProgram, scale: float = 1., opacity: float = 0.5, color = None):
+  if not hasattr(camera, 'target'):
+    return
+
+  color = color or [0, 0.5, 1]
+
+  # TODO: Hacky. See the TODO in Camera about the target attribute
+  # Ultimately would like to see a vector passed (instead of camera)
+  model = Matrix4([
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    camera.target.x, camera.target.y, camera.target.z, 1
+  ])
+
+  sp.uniforms.model_matrix = model
+  sp.uniforms.scale_matrix = Matrix4([
+    scale, 0, 0, 0,
+    0, scale, 0, 0,
+    0, 0, scale, 0,
+    0, 0, 0, 1
+  ])
+
+  sp.uniforms.color_in   = color
+  sp.uniforms.in_opacity = opacity
+
+def grid_per_instance(placeholder, sp: ShaderProgram, scale: float = 1.):
+  sp.uniforms.scale_matrix = Matrix4([
+    scale, 0, 0, 0,
+    0, scale, 0, 0,
+    0, 0, scale, 0,
+    0, 0, 0, 1
+  ])
+
+def tool_per_instance(tool, sp: ShaderProgram):
+  # TODO: This probably shouldn't be using the Serial shader.
+  # It would be better to have a similar shader that handles individual objects
+  # (instead of faking individual objects into "serial chains").
+  sp.uniforms.model_matrices  = [tool.tool_to_world] + [Transform()] * 6
+  sp.uniforms.use_link_colors = False
+  sp.uniforms.robot_color     = [0.5] * 3
