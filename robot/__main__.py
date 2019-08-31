@@ -31,9 +31,6 @@ if __name__ == "__main__":
     'serial', 'flat', 'grid', 'billboard', 'com'
   ])
 
-  welder = tool_entity.load('./robot/mech/tools/welder.json')
-  welder.shader_program = renderer.shaders.get('serial')
-
   with Timer('Load Robot and Construct Mesh') as t:
     with open('./robot/mech/robots/abb_irb_120.json') as json_file:
       serial_dictionary = json.load(json_file)
@@ -67,6 +64,9 @@ if __name__ == "__main__":
     Vector3( 0.5, -0.5,  0,),
     Vector3( 0.5,  0.5,  0,)
   ])
+
+  welder = tool_entity.load('./robot/mech/tools/welder.json')
+  tool_buffer = Buffer.from_mesh(welder.mesh)
 
   def serial_per_instance(serial: Serial, sp: ShaderProgram, color = None):
     color = color or [1, 1, 1]
@@ -126,6 +126,14 @@ if __name__ == "__main__":
       0, 0, 0, 1
     ])
 
+  def tool_per_instance(tool, sp: ShaderProgram):
+    # TODO: This probably shouldn't be using the Serial shader.
+    # It would be better to have a similar shader that handles individual objects
+    # (instead of faking individual objects into "serial chains").
+    sp.uniforms.model_matrices  = [tool.tool_to_world] + [Transform()] * 6
+    sp.uniforms.use_link_colors = False
+    sp.uniforms.robot_color     = [0.5] * 3
+
   renderer.register_entity_type(
     name         = 'serial',
     buffer       = serial_buffer,
@@ -159,7 +167,14 @@ if __name__ == "__main__":
   renderer.register_entity_type(
     name         = 'grid',
     buffer       = grid_buffer,
-    per_instance = triangle_per_instance
+    per_instance = grid_per_instance
+  )
+
+  renderer.register_entity_type(
+    name         = 'tool',
+    shader_name  = 'serial',
+    buffer       = tool_buffer,
+    per_instance = tool_per_instance
   )
 
   # buffer_instance.set_attribute_locations(sp)
@@ -186,7 +201,7 @@ if __name__ == "__main__":
   serials[1].to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
     Vector3(0, 0, 0))
-  serials[1].attach(welder.tool)
+  serials[1].attach(welder)
 
   serials[1].traj = LinearOS(
     serials[1],
@@ -210,6 +225,8 @@ if __name__ == "__main__":
   renderer.add('triangle', camera, None, scale=20)
 
   renderer.add('grid', None, None, scale=10000)
+
+  renderer.add('tool', welder, None)
 
   # world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
