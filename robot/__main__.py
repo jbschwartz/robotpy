@@ -54,6 +54,12 @@ if __name__ == "__main__":
   mesh = Mesh.from_file(p, './robot/visual/meshes/frame.stl')
   frame_buffer = Buffer.from_meshes(mesh)
 
+  triangle_buffer = Buffer.from_points([
+    Vector3( 0.5, -0.33, 0),
+    Vector3( 0.0,  0.66, 0),
+    Vector3(-0.5, -0.33, 0)
+  ])
+
   def serial_per_instance(serial: Serial, sp: ShaderProgram, color = None):
     color = color or [1, 1, 1]
 
@@ -64,6 +70,8 @@ if __name__ == "__main__":
 
   def frame_per_instance(serial: Serial, sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
     sp.uniforms.model_matrix = serial.pose()
+    # TODO: Make this happen at the buffer level so this does not need to be called per frame
+    # Unless we actually want per frame scaling (often times we don't)
     sp.uniforms.scale_matrix = Matrix4([
       scale, 0, 0, 0,
       0, scale, 0, 0,
@@ -75,6 +83,32 @@ if __name__ == "__main__":
   def com_per_instance(link: Link, sp: ShaderProgram, radius: float = 25.):
     sp.uniforms.radius   = radius
     sp.uniforms.position = link.properties.com
+
+  def triangle_per_instance(camera: vis.Camera, sp: ShaderProgram, scale: float = 1., opacity: float = 0.5, color = None):
+    if not hasattr(camera, 'target'):
+      return
+
+    color = color or [0, 0.5, 1]
+
+    # TODO: Hacky. See the TODO in Camera about the target attribute
+    # Ultimately would like to see a vector passed (instead of camera)
+    model = Matrix4([
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, 0,
+      camera.target.x, camera.target.y, camera.target.z, 1
+    ])
+
+    sp.uniforms.model_matrix = model
+    sp.uniforms.scale_matrix = Matrix4([
+      scale, 0, 0, 0,
+      0, scale, 0, 0,
+      0, 0, scale, 0,
+      0, 0, 0, 1
+    ])
+
+    sp.uniforms.color_in   = color
+    sp.uniforms.in_opacity = opacity
 
   renderer.register_entity_type(
     name         = 'serial',
@@ -99,8 +133,14 @@ if __name__ == "__main__":
     # adder        = adder_function
   )
 
-  # buffer_instance.set_attribute_locations(sp)
+  renderer.register_entity_type(
+    name         = 'triangle',
+    shader_name  = 'billboard',
+    buffer       = triangle_buffer,
+    per_instance = triangle_per_instance
+  )
 
+  # buffer_instance.set_attribute_locations(sp)
 
   # robot_1 = renderer.add_many('serial', serial, parent)
   # coms = renderer.add_many('com', serials[0].links, robot_1)
@@ -137,13 +177,15 @@ if __name__ == "__main__":
     ],
     3)
 
+  camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
+
   renderer.add('serial', serials[0], None, color=[1, 0.5, 0])
   renderer.add('serial', serials[1], None, color=[0.5, 1, 0])
 
   renderer.add('frame', serials[0], None, scale=15)
   renderer.add('frame', serials[1], None, scale=15)
 
-  camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
+  renderer.add('triangle', camera, None, scale=20)
 
   # world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
@@ -153,12 +195,10 @@ if __name__ == "__main__":
   bindings = Bindings()
   settings = vis.CameraSettings()
   camera_controller = vis.CameraController(camera, settings, bindings, scene, window)
-  triangle = entities.TriangleEntity(camera_controller, renderer.shaders.get('billboard'))
 
   scene.entities.append(grid)
   scene.entities.append(serials[0])
   scene.entities.append(serials[1])
-  scene.entities.append(triangle)
 
   for link in serials[0].links:
     renderer.add('com', link, None)
