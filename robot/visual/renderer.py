@@ -56,6 +56,9 @@ class Renderer():
   @listen(Event.START_RENDERER)
   def load_buffers(self):
     for entity in self.entities.values():
+      if len(entity.instances) == 0:
+        logger.warn(f'Entity `{entity.name}` has no instances')
+
       if not entity.buffer.is_procedural:
         entity.buffer.set_attribute_locations(entity.shader)
         entity.buffer.load()
