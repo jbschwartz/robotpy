@@ -126,13 +126,5 @@ class Window():
         self.emit(Event.DRAW)
         last_frame = now
 
-      self.emit(Event.END_FRAME)
-
       glfw.swap_buffers(self.window)
       glfw.poll_events()
-
-    self.emit(Event.END_RENDERER)
-
-
-
-
