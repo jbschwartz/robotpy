@@ -165,4 +165,4 @@ if __name__ == "__main__":
 
   renderer.ubos = [matrix_ub, light_ub]
 
-  window.run()
+  window.run(fps_limit = 60)

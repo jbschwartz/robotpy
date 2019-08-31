@@ -55,7 +55,7 @@ class Renderer():
         entity.buffer.load()
 
   @listen(Event.START_FRAME)
-  def frame(self, delta: float = 0):
+  def frame(self):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     self.load_buffer_objects()

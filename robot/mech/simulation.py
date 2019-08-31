@@ -1,7 +1,9 @@
-from typing import Optional
+import glfw, math, statistics
 
-import glfw
+from collections import deque
+from typing      import Optional
 
+from robot.common                    import logger
 from robot.spatial                   import AABB, Ray
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
@@ -11,6 +13,8 @@ class Simulation():
   def __init__(self) -> None:
     self.entities  = []
     self.is_paused = False
+
+    self.tick_samples = deque([], maxlen = 20)
 
   @property
   def aabb(self) -> AABB:
@@ -34,10 +38,14 @@ class Simulation():
   def pause(self, key, action, modifiers) -> None:
     if key == glfw.KEY_SPACE and action == glfw.PRESS:
       self.is_paused = not self.is_paused
+    if key == glfw.KEY_Q and action == glfw.PRESS:
+      logger.info(f'Ticks Per Second: {math.floor(statistics.mean(self.tick_samples))}')
 
-  @listen(Event.START_FRAME)
+  @listen(Event.UPDATE)
   def update(self, delta: float = 0) -> None:
     """Step the simulation forward by a `delta` timestep."""
+    self.tick_samples.append(1 / delta)
+
     if self.is_paused:
       return
 

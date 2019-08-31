@@ -1,4 +1,4 @@
-import math, numpy, glfw, statistics, sys
+import math, numpy, glfw, sys
 
 from OpenGL.GL import GL_TRUE
 
@@ -14,11 +14,8 @@ class Window():
     self.width = width
     self.height = height
 
-    self.pause = False
     self.dragging = None
     self.modifiers = 0
-
-    self.show_fps = False
 
     if not glfw.init():
       sys.exit('GLFW initialization failed')
@@ -56,9 +53,6 @@ class Window():
     self.modifiers = mods
 
     self.emit(Event.KEY, key, action, self.modifiers)
-
-    if key == glfw.KEY_Q and action == glfw.PRESS:
-      self.show_fps = not self.show_fps
 
   def scroll_callback(self, window, x_direction, y_direction):
     self.emit(Event.SCROLL, sign(x_direction), sign(y_direction))
@@ -104,27 +98,17 @@ class Window():
 
     frame_time = 0 if not fps_limit else 1 / fps_limit
 
-    FPS = []
-
     while not glfw.window_should_close(self.window):
       now = glfw.get_time()
-      delta_update =  now - last_update
 
-      if len(FPS) < 20:
-        FPS.append(1 / delta_update)
-      else:
-        if self.show_fps:
-          logger.info(f'FPS: {math.floor(statistics.mean(FPS))}')
-        FPS = []
-
+      self.emit(Event.UPDATE, delta = now - last_update)
       last_update = now
-
-      self.emit(Event.START_FRAME, delta = delta_update)
 
       delta_frame = now - last_frame
       if not fps_limit or (fps_limit and delta_frame >= frame_time):
+        self.emit(Event.START_FRAME)
         self.emit(Event.DRAW)
         last_frame = now
 
-      glfw.swap_buffers(self.window)
-      glfw.poll_events()
+        glfw.swap_buffers(self.window)
+        glfw.poll_events()

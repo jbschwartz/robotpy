@@ -3,6 +3,7 @@ import enum
 class Event(enum.Enum):
   START_RENDERER = enum.auto()
   START_FRAME    = enum.auto()
+  UPDATE         = enum.auto()
   DRAW           = enum.auto()
   WINDOW_RESIZE  = enum.auto()
   CURSOR         = enum.auto()
