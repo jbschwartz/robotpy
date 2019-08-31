@@ -16,7 +16,9 @@ Entity = namedtuple('Entity', 'name shader draw_mode buffer instances per_instan
 
 @listener
 class Renderer():
-  def __init__(self):
+  def __init__(self, camera, light):
+    self.camera   = camera
+    self.light    = light
     self.entities = {}
     self.shaders  = {}
     self.ubos     = []
@@ -60,6 +62,8 @@ class Renderer():
 
   @listen(Event.DRAW)
   def draw(self):
+    self.update_environment()
+
     for entity in self.entities.values():
       with entity.shader as sp, entity.buffer:
         for instance, kwargs in entity.instances:
@@ -143,3 +147,6 @@ class Renderer():
       }
 
       self.add(entity_type, instance, parent, **per_instance_kwargs)
+
+  def update_environment(self) -> None:
+    self.light.position = self.camera.position

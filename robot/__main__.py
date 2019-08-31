@@ -25,7 +25,6 @@ if __name__ == "__main__":
   with Timer('Initialize Window') as t:
     window = vis.Window(750, 750, "robotpy")
 
-  renderer = vis.Renderer()
 
   with Timer('Load Robot and Construct Mesh') as t:
     with open('./robot/mech/robots/abb_irb_120.json') as json_file:
@@ -63,6 +62,10 @@ if __name__ == "__main__":
 
   welder = tool.load('./robot/mech/tools/welder.json')
   tool_buffer = Buffer.from_mesh(welder.mesh)
+
+  camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
+  light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
+  renderer = vis.Renderer(camera, light)
 
   renderer.register_entity_type(
     name         = 'serial',
@@ -136,8 +139,6 @@ if __name__ == "__main__":
     ],
     3)
 
-  camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
-
   renderer.add_many('serial', serials, None, color=([1, 0.5, 0], [0.5, 1, 0]))
 
   renderer.add('triangle', camera, None, scale=20)
@@ -145,9 +146,6 @@ if __name__ == "__main__":
   renderer.add('grid', None, None, scale=10000)
 
   # world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
-  light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
-
-  scene = vis.Scene(camera, light)
 
   bindings = Bindings()
   settings = vis.CameraSettings()
