@@ -32,7 +32,6 @@ if __name__ == "__main__":
     'serial', 'flat', 'grid', 'billboard', 'com'
   ])
 
-  ee_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
   grid = entities.GridEntity(renderer.shaders.get('grid'))
   welder = tool_entity.load('./robot/mech/tools/welder.json')
   welder.shader_program = renderer.shaders.get('serial')
@@ -97,9 +96,6 @@ if __name__ == "__main__":
   # coms = renderer.add_many('com', serials[0].links, robot_1)
   # frames = renderer.add_many('frames', serials.links, robot_1)
 
-  # robot.frame_entity  = ee_frame
-  # robot2.frame_entity = ee_frame
-
   serials[0].to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
     Vector3(-400, 400, 0))
@@ -139,7 +135,7 @@ if __name__ == "__main__":
 
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
-  world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
+  # world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
 
   scene = vis.Scene(camera, light)
@@ -149,7 +145,6 @@ if __name__ == "__main__":
   camera_controller = vis.CameraController(camera, settings, bindings, scene, window)
   triangle = entities.TriangleEntity(camera_controller, renderer.shaders.get('billboard'))
 
-  scene.entities.append(world_frame)
   scene.entities.append(grid)
   scene.entities.append(serials[0])
   scene.entities.append(serials[1])
