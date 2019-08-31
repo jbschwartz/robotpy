@@ -11,12 +11,13 @@ class Simulation():
 
   @property
   def aabb(self):
-    aabb = AABB()
-    for entity in self.entities:
-      if hasattr(entity, 'aabb'):
-        aabb.expand(entity.aabb)
+    aabbs = [
+      entity.aabb
+      for entity in self.entities
+      if hasattr(entity, 'aabb')
+    ]
 
-    return aabb
+    return AABB.from_aabbs(aabbs)
 
   def intersect(self, ray):
     if not self.aabb.intersect(ray):
