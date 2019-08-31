@@ -7,7 +7,7 @@ from ctypes import c_void_p
 from typing import Iterable
 
 from robot.common    import logger
-from robot.spatial   import Mesh
+from robot.spatial   import Mesh, Vector3
 from .shader_program import ShaderProgram
 
 from OpenGL.GL import *
@@ -71,6 +71,16 @@ class Buffer():
 
     # TODO: Maybe there is something better than a deepcopy
     return cls(data, deepcopy(MESH_BUFFER_ATTRS))
+
+  @classmethod
+  def from_points(cls, points: Iterable[Vector3]) -> 'Buffer':
+    """Create one Buffer for a collection of Vector3 points."""
+    data_list = [(point.xyz,) for point in points]
+    data = np.array(data_list, dtype=[('', np.float32, 3)])
+
+    return cls(data, {
+      'position': {'type': GL_FLOAT, 'number_of_components': 3}
+    })
 
   @classmethod
   def Procedural(cls, size) -> 'Buffer':
