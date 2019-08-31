@@ -6,8 +6,7 @@ from robot.spatial import vector3
 Vector3 = vector3.Vector3
 
 from robot.common          import Bindings, logger, Timer
-from robot.mech.serial     import Serial
-from robot.mech.simulation import Simulation
+from robot.mech            import Link, Serial, Simulation
 from robot.spatial.euler   import Axes, Order
 from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
