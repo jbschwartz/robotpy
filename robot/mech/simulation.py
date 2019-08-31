@@ -13,18 +13,17 @@ class Simulation():
   def aabb(self):
     aabb = AABB()
     for entity in self.entities:
-      try:
-        # TODO: Maybe there's a better way to do this. Or at least I need to put an AABB on all entities (in the entity base class?)
+      if hasattr(entity, 'aabb'):
         aabb.expand(entity.aabb)
-      except AttributeError:
-        pass
+
     return aabb
 
   def intersect(self, ray):
-    if self.aabb.intersect(ray):
-      return ray.closest_intersection(self.entities)
-    else:
+    if not self.aabb.intersect(ray):
       return None
+
+    return ray.closest_intersection(self.entities)
+
 
   @listen(Event.UPDATE)
   def update(self, delta: Number = 0) -> None:
