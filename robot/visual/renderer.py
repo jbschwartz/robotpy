@@ -21,26 +21,26 @@ class Renderer():
     self.shaders  = {}
     self.ubos     = []
 
-  def initialize_shaders(self, shader_names: Iterable[str]) -> None:
-    self.shaders = {}
-    with Timer('Initialize Shaders'):
-      for shader_name in shader_names:
-        try:
-          self.shaders[shader_name] = ShaderProgram.from_file_name(shader_name)
-        except FileNotFoundError:
-          # Single file not found. Instead look for individual files.
-          abbreviation = lambda type_name: type_name[0].lower()
+  def initialize_shader(self, shader_name: str) -> None:
+    if shader_name in self.shaders:
+      return
 
-          file_names = {
-            shader_type: f"{shader_name}_{abbreviation(shader_type.name)}"
-            for shader_type in ShaderType
-          }
+    try:
+      self.shaders[shader_name] = ShaderProgram.from_file_name(shader_name)
+    except FileNotFoundError:
+      # Single file not found. Instead look for individual files.
+      abbreviation = lambda type_name: type_name[0].lower()
 
-          try:
-            self.shaders[shader_name] = ShaderProgram.from_file_names(shader_name, file_names)
-          except FileNotFoundError:
-            # TODO: Log this and wait to throw until we know it is being used?
-            pass
+      file_names = {
+        shader_type: f"{shader_name}_{abbreviation(shader_type.name)}"
+        for shader_type in ShaderType
+      }
+
+      try:
+        self.shaders[shader_name] = ShaderProgram.from_file_names(shader_name, file_names)
+      except FileNotFoundError:
+        logger.error(f'Shader program `{shader_name}` not found')
+        raise
 
   @listen(Event.START_FRAME)
   def load_buffer_objects(self):
@@ -63,7 +63,7 @@ class Renderer():
   def add(self, entity_type: str, instance, parent = None, **kwargs) -> None:
     entity = self.entities.get(entity_type, None)
     if entity is None:
-      return logger.error(f'No entity type `{entity_type}` found')
+      return logger.error(f'No entity type `{entity_type}` found when adding entity')
 
     entity.instances.append((
       instance,
@@ -72,16 +72,19 @@ class Renderer():
 
   def register_entity_type(self, name: str, buffer: Buffer, per_instance: Callable, shader_name: str = None, draw_mode: int = None) -> None:
     if self.entities.get(name, None) is not None:
-      return logger.warn(f'Entity type `{name}` already registered.')
+      return logger.warn(f'Entity type `{name}` already registered. Keeping original values')
 
+    # If shader name is not provided, assume it is the same name as the entity
     shader_name = shader_name or name
-    shader = self.shaders.get(shader_name, None)
-    if shader is None:
-      return logger.error(f'Shader program `{shader_name}` not found when registering entity type `{name}`')
+
+    try:
+      self.initialize_shader(shader_name)
+    except FileNotFoundError:
+      return logger.error(f'Entity type `{name}` creation failed')
 
     self.entities[name] = Entity(
       name         = name,
-      shader       = shader,
+      shader       = self.shaders.get(shader_name),
       draw_mode    = draw_mode or GL_TRIANGLES,
       buffer       = buffer,
       instances    = [],

@@ -24,9 +24,6 @@ if __name__ == "__main__":
     window = vis.Window(750, 750, "robotpy")
 
   renderer = vis.Renderer()
-  renderer.initialize_shaders([
-    'serial', 'flat', 'grid', 'billboard', 'com'
-  ])
 
   with Timer('Load Robot and Construct Mesh') as t:
     with open('./robot/mech/robots/abb_irb_120.json') as json_file:
