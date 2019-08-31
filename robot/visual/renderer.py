@@ -73,7 +73,7 @@ class Renderer():
     if self.entities.get(name, None) is not None:
       return logger.warn(f'Entity type `{name}` already registered.')
 
-    shader = self.shaders.get(name, None)
+    shader = self.shaders.get(shader_name, None)
     if shader is None:
       return logger.error(f'Shader program `{shader_name}` not found when registering entity type `{name}`')
 
