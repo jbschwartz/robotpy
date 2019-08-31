@@ -12,6 +12,9 @@ class Mesh:
     self.facets = facets or []
     self.aabb = AABB()
 
+    for f in self.facets:
+      self.aabb.expand(f.vertices)
+
     self._accelerator = None
 
   @classmethod
