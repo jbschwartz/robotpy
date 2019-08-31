@@ -7,11 +7,11 @@ class Timer:
     self.message = message
 
   def __enter__(self):
-    self.start = time.clock()
+    self.start = time.perf_counter()
     return self
 
   def __exit__(self, *args):
-    self.end = time.clock()
+    self.end = time.perf_counter()
     self.elapsed = self.end - self.start
 
     if self.message:
