@@ -23,17 +23,13 @@ class Renderer():
     self.shaders  = {}
     self.ubos     = []
 
-  @listen(Event.START_FRAME)
-  def start_frame(self):
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-  @listen(Event.START_FRAME)
-  def load_buffer_objects(self):
-    for ubo in self.ubos:
-      ubo.load()
-
   @listen(Event.START_RENDERER)
-  def start_renderer(self):
+  def start(self) -> None:
+    self.configure_opengl()
+    self.bind_buffer_objects()
+    self.load_buffers()
+
+  def configure_opengl(self) -> None:
     glClearColor(1, 1, 1, 1)
 
     capabilities = [GL_DEPTH_TEST, GL_MULTISAMPLE, GL_BLEND, GL_CULL_FACE]
@@ -44,13 +40,11 @@ class Renderer():
     glCullFace(GL_BACK)
     glFrontFace(GL_CCW)
 
-  @listen(Event.START_RENDERER)
   def bind_buffer_objects(self) -> None:
     for ubo in self.ubos:
       for shader in self.shaders.values():
         shader.bind_ubo(ubo)
 
-  @listen(Event.START_RENDERER)
   def load_buffers(self):
     for entity in self.entities.values():
       if len(entity.instances) == 0:
@@ -59,6 +53,16 @@ class Renderer():
       if not entity.buffer.is_procedural:
         entity.buffer.set_attribute_locations(entity.shader)
         entity.buffer.load()
+
+  @listen(Event.START_FRAME)
+  def frame(self):
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    self.load_buffer_objects()
+
+  def load_buffer_objects(self):
+    for ubo in self.ubos:
+      ubo.load()
 
   @listen(Event.DRAW)
   def draw(self):
