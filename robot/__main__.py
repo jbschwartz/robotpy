@@ -19,10 +19,6 @@ from robot.visual.opengl.uniform_buffer    import Mapping, UniformBuffer
 
 import robot.visual as vis
 
-import robot.visual.entities as entities
-
-from robot.visual.entities import tool_entity
-
 if __name__ == "__main__":
   with Timer('Initialize Window') as t:
     window = vis.Window(750, 750, "robotpy")
