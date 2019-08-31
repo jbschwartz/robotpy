@@ -70,6 +70,13 @@ if __name__ == "__main__":
     sp.uniforms.link_colors     = [link.color for link in serial.links]
     sp.uniforms.robot_color     = color
 
+  def serial_add_children(renderer: vis.Renderer, serial: Serial):
+    renderer.add('frame', serial, None, scale=15)
+    renderer.add_many('com', serial.links, None)
+
+    if serial.tool is not None:
+      renderer.add('tool', serial.tool, None)
+
   def frame_per_instance(serial: Serial, sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
     sp.uniforms.model_matrix = serial.pose()
     # TODO: Make this happen at the buffer level so this does not need to be called per frame
@@ -131,8 +138,8 @@ if __name__ == "__main__":
   renderer.register_entity_type(
     name         = 'serial',
     buffer       = serial_buffer,
-    per_instance = serial_per_instance
-    # adder        = adder_function
+    per_instance = serial_per_instance,
+    add_children = serial_add_children
   )
 
   renderer.register_entity_type(
@@ -171,10 +178,6 @@ if __name__ == "__main__":
     per_instance = tool_per_instance
   )
 
-  # robot_1 = renderer.add_many('serial', serial, parent)
-  # coms = renderer.add_many('com', serials[0].links, robot_1)
-  # frames = renderer.add_many('frames', serials.links, robot_1)
-
   serials[0].to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
     Vector3(-400, 400, 0))
@@ -209,17 +212,10 @@ if __name__ == "__main__":
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
   renderer.add_many('serial', serials, None, color=([1, 0.5, 0], [0.5, 1, 0]))
-  renderer.add_many('frame', serials, None, scale=(15, 15))
-
-  for serial in serials:
-    renderer.add_many('com', serial.links, None)
-
 
   renderer.add('triangle', camera, None, scale=20)
 
   renderer.add('grid', None, None, scale=10000)
-
-  renderer.add('tool', welder, None)
 
   # world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)

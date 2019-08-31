@@ -12,7 +12,7 @@ from .opengl.shader_program import ShaderProgram
 from .opengl.shader         import ShaderType
 from .opengl.uniform_buffer import UniformBuffer
 
-Entity = namedtuple('Entity', 'name shader draw_mode buffer instances per_instance')
+Entity = namedtuple('Entity', 'name shader draw_mode buffer instances per_instance add_children')
 
 @listener
 class Renderer():
@@ -93,7 +93,7 @@ class Renderer():
         logger.error(f'Shader program `{shader_name}` not found')
         raise
 
-  def register_entity_type(self, name: str, buffer: Buffer, per_instance: Callable, shader_name: str = None, draw_mode: int = None) -> None:
+  def register_entity_type(self, name: str, buffer: Buffer, per_instance: Callable, add_children: Callable = None, shader_name: str = None, draw_mode: int = None) -> None:
     if self.entities.get(name, None) is not None:
       return logger.warn(f'Entity type `{name}` already registered. Keeping original values')
 
@@ -111,7 +111,8 @@ class Renderer():
       draw_mode    = draw_mode or GL_TRIANGLES,
       buffer       = buffer,
       instances    = [],
-      per_instance = per_instance
+      per_instance = per_instance,
+      add_children = add_children
     )
 
   def add(self, entity_type: str, instance, parent = None, **kwargs) -> None:
@@ -123,6 +124,9 @@ class Renderer():
       instance,
       kwargs
     ))
+
+    if entity.add_children is not None:
+      entity.add_children(self, instance)
 
   def add_many(self, entity_type: str, instances: Iterable, parent = None, **kwargs) -> None:
     if entity_type not in self.entities:
