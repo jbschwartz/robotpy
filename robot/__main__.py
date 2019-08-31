@@ -60,6 +60,15 @@ if __name__ == "__main__":
     Vector3(-0.5, -0.33, 0)
   ])
 
+  grid_buffer = Buffer.from_points([
+    Vector3( 0.5,  0.5,  0,),
+    Vector3(-0.5,  0.5,  0,),
+    Vector3(-0.5, -0.5,  0,),
+    Vector3(-0.5, -0.5,  0,),
+    Vector3( 0.5, -0.5,  0,),
+    Vector3( 0.5,  0.5,  0,)
+  ])
+
   def serial_per_instance(serial: Serial, sp: ShaderProgram, color = None):
     color = color or [1, 1, 1]
 
@@ -110,6 +119,14 @@ if __name__ == "__main__":
     sp.uniforms.color_in   = color
     sp.uniforms.in_opacity = opacity
 
+  def grid_per_instance(placeholder, sp: ShaderProgram, scale: float = 1.):
+    sp.uniforms.scale_matrix = Matrix4([
+      scale, 0, 0, 0,
+      0, scale, 0, 0,
+      0, 0, scale, 0,
+      0, 0, 0, 1
+    ])
+
   renderer.register_entity_type(
     name         = 'serial',
     buffer       = serial_buffer,
@@ -137,6 +154,12 @@ if __name__ == "__main__":
     name         = 'triangle',
     shader_name  = 'billboard',
     buffer       = triangle_buffer,
+    per_instance = triangle_per_instance
+  )
+
+  renderer.register_entity_type(
+    name         = 'grid',
+    buffer       = grid_buffer,
     per_instance = triangle_per_instance
   )
 
@@ -186,6 +209,8 @@ if __name__ == "__main__":
   renderer.add('frame', serials[1], None, scale=15)
 
   renderer.add('triangle', camera, None, scale=20)
+
+  renderer.add('grid', None, None, scale=10000)
 
   # world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
