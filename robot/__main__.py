@@ -151,10 +151,7 @@ if __name__ == "__main__":
 
   bindings = Bindings()
   settings = vis.CameraSettings()
-  camera_controller = vis.CameraController(camera, settings, bindings, scene, window)
-
-  scene.entities.append(serials[0])
-  scene.entities.append(serials[1])
+  camera_controller = vis.CameraController(camera, settings, bindings, sim, window)
 
   matrix_ub = UniformBuffer("Matrices", 1)
 
