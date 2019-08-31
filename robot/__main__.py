@@ -7,6 +7,7 @@ Vector3 = vector3.Vector3
 
 from robot.common          import Bindings, logger, Timer
 from robot.mech.serial     import Serial
+from robot.mech.simulation import Simulation
 from robot.spatial.euler   import Axes, Order
 from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
 from robot.traj.linear_js  import LinearJS
@@ -43,6 +44,10 @@ if __name__ == "__main__":
         meshes = Mesh.from_file(vis.STLParser(), f'./robot/mech/robots/meshes/{serial_dictionary["mesh_file"]}')
 
       serials = [Serial.from_dict_meshes(serial_dictionary, meshes or []) for _ in range(2)]
+
+  sim = Simulation()
+  sim.entities.append(serials[0])
+  sim.entities.append(serials[1])
 
   serial_buffer = Buffer.from_meshes(meshes)
 
