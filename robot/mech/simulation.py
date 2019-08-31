@@ -1,5 +1,6 @@
-from numbers import Number
-from typing  import Optional
+from typing import Optional
+
+import glfw
 
 from robot.spatial                   import AABB, Ray
 from robot.visual.messaging.listener import listen, listener
@@ -8,7 +9,8 @@ from robot.visual.messaging.event    import Event
 @listener
 class Simulation():
   def __init__(self) -> None:
-    self.entities = []
+    self.entities  = []
+    self.is_paused = False
 
   @property
   def aabb(self) -> AABB:
@@ -28,10 +30,17 @@ class Simulation():
 
     return ray.closest_intersection(self.entities)
 
+  @listen(Event.KEY)
+  def pause(self, key, action, modifiers) -> None:
+    if key == glfw.KEY_SPACE and action == glfw.PRESS:
+      self.is_paused = not self.is_paused
 
-  @listen(Event.UPDATE)
-  def update(self, delta: Number = 0) -> None:
+  @listen(Event.START_FRAME)
+  def update(self, delta: float = 0) -> None:
     """Step the simulation forward by a `delta` timestep."""
+    if self.is_paused:
+      return
+
     for entity in self.entities:
       if entity.traj:
         result = entity.traj.advance(delta)

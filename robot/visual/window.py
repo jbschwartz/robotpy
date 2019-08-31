@@ -57,9 +57,6 @@ class Window():
 
     self.emit(Event.KEY, key, action, self.modifiers)
 
-    # This may be better suited in some sort of simulation controller class
-    if key == glfw.KEY_SPACE and action == glfw.PRESS:
-      self.pause = not self.pause
     if key == glfw.KEY_Q and action == glfw.PRESS:
       self.show_fps = not self.show_fps
 
@@ -122,10 +119,7 @@ class Window():
 
       last_update = now
 
-      if not self.pause:
-        self.emit(Event.UPDATE, delta = delta_update)
-
-      self.emit(Event.START_FRAME)
+      self.emit(Event.START_FRAME, delta = delta_update)
 
       delta_frame = now - last_frame
       if not fps_limit or (fps_limit and delta_frame >= frame_time):
