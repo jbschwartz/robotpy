@@ -74,9 +74,8 @@ if __name__ == "__main__":
   # coms = renderer.add_many('com', serials[0].links, robot_1)
   # frames = renderer.add_many('frames', serials.links, robot_1)
 
-  robot, robot2 = [entities.RobotEntity(serial, renderer.shaders.get('serial')) for serial in serials]
-  robot.frame_entity  = ee_frame
-  robot2.frame_entity = ee_frame
+  # robot.frame_entity  = ee_frame
+  # robot2.frame_entity = ee_frame
 
   serials[0].to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
@@ -96,8 +95,7 @@ if __name__ == "__main__":
   serials[1].to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
     Vector3(0, 0, 0))
-  robot2.color = (0.5, 1, 0)
-  robot2.attach(welder)
+  serials[1].attach(welder.tool)
 
   serials[1].traj = LinearOS(
     serials[1],
@@ -110,6 +108,7 @@ if __name__ == "__main__":
     ],
     3)
 
+  renderer.add('serial', serials[0], None, color=[1, 0.5, 0])
   renderer.add('serial', serials[1], None, color=[0.5, 1, 0])
 
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
@@ -126,11 +125,11 @@ if __name__ == "__main__":
 
   scene.entities.append(world_frame)
   scene.entities.append(grid)
-  # scene.entities.append(robot2)
-  scene.entities.append(robot)
+  scene.entities.append(serials[0])
+  scene.entities.append(serials[1])
   scene.entities.append(triangle)
 
-  for link in robot.serial.links:
+  for link in serials[0].links:
     com = entities.COMEntity(link, renderer.shaders.get('com'))
     scene.entities.append(com)
 

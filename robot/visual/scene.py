@@ -50,21 +50,21 @@ class Scene():
     glCullFace(GL_BACK)
     glFrontFace(GL_CCW)
 
-    for entity in self.entities:
-      entity.load()
+    # for entity in self.entities:
+    #   entity.load()
 
   @listen(Event.START_FRAME)
   def start_frame(self):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-  @listen(Event.UPDATE)
-  def update(self, delta = 0):
-    for entity in self.entities:
-      entity.update(delta)
+  # @listen(Event.UPDATE)
+  # def update(self, delta = 0):
+  #   for entity in self.entities:
+  #     entity.update(delta)
 
-  @listen(Event.DRAW)
-  def draw(self):
-    self.light.position = self.camera.position
+  # @listen(Event.DRAW)
+  # def draw(self):
+  #   self.light.position = self.camera.position
 
-    for entity in self.entities:
-      entity.draw()
+  #   for entity in self.entities:
+  #     entity.draw()
