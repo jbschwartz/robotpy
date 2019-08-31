@@ -123,3 +123,19 @@ class Renderer():
       instance,
       kwargs
     ))
+
+  def add_many(self, entity_type: str, instances: Iterable, parent = None, **kwargs) -> None:
+    if entity_type not in self.entities:
+      return logger.error(f'No entity type `{entity_type}` found when adding entity')
+
+    for index, instance in enumerate(instances):
+      # Keyword arguments are provided as iterables, one for each instance in instances
+      # For the nth instance, collect all of the nth keyword argument values
+      # Ignore keyword arguments if they are not provided or explicitly `None`
+      per_instance_kwargs = {
+        k: v[index]
+        for k, v in kwargs.items()
+        if index < len(v) and v[index] is not None
+      }
+
+      self.add(entity_type, instance, parent, **per_instance_kwargs)

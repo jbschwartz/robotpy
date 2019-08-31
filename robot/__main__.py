@@ -171,8 +171,6 @@ if __name__ == "__main__":
     per_instance = tool_per_instance
   )
 
-  # buffer_instance.set_attribute_locations(sp)
-
   # robot_1 = renderer.add_many('serial', serial, parent)
   # coms = renderer.add_many('com', serials[0].links, robot_1)
   # frames = renderer.add_many('frames', serials.links, robot_1)
@@ -210,11 +208,12 @@ if __name__ == "__main__":
 
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
 
-  renderer.add('serial', serials[0], None, color=[1, 0.5, 0])
-  renderer.add('serial', serials[1], None, color=[0.5, 1, 0])
+  renderer.add_many('serial', serials, None, color=([1, 0.5, 0], [0.5, 1, 0]))
+  renderer.add_many('frame', serials, None, scale=(15, 15))
 
-  renderer.add('frame', serials[0], None, scale=15)
-  renderer.add('frame', serials[1], None, scale=15)
+  for serial in serials:
+    renderer.add_many('com', serial.links, None)
+
 
   renderer.add('triangle', camera, None, scale=20)
 
@@ -233,9 +232,6 @@ if __name__ == "__main__":
 
   scene.entities.append(serials[0])
   scene.entities.append(serials[1])
-
-  for link in serials[0].links:
-    renderer.add('com', link, None)
 
   matrix_ub = UniformBuffer("Matrices", 1)
 
