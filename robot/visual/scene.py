@@ -1,12 +1,9 @@
 from OpenGL.GL import *
 
-from ctypes import c_void_p
-
-from robot.spatial       import AABB, Matrix4
+from robot.spatial       import AABB
 from .camera             import Camera
 from .messaging.listener import listen, listener
 from .messaging.event    import Event
-from .opengl.uniform_buffer import Mapping, UniformBuffer
 
 @listener
 class Scene():
@@ -50,21 +47,10 @@ class Scene():
     glCullFace(GL_BACK)
     glFrontFace(GL_CCW)
 
-    # for entity in self.entities:
-    #   entity.load()
-
   @listen(Event.START_FRAME)
   def start_frame(self):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-  # @listen(Event.UPDATE)
-  # def update(self, delta = 0):
-  #   for entity in self.entities:
-  #     entity.update(delta)
-
-  # @listen(Event.DRAW)
-  # def draw(self):
-  #   self.light.position = self.camera.position
-
-  #   for entity in self.entities:
-  #     entity.draw()
+  @listen(Event.DRAW)
+  def draw(self):
+    self.light.position = self.camera.position
