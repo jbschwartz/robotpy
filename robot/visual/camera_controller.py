@@ -99,6 +99,8 @@ class CameraController():
       assert self.target is not None, "There must always be a valid camera target."
       assert isinstance(self.target, Vector3), "Camera target must be a Vector3."
 
+      # TODO: Do I really mean to be putting a target attribute onto the camera instance?
+      # What happened to self.target?
       self.camera.target = self.target
 
   @listen(Event.DRAG)
