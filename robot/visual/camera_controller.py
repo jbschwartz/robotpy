@@ -73,7 +73,12 @@ class CameraController():
     self.bindings = bindings
     self.scene = scene
     self.window = window
-    self.target = self.scene.aabb.center
+
+    if len(self.scene.entities) > 0:
+      self.target = self.scene.aabb.center
+    else:
+      self.target = Vector3()
+
     self.is_selecting = None
     self.orbit_type = OrbitType.CONSTRAINED
 
@@ -94,7 +99,8 @@ class CameraController():
       if x.hit:
         self.target = r.evaluate(x.t)
       else:
-        self.target = self.scene.aabb.center
+        if len(self.scene.entities) > 0:
+          self.target = self.scene.aabb.center
 
       assert self.target is not None, "There must always be a valid camera target."
       assert isinstance(self.target, Vector3), "Camera target must be a Vector3."
