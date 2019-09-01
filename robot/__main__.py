@@ -88,7 +88,7 @@ if __name__ == "__main__":
   def rectangle_instance(rectangle: Rectangle, sp: ShaderProgram):
     gl.glDisable(gl.GL_DEPTH_TEST)
 
-    sp.uniforms.color        = rectangle.color
+    sp.uniforms.color        = rectangle.color if not rectangle.hover else [0, 1, 1]
     sp.uniforms.top_left     = rectangle.position
     sp.uniforms.scale_matrix = Matrix4.from_scale(Vector3(rectangle.width, rectangle.height, 1))
 
