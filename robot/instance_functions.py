@@ -1,4 +1,6 @@
-from robot.mech                         import Link, Serial
+from typing import Union
+
+from robot.mech                         import Link, Serial, Tool
 from robot.spatial                      import Matrix4, Transform
 from robot.visual                       import Camera, Renderer
 from robot.visual.opengl.shader_program import ShaderProgram
@@ -12,14 +14,19 @@ def serial(serial: Serial, sp: ShaderProgram, color = None):
   sp.uniforms.robot_color     = color
 
 def serial_add_children(renderer: Renderer, serial: Serial):
-  renderer.add('frame', serial, None, scale=15)
+  renderer.add_many('frame', serial.links, None, scale=(15,) * len(serial.links))
   renderer.add_many('com', serial.links, None)
 
   if serial.tool is not None:
     renderer.add('tool', serial.tool, None)
+    renderer.add('frame', serial.tool, None, scale=15)
 
-def frame(serial: Serial, sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
-  sp.uniforms.model_matrix = serial.pose()
+def frame(component: Union[Link, Tool], sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
+  if isinstance(component, Link):
+    sp.uniforms.model_matrix = component.to_world
+  elif isinstance(component, Tool):
+    sp.uniforms.model_matrix = component.tip
+
   # TODO: Make this happen at the buffer level so this does not need to be called per frame
   # Unless we actually want per frame scaling (often times we don't)
   sp.uniforms.scale_matrix = Matrix4([
