@@ -72,14 +72,7 @@ class KDTreeNode():
     if self.is_leaf():
       return ray.closest_intersection(self.facets)
     else:
-      return self.intersect_children(ray)
-
-  def intersect_children(self, ray):
-    '''Intersect ray with children and return the ray's t parameter for found intersections. Return None for no intersections.'''
-    intersections = [child.intersect(ray) for child in self.children]
-    valid_intersections = [inter for inter in intersections if inter is not None]
-
-    return min(valid_intersections) if valid_intersections else None
+      return ray.closest_intersection(self.children)
 
 class KDTree():
   def __init__(self, mesh):
