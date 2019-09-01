@@ -79,7 +79,12 @@ class Serial:
 
   @property
   def aabb(self) -> AABB:
-    return AABB.from_points([link.aabb for link in self.links])
+    aabb = AABB.from_points([link.aabb for link in self.links])
+
+    if self.tool:
+      aabb.expand(self.tool.aabb)
+
+    return aabb
 
   def attach(self, tool: Tool = None):
     '''Attach the tool to the robot's end effector.'''
@@ -89,7 +94,11 @@ class Serial:
 
   def intersect(self, ray):
     if self.aabb.intersect(ray):
-      return ray.closest_intersection(self.links)
+      components = [*self.links]
+      if self.tool:
+        components.append(self.tool)
+
+      return ray.closest_intersection(components)
     else:
       return None
 
