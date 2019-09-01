@@ -71,7 +71,10 @@ from robot.visual.gui import Rectangle
 if __name__ == "__main__":
   window, renderer = setup()
 
-  r = Rectangle(Vector3(0, 0.5), 0.25, 0.25, color=[0.65] * 3)
+  rectangles = [
+    Rectangle(Vector3(0.125, 0.375), 0.125, 0.125, color=[0.25] * 3),
+    Rectangle(Vector3(0, 0.5), 0.25, 0.25, color=[0.65] * 3)
+  ]
 
   rectangle_buffer = Buffer.from_points([
     Vector3( 2,  0,  0),
@@ -83,6 +86,8 @@ if __name__ == "__main__":
   ])
 
   def rectangle_instance(rectangle: Rectangle, sp: ShaderProgram):
+    gl.glDisable(gl.GL_DEPTH_TEST)
+
     sp.uniforms.color        = rectangle.color
     sp.uniforms.top_left     = rectangle.position
     sp.uniforms.scale_matrix = Matrix4.from_scale(Vector3(rectangle.width, rectangle.height, 1))
@@ -93,6 +98,6 @@ if __name__ == "__main__":
     per_instance = rectangle_instance
   )
 
-  renderer.add('rectangle', r, None)
+  renderer.add_many('rectangle', rectangles, None)
 
   window.run(fps_limit = 60)
