@@ -78,7 +78,7 @@ class CameraController():
     self.orbit_type = OrbitType.CONSTRAINED
 
   @listen(Event.CLICK)
-  def click(self, button, action, cursor):
+  def click(self, button, action, cursor, mods):
     if button == glfw.MOUSE_BUTTON_LEFT:
       if action == glfw.PRESS:
         self.is_selecting = self.window.ndc(cursor)
