@@ -1,3 +1,6 @@
+from .intersection import Intersection
+from .ray          import Ray
+
 DEPTH_BOUND = 8
 
 class KDTreeNode():
@@ -61,10 +64,10 @@ class KDTreeNode():
     # If we've gotten this far, this node is an interrior node
     self.facets = None
 
-  def intersect(self, ray):
-    '''Intersect ray with node and return the ray's t parameter for found intersections. Return None for no intersections.'''
+  def intersect(self, ray: Ray) -> Intersection:
+    """Intersect ray with node and return closest found intersection. Return Intersection.Miss() for no intersections."""
     if not self.aabb.intersect(ray):
-      return None
+      return Intersection.Miss()
 
     if self.is_leaf():
       return ray.closest_intersection(self.facets)
@@ -87,7 +90,7 @@ class KDTree():
   def construct(self):
     self.root.branch()
 
-  def intersect(self, ray):
+  def intersect(self, ray: Ray) -> Intersection:
     return self.root.intersect(ray)
 
   def update(self, mesh, facet):
