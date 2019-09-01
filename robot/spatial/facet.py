@@ -2,11 +2,12 @@ import math
 
 from typing import Iterable, Union
 
-from .aabb       import AABB
-from .exceptions import DegenerateTriangleError
-from .ray        import Ray
-from .transform  import Transform
-from .vector3    import Vector3
+from .aabb         import AABB
+from .exceptions   import DegenerateTriangleError
+from .intersection import Intersection
+from .ray          import Ray
+from .transform    import Transform
+from .vector3      import Vector3
 
 class Facet:
   """A piece of surface geometry (typically a triangle)."""
@@ -77,7 +78,7 @@ class Facet:
     """Returns True if the Facet has 3 vertices."""
     return len(self.vertices) == 3
 
-  def intersect(self, ray: Ray, check_back_facing: bool = False) -> Union[float, None]:
+  def intersect(self, ray: Ray, check_back_facing: bool = False) -> Intersection:
     """Returns the parametric value of ray intersection (or None for a miss).
 
     Returns `None` when the ray origin is in the triangle and the ray points away.
@@ -94,13 +95,13 @@ class Facet:
 
     if not check_back_facing and det < 0:
       # The ray intersects the back of the triangle
-      return None
+      return Intersection.Miss()
 
     try:
       inv_det = 1 / det
     except ZeroDivisionError:
       # The ray is parallel to the triangle
-      return None
+      return Intersection.Miss()
 
     T = ray.origin - self.vertices[0]
     Q = T % E1
@@ -110,11 +111,11 @@ class Facet:
 
     # Checking if the point of intersection is outside the bounds of the triangle
     if not (0 <= u <= 1) or (v < 0) or (u + v > 1):
-      return None
+      return Intersection.Miss()
 
     t = Q * E2 / det
 
-    return t
+    return Intersection(t, self)
 
   def compute_edges(self) -> None:
     '''Construct a list of edges from the Facet's current vertices.'''
