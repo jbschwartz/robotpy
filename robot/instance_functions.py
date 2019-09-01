@@ -14,12 +14,14 @@ def serial(serial: Serial, sp: ShaderProgram, color = None):
   sp.uniforms.robot_color     = color
 
 def serial_add_children(renderer: Renderer, serial: Serial):
-  renderer.add_many('frame', serial.links, None, scale=(15,) * len(serial.links))
-  renderer.add_many('com', serial.links, None)
+  # renderer.add_many('frame', serial.links, None, scale=(15,) * len(serial.links))
+  # renderer.add_many('com', serial.links, None)
 
   if serial.tool is not None:
     renderer.add('tool', serial.tool, None)
     renderer.add('frame', serial.tool, None, scale=15)
+  else:
+    renderer.add('frame', serial.links[-1], None, scale=15)
 
 def frame(component: Union[Link, Tool], sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
   if isinstance(component, Link):
@@ -35,7 +37,6 @@ def frame(component: Union[Link, Tool], sp: ShaderProgram, scale: float = 1., op
     0, 0, scale, 0,
     0, 0, 0, 1
   ])
-  sp.uniforms.in_opacity = opacity
 
 def com(link: Link, sp: ShaderProgram, radius: float = 25.):
   sp.uniforms.radius   = radius
@@ -66,6 +67,20 @@ def triangle(camera: Camera, sp: ShaderProgram, scale: float = 1., opacity: floa
 
   sp.uniforms.color_in   = color
   sp.uniforms.in_opacity = opacity
+
+def trajectory(serial: Serial, sp: ShaderProgram, scale: float = 1., color = None):
+  color = color or [1, 0, 0]
+
+  sp.uniforms.model_matrix = serial.to_world
+
+  sp.uniforms.scale_matrix = Matrix4([
+    scale, 0, 0, 0,
+    0, scale, 0, 0,
+    0, 0, scale, 0,
+    0, 0, 0, 1
+  ])
+
+  sp.uniforms.color_in   = color
 
 def grid(placeholder, sp: ShaderProgram, scale: float = 1.):
   sp.uniforms.scale_matrix = Matrix4([
