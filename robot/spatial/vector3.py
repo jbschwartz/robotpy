@@ -1,6 +1,7 @@
 import math
 
-from typing import Union
+from typing  import Union
+from numbers import Number
 
 from robot     import utils
 from .swizzler import Swizzler
@@ -36,20 +37,26 @@ class Vector3(Swizzler):
   def __add__(self, other: 'Vector3') -> 'Vector3':
     if isinstance(other, Vector3):
       return Vector3(self.x + other.x, self.y + other.y, self.z + other.z)
+    else:
+      return NotImplemented
 
   def __sub__(self, other: 'Vector3') -> 'Vector3':
     if isinstance(other, Vector3):
       return Vector3(self.x - other.x, self.y - other.y, self.z - other.z)
+    else:
+      return NotImplemented
 
   def __neg__(self) -> 'Vector3':
     return Vector3(-self.x, -self.y, -self.z)
 
   def __mul__(self, other: Union['Vector3', int, float]) -> Union['Vector3', float]:
-    if isinstance(other, (int, float)):
+    if isinstance(other, Number):
       return Vector3(other * self.x, other * self.y, other * self.z)
-    if isinstance(other, Vector3):
+    elif isinstance(other, Vector3):
       # Dot product
       return self.x * other.x + self.y * other.y + self.z * other.z
+    else:
+      return NotImplemented
 
   __rmul__ = __mul__
 
@@ -58,8 +65,10 @@ class Vector3(Swizzler):
     return cross(self, other)
 
   def __truediv__(self, other: Union[int, float]) -> 'Vector3':
-    if isinstance(other, (int, float)):
+    if isinstance(other, Number):
       return Vector3(self.x / other, self.y / other, self.z / other)
+    else:
+      return NotImplemented
 
   def __eq__(self, other: Union['Vector3', int]) -> bool:
     if isinstance(other, Vector3):
@@ -69,6 +78,8 @@ class Vector3(Swizzler):
         # Used to check Vector3 == 0 (i.e. check if Vector3 is the zero vector)
         # This is useful for unittest.assertAlmostEqual
         return self.x == 0 and self.y == 0 and self.z == 0
+    else:
+      return NotImplemented
 
   def __str__(self) -> str:
     return f'({self.x}, {self.y}, {self.z})'

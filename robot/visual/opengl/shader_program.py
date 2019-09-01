@@ -1,126 +1,117 @@
-import enum
-
 from OpenGL.GL import *
 
-from .uniform import Uniform
+from typing import Iterable
 
-# TODO: Need to handle other types of shaders I'm sure.
-class ShaderTypes(enum.Enum):
-  VERTEX   = GL_VERTEX_SHADER
-  FRAGMENT = GL_FRAGMENT_SHADER
+from robot.common    import FrozenDict, logger
+from robot.utils     import raise_if
+from .shader         import Shader, ShaderType
+from .uniform        import Uniform
+from .uniform_buffer import UniformBuffer
 
-class Shader():
-  def __init__(self, shader_type, path, version = 430):
-    self.id          = None
-    self.path        = path
-    self.shader_type = shader_type
-    self.version     = version
+class UniformDict():
+  def __init__(self, d: dict) -> None:
+    self.__dict__['_uniforms']       = FrozenDict(d)
+    self.__dict__['_already_logged'] = []
 
-    self.load()
+  @classmethod
+  def from_program(cls, program_id: int) -> 'UniformDict':
+    uniforms = {}
 
-  def __del__(self):
-    glDeleteShader(self.id)
+    num_uniforms = glGetProgramInterfaceiv(program_id, GL_UNIFORM, GL_ACTIVE_RESOURCES)
 
-  def create(self):
-    self.id = glCreateShader(self.shader_type.value)
+    for uniform_index in range(num_uniforms):
+      uniform = Uniform.from_program_index(program_id, uniform_index)
 
-  def source(self):
-    with open(self.path) as file:
-      source = file.read()
+      uniforms[uniform.name] = uniform
 
-    version_str = f'#version {self.version}'
-    define_str  = f'#define {self.shader_type.name}'
+    return cls(uniforms)
 
-    glShaderSource(self.id, '\n'.join([version_str, define_str, source]))
+  def __getattr__(self, name):
+    return getattr(self._uniforms, name)
 
-  def load(self):
-    self.create()
-    self.source()
-
-    glCompileShader(self.id)
-
-    if glGetShaderiv(self.id, GL_COMPILE_STATUS) != GL_TRUE:
-      msg = glGetShaderInfoLog(self.id).decode('unicode_escape')
-      raise RuntimeError(f'Shader compilation failed: {msg}')
+  def __setattr__(self, name, value):
+    try:
+      uniform = getattr(self._uniforms, name)
+      uniform.value = value
+    except AttributeError:
+      if name not in self._already_logged:
+        self._already_logged.append(name)
+        logger.warning(f'Setting uniform {name} that does not exist')
 
 class ShaderProgram():
   DEFAULT_FOLDER = './robot/visual/glsl/'
   DEFAULT_EXTENSION = '.glsl'
 
-  def __init__(self, name=None, **names):
-    # self.uniforms must be declared before any other properties
-    # TODO: Make this not so
-    self.uniforms = []
-
+  def __init__(self, name, shaders: Iterable[Shader]) -> None:
     self.id = glCreateProgram()
 
-    # Use `name` for all shaders by default, replacing any specifically passed in
-    # Also re-key the dictionary with ShaderType enum objects
-    shader_names = {
-      **{k: name for k in ShaderTypes},
-      **{ShaderTypes[k.upper()]: name for k, name in names.items()}
-    }
+    #  Used for warning/error messaging
+    self.name = name
 
-    self.link(shader_names)
+    for shader in shaders:
+      glAttachShader(self.id, shader.id)
 
-    self.get_uniforms()
+    self.link()
+
+    self.uniforms = UniformDict.from_program(self.id)
+
+  @classmethod
+  def get_shader_file_path(cls, file_name: str) -> str:
+    return cls.DEFAULT_FOLDER + file_name + cls.DEFAULT_EXTENSION
+
+  @classmethod
+  def from_file_name(cls, file_name: str) -> 'ShaderProgram':
+    """Open a glsl file with the given file name and create a ShaderProgram."""
+    with open(cls.get_shader_file_path(file_name)) as file:
+      source = file.read()
+
+    shaders = [Shader(shader_type, source) for shader_type in ShaderType]
+
+    return cls(file_name, shaders)
+
+  @classmethod
+  def from_file_names(cls, shader_name: str, file_names_by_type: dict) -> 'ShaderProgram':
+    shaders = []
+    for shader_type, file_name in file_names_by_type.items():
+      with open(cls.get_shader_file_path(file_name)) as file:
+        source = file.read()
+
+      shaders.append(
+        Shader(shader_type, source)
+      )
+
+    return cls(shader_name, shaders)
 
   def __del__(self):
     glDeleteProgram(self.id)
 
-  def __getattr__(self, attribute):
-    if attribute != 'uniforms' and attribute not in self.uniforms:
-      raise AttributeError
+  def __enter__(self) -> 'ShaderProgram':
+    glUseProgram(self.id)
+    return self
 
-    return self.uniforms[attribute]
+  def __exit__(self, exc_type, exc_value, exc_traceback) -> None:
+    glUseProgram(0)
 
-  def __setattr__(self, attribute, value):
-    if attribute == 'uniforms' or attribute not in self.uniforms:
-      super(ShaderProgram, self).__setattr__(attribute, value)
-    else:
-      self.uniforms[attribute].value = value
-
-  def link(self, shader_names):
-    self.attach_shaders(shader_names)
-
+  def link(self):
     glLinkProgram(self.id)
 
     if glGetProgramiv(self.id, GL_LINK_STATUS) != GL_TRUE:
       msg = glGetProgramInfoLog(self.id).decode('unicode_escape')
       raise RuntimeError(f'Error linking program: {msg}')
 
-  def use(self):
-    glUseProgram(self.id)
+  def bind_ubo(self, ubo: UniformBuffer) -> None:
+    """Set the ShaderProgram's uniform block to the binding index provided by the Uniform Buffer.
 
-  def get_uniforms(self):
-    self.uniforms = {}
+    If the ShaderProgram doesn't use the UniformBuffer, just ignore it.
+    """
+    block_index = glGetUniformBlockIndex(self.id, ubo.name)
 
-    num_uniforms = glGetProgramInterfaceiv(self.id, GL_UNIFORM, GL_ACTIVE_RESOURCES)
+    if block_index != GL_INVALID_INDEX:
+      glUniformBlockBinding(self.id, block_index, ubo.binding_index)
 
-    for uniform_index in range(num_uniforms):
-      uniform = Uniform.from_program_index(self.id, uniform_index)
+  def attribute_location(self, name: str) -> int:
+    result = glGetAttribLocation(self.id, name)
 
-      self.uniforms[uniform.name] = uniform
+    raise_if(result == -1, AttributeError)
 
-  def get_uniform_block(self, name: str) -> int:
-    result = glGetUniformBlockIndex(self.id, name)
-
-    return result if result != GL_INVALID_INDEX else None
-
-  def bind_ubo(self, name, binding_index):
-    result = self.get_uniform_block(name)
-
-    if result is not None:
-      glUniformBlockBinding(self.id, result, binding_index)
-
-  def attach_shaders(self, shaders : dict):
-    get_path = lambda name: self.DEFAULT_FOLDER + name + self.DEFAULT_EXTENSION
-
-    files = {k: get_path(name) for k, name in shaders.items()}
-
-    for shader_type, file_path in files.items():
-      shader = Shader(shader_type, file_path)
-      glAttachShader(self.id, shader.id)
-
-  def attribute_location(self, name):
-    return glGetAttribLocation(self.id, name)
+    return result

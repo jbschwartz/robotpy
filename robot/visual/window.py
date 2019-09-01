@@ -1,8 +1,11 @@
-import math, numpy, glfw, statistics, sys
+import math, numpy, glfw, sys
+
+from typing import Optional
 
 from OpenGL.GL import GL_TRUE
 
 from robot.common       import logger, Timer
+from robot.utils        import sign
 from robot.spatial      import Vector3
 from .messaging.emitter import emitter
 from .messaging.event   import Event
@@ -13,11 +16,8 @@ class Window():
     self.width = width
     self.height = height
 
-    self.pause = False
     self.dragging = None
     self.modifiers = 0
-
-    self.show_fps = False
 
     if not glfw.init():
       sys.exit('GLFW initialization failed')
@@ -56,14 +56,8 @@ class Window():
 
     self.emit(Event.KEY, key, action, self.modifiers)
 
-    # This may be better suited in some sort of simulation controller class
-    if key == glfw.KEY_SPACE and action == glfw.PRESS:
-      self.pause = not self.pause
-    if key == glfw.KEY_Q and action == glfw.PRESS:
-      self.show_fps = not self.show_fps
-
   def scroll_callback(self, window, x_direction, y_direction):
-    self.emit(Event.SCROLL, numpy.sign(x_direction), numpy.sign(y_direction))
+    self.emit(Event.SCROLL, sign(x_direction), sign(y_direction))
 
   def mouse_button_callback(self, window, button, action, mods):
     self.emit(Event.CLICK, button, action, self.get_cursor())
@@ -94,51 +88,25 @@ class Window():
   def ndc(self, cursor):
     return Vector3(2 * cursor.x / self.width - 1, 1 - 2 * cursor.y / self.height)
 
-  def run(self, fps_limit = None):
+  def run(self, fps_limit: Optional[int] = None):
     # Send a window resize event so observers are provided the initial window size
     self.window_callback(self.window, *glfw.get_window_size(self.window))
 
-    with Timer('START_RENDERER') as t:
-      self.emit(Event.START_RENDERER)
+    period = (1 / fps_limit) if fps_limit else 0
 
-    now = glfw.get_time()
-    last_frame = now
-    last_update = now
+    update = Timer()
+    frame  = Timer(period = period)
 
-    frame_time = 0 if not fps_limit else 1 / fps_limit
-
-    FPS = []
+    self.emit(Event.START_RENDERER)
 
     while not glfw.window_should_close(self.window):
-      now = glfw.get_time()
-      delta_update =  now - last_update
+      with update:
+        self.emit(Event.UPDATE, delta = update.time_since_last)
 
-      if len(FPS) < 20:
-        FPS.append(1 / delta_update)
-      else:
-        if self.show_fps:
-          logger.info(f'FPS: {math.floor(statistics.mean(FPS))}')
-        FPS = []
+      with frame:
+        if frame.ready:
+          self.emit(Event.START_FRAME)
+          self.emit(Event.DRAW)
 
-      last_update = now
-
-      if not self.pause:
-        self.emit(Event.UPDATE, delta = delta_update)
-
-      self.emit(Event.START_FRAME)
-
-      delta_frame = now - last_frame
-      if not fps_limit or (fps_limit and delta_frame >= frame_time):
-        self.emit(Event.DRAW)
-        last_frame = now
-
-      self.emit(Event.END_FRAME)
-
-      glfw.swap_buffers(self.window)
-      glfw.poll_events()
-
-    self.emit(Event.END_RENDERER)
-
-
-
-
+          glfw.swap_buffers(self.window)
+          glfw.poll_events()
