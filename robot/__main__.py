@@ -54,6 +54,50 @@ if __name__ == "__main__":
     Vector3( 0.5,  0.5,  0,)
   ])
 
+  bounding_buffer = Buffer.from_points([
+    Vector3(0.5,  0.5, -0.5),
+    Vector3(0.5,  0.5,  0.5),
+    Vector3(0.5, -0.5,  0.5),
+    Vector3(0.5, -0.5,  0.5),
+    Vector3(0.5, -0.5, -0.5),
+    Vector3(0.5,  0.5, -0.5),
+
+    Vector3(-0.5,  0.5, -0.5),
+    Vector3(-0.5, -0.5,  0.5),
+    Vector3(-0.5,  0.5,  0.5),
+    Vector3(-0.5, -0.5,  0.5),
+    Vector3(-0.5,  0.5, -0.5),
+    Vector3(-0.5, -0.5, -0.5),
+
+    Vector3( 0.5, -0.5, -0.5),
+    Vector3( 0.5, -0.5,  0.5),
+    Vector3(-0.5, -0.5,  0.5),
+    Vector3(-0.5, -0.5,  0.5),
+    Vector3(-0.5, -0.5, -0.5),
+    Vector3( 0.5, -0.5, -0.5),
+
+    Vector3( 0.5,  0.5, -0.5),
+    Vector3(-0.5,  0.5,  0.5),
+    Vector3( 0.5,  0.5,  0.5),
+    Vector3( 0.5,  0.5, -0.5),
+    Vector3(-0.5,  0.5, -0.5),
+    Vector3(-0.5,  0.5,  0.5),
+
+    Vector3( 0.5, -0.5,  0.5),
+    Vector3( 0.5,  0.5,  0.5),
+    Vector3(-0.5,  0.5,  0.5),
+    Vector3(-0.5,  0.5,  0.5),
+    Vector3(-0.5, -0.5,  0.5),
+    Vector3( 0.5, -0.5,  0.5),
+
+    Vector3( 0.5,  0.5, -0.5),
+    Vector3( 0.5, -0.5, -0.5),
+    Vector3(-0.5,  0.5, -0.5),
+    Vector3(-0.5,  0.5, -0.5),
+    Vector3( 0.5, -0.5, -0.5),
+    Vector3(-0.5, -0.5, -0.5)
+  ])
+
   welder = tool.load('./robot/mech/tools/welder.json')
   tool_buffer = Buffer.from_mesh(welder.mesh)
 
@@ -117,6 +161,13 @@ if __name__ == "__main__":
     buffer       = trajectory_buffer,
     per_instance = pif.trajectory,
     draw_mode    = gl.GL_LINE_STRIP
+  )
+
+  renderer.register_entity_type(
+    name         = 'bounding',
+    shader_name  = 'flat',
+    buffer       = bounding_buffer,
+    per_instance = pif.bounding,
   )
 
   serials[0].to_world = Transform.from_orientation_translation(
