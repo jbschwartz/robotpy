@@ -90,6 +90,19 @@ def grid(placeholder, sp: ShaderProgram, scale: float = 1.):
     0, 0, 0, 1
   ])
 
+def bounding(tool, sp: ShaderProgram, color):
+  sp.uniforms.model_matrix = Transform.from_axis_angle_translation(translation = tool.aabb.center)
+  size = tool.aabb.size
+
+  sp.uniforms.scale_matrix = Matrix4([
+    size.x, 0, 0, 0,
+    0, size.y, 0, 0,
+    0, 0, size.z, 0,
+    0, 0, 0, 1
+  ])
+  sp.uniforms.color_in = [0, 1, 1]
+  sp.uniforms.in_opacity = 0.25
+
 def tool(tool, sp: ShaderProgram):
   # TODO: This probably shouldn't be using the Serial shader.
   # It would be better to have a similar shader that handles individual objects
