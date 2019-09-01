@@ -2,7 +2,7 @@ import json, os
 
 from typing import Optional
 
-from robot.spatial import AABB, Mesh, Ray, Transform, Vector3
+from robot.spatial import AABB, Intersection, Mesh, Ray, Transform, Vector3
 from robot.visual.filetypes.stl.stl_parser import STLParser
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -48,11 +48,13 @@ class Tool:
     """Return the offset of the tool tip to tool_base in world space."""
     return self._tip.translation()
 
-  def intersect(self, world_ray: Ray) -> Optional[bool]:
-    """Return whether or not the provided Ray in world space intersects the Tool Mesh."""
-    if self.aabb.intersect(world_ray):
-      world_to_tool = self.to_world.inverse()
+  def intersect(self, world_ray: Ray) -> Intersection:
+    """Intersect a ray with Tool and return closest found Intersection. Return Intersection.Miss() for no intersection."""
+    if not self.aabb.intersect(world_ray):
+      return Intersection.Miss()
 
-      return self.mesh.intersect(world_ray.transform(world_to_tool))
+    world_to_tool = self.to_world.inverse()
 
-    return None
+    facet = self.mesh.intersect(world_ray.transform(world_to_tool))
+    if facet.hit:
+      return Intersection(facet.t, self)
