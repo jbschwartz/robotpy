@@ -3,6 +3,7 @@ from typing import Iterable
 from .dual       import Dual
 from .quaternion import conjugate, Quaternion
 from .transform  import Transform
+from .vector3    import Vector3
 
 class Matrix4:
   def __init__(self, elements: Iterable[float] = None) -> None:
@@ -44,6 +45,16 @@ class Matrix4:
     assert len(elements) == 16
 
     return cls(elements)
+
+  @classmethod
+  def from_scale(cls, scale: Vector3) -> 'Matrix4':
+    x, y, z = scale.xyz
+    return cls([
+        x, 0.0, 0.0, 0.0,
+      0.0,   y, 0.0, 0.0,
+      0.0, 0.0,   z, 0.0,
+      0.0, 0.0, 0.0, 1.0
+    ])
 
   def __str__(self) -> str:
     # Get the width of "widest" floating point number
