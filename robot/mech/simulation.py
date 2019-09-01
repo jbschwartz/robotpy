@@ -32,6 +32,7 @@ class Simulation():
     if not self.aabb.intersect(ray):
       return None
 
+    print('Intersecting scene')
     return ray.closest_intersection(self.entities)
 
   @listen(Event.KEY)
@@ -50,10 +51,10 @@ class Simulation():
     self.tick_samples.append(1 / delta)
 
     for entity in self.entities:
-      if entity.traj:
+      if hasattr(entity, 'traj'):
         result = entity.traj.advance(delta)
         entity.angles = result
 
-      if entity.traj.is_done():
-        entity.traj.reverse()
-        entity.traj.restart()
+        if entity.traj.is_done():
+          entity.traj.reverse()
+          entity.traj.restart()
