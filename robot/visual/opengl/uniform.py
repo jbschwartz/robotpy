@@ -71,11 +71,7 @@ class Uniform:
     self._value = value
     try:
       self.set_value(self.location, value)
-    except UniformTypeError as e:
+    except (UniformArraySizeError, UniformSizeError, UniformTypeError) as e:
       if self.logged.get(type(e), None) is None:
         self.logged[type(e)] = True
         logger.error(f'When setting `{self.name}` uniform: {e.args[0]}')
-    except (UniformArraySizeError, UniformSizeError) as e:
-      if self.logged.get(type(e), None) is None:
-        self.logged[type(e)] = True
-        logger.warning(f'When setting `{self.name}` uniform: {e.args[0]}')

@@ -27,9 +27,12 @@ sizes = {
 
 class UniformBuffer():
   """OpenGL Uniform Buffer Object."""
-  def __init__(self, name: str, block_index: int) -> None:
-    self.id = glGenBuffers(1)
-    glBindBufferBase(GL_UNIFORM_BUFFER, block_index, self.id)
+  def __init__(self, name: str, binding_index: int) -> None:
+    self.id            = glGenBuffers(1)  # OpenGL buffer ID
+    self.name          = name
+    self.binding_index = binding_index
+
+    glBindBufferBase(GL_UNIFORM_BUFFER, self.binding_index, self.id)
 
   def resolve_dot_notation(self, start_object, field):
     current = start_object

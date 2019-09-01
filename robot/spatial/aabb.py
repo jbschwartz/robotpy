@@ -19,6 +19,14 @@ class AABB:
 
     return aabb
 
+  @classmethod
+  def from_aabbs(cls, aabbs: Iterable['AABB']) -> 'AABB':
+    """Construct an AABB from a list of other AABBs."""
+    aabb = cls()
+    aabb.expand(aabbs)
+
+    return aabb
+
   def expand(self, objects: Iterable[Union[Vector3, 'AABB']]) -> None:
     """Expand the bounding box to include the passed objects."""
     # If the passed parameter looks iterable, try to break it up recursively

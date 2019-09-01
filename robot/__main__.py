@@ -1,48 +1,25 @@
 import json, math, sys
-import numpy as np
-from OpenGL.GL import *
 
-from robot.spatial import vector3
-Vector3 = vector3.Vector3
+import OpenGL.GL as gl
 
 from robot.common          import Bindings, logger, Timer
-from robot.mech.serial     import Serial
+from robot.mech            import Serial, Simulation
+from robot.mech            import tool
 from robot.spatial.euler   import Axes, Order
-from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
-from robot.traj.linear_js  import LinearJS
+from robot.spatial         import Mesh, Transform, Quaternion, Vector3
 from robot.traj.linear_os  import LinearOS
-from robot.visual.opengl.shader_program import ShaderProgram
+from robot.visual.filetypes.stl.stl_parser import STLParser
+from robot.visual.opengl.buffer            import Buffer
+from robot.visual.opengl.uniform_buffer    import Mapping, UniformBuffer
+
+import robot.instance_functions as pif
 
 import robot.visual as vis
-
-import robot.visual.entities as entities
-
-from robot.visual.entities import tool_entity
 
 if __name__ == "__main__":
   with Timer('Initialize Window') as t:
     window = vis.Window(750, 750, "robotpy")
 
-  with Timer('Initialize Shaders') as t:
-    program = ShaderProgram(vertex='serial_v', fragment='serial_f')
-    flat_program = ShaderProgram('flat')
-    grid_program = ShaderProgram('grid')
-    bill_program = ShaderProgram('billboard')
-    com_program = ShaderProgram('com')
-
-  program.bind_ubo("Matrices", 1)
-  flat_program.bind_ubo("Matrices", 1)
-  grid_program.bind_ubo("Matrices", 1)
-  bill_program.bind_ubo("Matrices", 1)
-  com_program.bind_ubo("Matrices", 1)
-
-  program.bind_ubo("Light", 2)
-
-  ee_frame = entities.FrameEntity(Transform(), flat_program)
-  bb = entities.BoundingEntity(flat_program)
-  grid = entities.GridEntity(grid_program)
-  welder = tool_entity.load('./robot/mech/tools/welder.json')
-  welder.shader_program = program
 
   with Timer('Load Robot and Construct Mesh') as t:
     with open('./robot/mech/robots/abb_irb_120.json') as json_file:
@@ -53,9 +30,78 @@ if __name__ == "__main__":
 
       serials = [Serial.from_dict_meshes(serial_dictionary, meshes or []) for _ in range(2)]
 
-  robot, robot2 = [entities.RobotEntity(serial, program) for serial in serials]
-  robot.frame_entity  = ee_frame
-  robot2.frame_entity = ee_frame
+  sim = Simulation()
+  sim.entities.append(serials[0])
+  sim.entities.append(serials[1])
+
+  serial_buffer = Buffer.from_meshes(meshes)
+
+  p = STLParser()
+  mesh = Mesh.from_file(p, './robot/visual/meshes/frame.stl')
+  frame_buffer = Buffer.from_meshes(mesh)
+
+  triangle_buffer = Buffer.from_points([
+    Vector3( 0.5, -0.33, 0),
+    Vector3( 0.0,  0.66, 0),
+    Vector3(-0.5, -0.33, 0)
+  ])
+
+  grid_buffer = Buffer.from_points([
+    Vector3( 0.5,  0.5,  0,),
+    Vector3(-0.5,  0.5,  0,),
+    Vector3(-0.5, -0.5,  0,),
+    Vector3(-0.5, -0.5,  0,),
+    Vector3( 0.5, -0.5,  0,),
+    Vector3( 0.5,  0.5,  0,)
+  ])
+
+  welder = tool.load('./robot/mech/tools/welder.json')
+  tool_buffer = Buffer.from_mesh(welder.mesh)
+
+  camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
+  light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
+  renderer = vis.Renderer(camera, light)
+
+  renderer.register_entity_type(
+    name         = 'serial',
+    buffer       = serial_buffer,
+    per_instance = pif.serial,
+    add_children = pif.serial_add_children
+  )
+
+  renderer.register_entity_type(
+    name         = 'frame',
+    shader_name  = 'frame',
+    buffer       = frame_buffer,
+    per_instance = pif.frame
+  )
+
+  renderer.register_entity_type(
+    name         = 'com',
+    buffer       = Buffer.Procedural(4),
+    per_instance = pif.com,
+    draw_mode    = gl.GL_TRIANGLE_STRIP
+  )
+
+  renderer.register_entity_type(
+    name         = 'triangle',
+    shader_name  = 'billboard',
+    buffer       = triangle_buffer,
+    per_instance = pif.triangle
+  )
+
+  renderer.register_entity_type(
+    name         = 'grid',
+    buffer       = grid_buffer,
+    per_instance = pif.grid
+  )
+
+  renderer.register_entity_type(
+    name         = 'tool',
+    shader_name  = 'serial',
+    buffer       = tool_buffer,
+    per_instance = pif.tool
+  )
 
   serials[0].to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
@@ -75,8 +121,7 @@ if __name__ == "__main__":
   serials[1].to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
     Vector3(0, 0, 0))
-  robot2.color = (0.5, 1, 0)
-  robot2.attach(welder)
+  serials[1].attach(welder)
 
   serials[1].traj = LinearOS(
     serials[1],
@@ -89,27 +134,30 @@ if __name__ == "__main__":
     ],
     3)
 
-  triangle = entities.TriangleEntity(bill_program)
+  renderer.add_many('serial', serials, None, color=([1, 0.5, 0], [0.5, 1, 0]))
 
-  camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
+  renderer.add('triangle', camera, None, scale=20)
 
-  world_frame = entities.FrameEntity(Transform(), flat_program)
-  light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
+  renderer.add('grid', None, None, scale=10000)
 
-  scene = vis.Scene(camera, light)
+  # world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
 
   bindings = Bindings()
   settings = vis.CameraSettings()
-  camera_controller = vis.CameraController(camera, settings, bindings, scene, window)
+  camera_controller = vis.CameraController(camera, settings, bindings, sim, window)
 
-  scene.entities.append(world_frame)
-  scene.entities.append(grid)
-  scene.entities.append(robot2)
-  scene.entities.append(robot)
-  scene.entities.append(triangle)
+  matrix_ub = UniformBuffer("Matrices", 1)
 
-  for link in robot.serial.links:
-    com = entities.COMEntity(link, com_program)
-    scene.entities.append(com)
+  matrix_ub.bind(Mapping(
+    camera, ['projection.matrix', 'world_to_camera']
+  ))
 
-  window.run()
+  light_ub = UniformBuffer("Light", 2)
+
+  light_ub.bind(Mapping(
+    light, ['position', 'color', 'intensity']
+  ))
+
+  renderer.ubos = [matrix_ub, light_ub]
+
+  window.run(fps_limit = 60)

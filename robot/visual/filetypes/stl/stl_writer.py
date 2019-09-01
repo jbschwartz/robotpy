@@ -22,7 +22,8 @@ class STLWriter():
       mesh_id = 0
       for mesh in meshes:
         for facet in mesh.facets:
-          buffer = [ *facet.normal, *facet.vertices[0], *facet.vertices[1], *facet.vertices[2], mesh_id ]
+          normal = facet.normal if facet.normal is not None else facet.computed_normal
+          buffer = [ *normal, *facet.vertices[0], *facet.vertices[1], *facet.vertices[2], mesh_id ]
           file.write(struct.pack('<fff fff fff fff H', *buffer))
           num_facets += 1
 
