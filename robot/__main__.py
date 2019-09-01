@@ -77,12 +77,12 @@ if __name__ == "__main__":
   ]
 
   rectangle_buffer = Buffer.from_points([
-    Vector3( 2,  0,  0),
+    Vector3( 1,  0,  0),
     Vector3( 0,  0,  0),
-    Vector3( 0, -2,  0),
-    Vector3( 0, -2,  0),
-    Vector3( 2, -2,  0),
-    Vector3( 2,  0,  0)
+    Vector3( 0, -1,  0),
+    Vector3( 0, -1,  0),
+    Vector3( 1, -1,  0),
+    Vector3( 1,  0,  0)
   ])
 
   def rectangle_instance(rectangle: Rectangle, sp: ShaderProgram):
