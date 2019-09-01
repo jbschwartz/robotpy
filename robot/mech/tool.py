@@ -1,6 +1,6 @@
 import json, os
 
-from robot.spatial import Mesh, Transform, Vector3
+from robot.spatial import AABB, Mesh, Transform, Vector3
 from robot.visual.filetypes.stl.stl_parser import STLParser
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -30,6 +30,11 @@ class Tool:
     self.to_world = Transform.from_axis_angle_translation()
     self._tip = tip
     self.mesh = mesh
+
+  @property
+  def aabb(self) -> AABB:
+    """Return the Tool's Mesh AABB in world space."""
+    return AABB.from_points([self.to_world(corner) for corner in self.mesh.aabb.corners])
 
   @property
   def tip(self) -> Transform:
