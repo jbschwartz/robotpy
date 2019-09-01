@@ -107,11 +107,14 @@ class Link:
 
   def intersect(self, world_ray: Ray) -> Intersection:
     """Intersect a ray with Link and return closest found Intersection. Return Intersection.Miss() for no intersection."""
-    if self.aabb.intersect(world_ray):
+    if not self.aabb.intersect(world_ray):
       return Intersection.Miss()
 
     world_to_link = self.to_world.inverse()
 
     facet = self.mesh.intersect(world_ray.transform(world_to_link))
     if facet.hit:
+      # If we hit a facet, repackage the Intersection to report the Link being intersected
       return Intersection(facet.t, self)
+    else:
+      return facet

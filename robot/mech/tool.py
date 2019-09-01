@@ -57,4 +57,7 @@ class Tool:
 
     facet = self.mesh.intersect(world_ray.transform(world_to_tool))
     if facet.hit:
+      # If we hit a facet, repackage the Intersection to report the Link being intersected
       return Intersection(facet.t, self)
+    else:
+      return facet
