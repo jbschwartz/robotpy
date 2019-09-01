@@ -23,11 +23,12 @@ def load(file_path: str) -> 'Tool':
 
   tip_transform = Transform.from_json(data['tip_transform'])
 
-  return Tool(tip_transform, mesh)
+  return Tool(data['name'], tip_transform, mesh)
 
 class Tool:
   """Attachable robot end effector."""
-  def __init__(self, tip: Transform, mesh: 'Mesh') -> None:
+  def __init__(self, name: str, tip: Transform, mesh: 'Mesh') -> None:
+    self.name = name
     # Transformation of the tool origin to world space
     self.to_world = Transform.from_axis_angle_translation()
     self._tip = tip
