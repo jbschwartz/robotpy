@@ -2,19 +2,14 @@ import json, math, sys
 
 import OpenGL.GL as gl
 
-from robot.spatial import vector3
-Vector3 = vector3.Vector3
-
 from robot.common          import Bindings, logger, Timer
-from robot.mech            import Link, Serial, Simulation, Tool
+from robot.mech            import Serial, Simulation
 from robot.mech            import tool
 from robot.spatial.euler   import Axes, Order
-from robot.spatial         import Matrix4, Mesh, Transform, Quaternion
-from robot.traj.linear_js  import LinearJS
+from robot.spatial         import Mesh, Transform, Quaternion, Vector3
 from robot.traj.linear_os  import LinearOS
 from robot.visual.filetypes.stl.stl_parser import STLParser
 from robot.visual.opengl.buffer            import Buffer
-from robot.visual.opengl.shader_program    import ShaderProgram
 from robot.visual.opengl.uniform_buffer    import Mapping, UniformBuffer
 
 import robot.instance_functions as pif
