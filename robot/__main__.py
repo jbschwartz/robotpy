@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
   renderer.register_entity_type(
     name         = 'frame',
-    shader_name  = 'flat',
+    shader_name  = 'frame',
     buffer       = frame_buffer,
     per_instance = pif.frame
   )
