@@ -6,10 +6,11 @@ from robot.common          import Bindings, Timer
 from robot.mech            import Serial, Simulation
 from robot.mech            import tool
 from robot.spatial.euler   import Axes, Order
-from robot.spatial         import Mesh, Transform, Quaternion, Vector3
+from robot.spatial         import Matrix4, Mesh, Transform, Quaternion, Vector3
 from robot.traj.linear_os  import LinearOS
 from robot.visual.filetypes.stl.stl_parser import STLParser
 from robot.visual.opengl.buffer            import Buffer
+from robot.visual.opengl.shader_program    import ShaderProgram
 from robot.visual.opengl.uniform_buffer    import Mapping, UniformBuffer
 
 import robot.instance_functions as pif
@@ -65,7 +66,32 @@ def setup():
 
   return window, renderer
 
+from robot.visual.gui import Rectangle
+
 if __name__ == "__main__":
   window, renderer = setup()
+
+  r = Rectangle(Vector3(0, 0.5), 0.25, 0.25)
+
+  rectangle_buffer = Buffer.from_points([
+    Vector3( 2,  0,  0),
+    Vector3( 0,  0,  0),
+    Vector3( 0, -2,  0),
+    Vector3( 0, -2,  0),
+    Vector3( 2, -2,  0),
+    Vector3( 2,  0,  0)
+  ])
+
+  def rectangle_instance(rectangle: Rectangle, sp: ShaderProgram):
+    sp.uniforms.top_left     = rectangle.position
+    sp.uniforms.scale_matrix = Matrix4.from_scale(Vector3(rectangle.width, rectangle.height, 1))
+
+  renderer.register_entity_type(
+    name         = 'rectangle',
+    buffer       = rectangle_buffer,
+    per_instance = rectangle_instance
+  )
+
+  renderer.add('rectangle', r, None)
 
   window.run(fps_limit = 60)
