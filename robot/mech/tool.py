@@ -51,7 +51,6 @@ class Tool:
   def intersect(self, world_ray: Ray) -> Optional[bool]:
     """Return whether or not the provided Ray in world space intersects the Tool Mesh."""
     if self.aabb.intersect(world_ray):
-      print('Intersecting tool')
       world_to_tool = self.to_world.inverse()
 
       return self.mesh.intersect(world_ray.transform(world_to_tool))
