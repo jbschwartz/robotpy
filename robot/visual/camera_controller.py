@@ -91,7 +91,8 @@ class CameraController():
         end = self.window.ndc(cursor)
         self.is_selecting = None
 
-    if button == glfw.MOUSE_BUTTON_MIDDLE and action == glfw.PRESS:
+    if button in [glfw.MOUSE_BUTTON_LEFT, glfw.MOUSE_BUTTON_MIDDLE] and action == glfw.PRESS:
+
       r = self.camera.cast_ray(self.window.ndc(cursor))
       with Timer('Ray Intersection'):
         x = self.scene.intersect(r)
@@ -102,12 +103,12 @@ class CameraController():
         if len(self.scene.entities) > 0:
           self.target = self.scene.aabb.center
 
-      assert self.target is not None, "There must always be a valid camera target."
-      assert isinstance(self.target, Vector3), "Camera target must be a Vector3."
+        assert self.target is not None, "There must always be a valid camera target."
+        assert isinstance(self.target, Vector3), "Camera target must be a Vector3."
 
-      # TODO: Do I really mean to be putting a target attribute onto the camera instance?
-      # What happened to self.target?
-      self.camera.target = self.target
+        # TODO: Do I really mean to be putting a target attribute onto the camera instance?
+        # What happened to self.target?
+        self.camera.target = self.target
 
   @listen(Event.DRAG)
   def drag(self, button, cursor, cursor_delta, modifiers):

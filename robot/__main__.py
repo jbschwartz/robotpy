@@ -150,6 +150,12 @@ if __name__ == "__main__":
     ],
     3)
 
+  for link in serials[0].links:
+    link.color = [1, 0.5, 0]
+  for link in serials[1].links:
+    link.color = [0.5, 1, 0]
+  # renderer.add('bounding', serials[1], None, color=[0, 1, 1])
+
   renderer.add_many('serial', serials, None, color=([1, 0.5, 0], [0.5, 1, 0]))
 
   renderer.add('triangle', camera, None, scale=20)
