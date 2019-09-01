@@ -88,11 +88,11 @@ class CameraController():
 
     if button == glfw.MOUSE_BUTTON_MIDDLE and action == glfw.PRESS:
       r = self.camera.cast_ray(self.window.ndc(cursor))
-      with Timer('Ray Intersection') as tim:
-        t = self.scene.intersect(r)
+      with Timer('Ray Intersection'):
+        x = self.scene.intersect(r)
 
-      if t is not None:
-        self.target = r.evaluate(t)
+      if x.hit:
+        self.target = r.evaluate(x.t)
       else:
         self.target = self.scene.aabb.center
 
