@@ -79,9 +79,9 @@ class Facet:
     return len(self.vertices) == 3
 
   def intersect(self, ray: Ray, check_back_facing: bool = False) -> Intersection:
-    """Returns the parametric value of ray intersection (or None for a miss).
+    """Returns the Intersection with parametric value of ray (or Intersection.Miss() for a miss).
 
-    Returns `None` when the ray origin is in the triangle and the ray points away.
+    Returns Intersection.Miss() when the ray origin is in the triangle and the ray points away.
     Returns the ray origin when the ray origin is in the triangle and the ray points towards.
 
     This function implements the Moller-Trumbore intersection algorithm.
