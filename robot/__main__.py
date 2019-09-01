@@ -72,8 +72,8 @@ if __name__ == "__main__":
   window, renderer = setup()
 
   rectangles = [
-    Rectangle(Vector3(0.125, 0.375), 0.125, 0.125, color=[0.25] * 3),
-    Rectangle(Vector3(0, 0.5), 0.25, 0.25, color=[0.65] * 3)
+    Rectangle('Large', Vector3(0, 0), 0.25, 0.25, color=[0.65] * 3),
+    Rectangle('Small', Vector3(-1, 1), 0.125, 0.125, color=[0.25] * 3)
   ]
 
   rectangle_buffer = Buffer.from_points([
