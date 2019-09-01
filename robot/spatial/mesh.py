@@ -2,9 +2,10 @@ import math
 
 import numpy as np
 
-from .aabb   import AABB
-from .kdtree import KDTree
-from .ray    import Ray
+from .aabb         import AABB
+from .intersection import Intersection
+from .kdtree       import KDTree
+from .ray          import Ray
 
 class Mesh:
   def __init__(self, name = None, facets = None):
@@ -76,8 +77,8 @@ class Mesh:
     if self.accelerator:
       self.accelerator.update(self, facet)
 
-  def intersect(self, local_ray : Ray):
-    '''Intersect a ray with mesh and return the ray's t parameter for found intersections. Return None for no intersections.'''
+  def intersect(self, local_ray: Ray) -> Intersection:
+    """Intersect a ray with Mesh and return closest found Intersection. Return Intersection.Miss() for no intersection."""
     if self.accelerator:
       return self.accelerator.intersect(local_ray)
     else:
