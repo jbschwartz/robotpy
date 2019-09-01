@@ -14,6 +14,12 @@ All development for this project is done live on Twitch. Follow [@jschwartz](htt
 
 `py -m unittest`
 
+### Running a Single Test File
+
+For example, to run only the TestIntersection test class:
+
+`python -m unittest -v test.spatial.test_intersection.TestIntersection`
+
 ## Controls
 
 The visualization contains a relatively feature-full, CAD style camera.
