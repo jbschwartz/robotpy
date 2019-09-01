@@ -72,6 +72,6 @@ def tool(tool, sp: ShaderProgram):
   # TODO: This probably shouldn't be using the Serial shader.
   # It would be better to have a similar shader that handles individual objects
   # (instead of faking individual objects into "serial chains").
-  sp.uniforms.model_matrices  = [tool.tool_to_world] + [Transform()] * 6
+  sp.uniforms.model_matrices  = [tool.to_world] + [Transform()] * 6
   sp.uniforms.use_link_colors = False
   sp.uniforms.robot_color     = [0.5] * 3

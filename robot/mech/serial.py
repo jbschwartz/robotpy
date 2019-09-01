@@ -100,7 +100,7 @@ class Serial:
 
     # TODO: Move this into the loop above (by either adding tool to links list or concatenating on the spot)
     if self.tool is not None:
-      self.tool.tool_to_world = self.links[-1].to_world
+      self.tool.to_world = self.links[-1].to_world
 
   def pose(self) -> Transform:
     if self.tool is not None:

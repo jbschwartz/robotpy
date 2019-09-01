@@ -27,14 +27,14 @@ class Tool:
   """Attachable robot end effector."""
   def __init__(self, tip: Transform, mesh: 'Mesh') -> None:
     # Transformation of the tool origin to world space
-    self.tool_to_world = Transform.from_axis_angle_translation()
+    self.to_world = Transform.from_axis_angle_translation()
     self._tip = tip
     self.mesh = mesh
 
   @property
   def tip(self) -> Transform:
     """Returns the transform of the tool tip in world space."""
-    return self.tool_to_world * self._tip
+    return self.to_world * self._tip
 
   @property
   def offset(self) -> Vector3:
