@@ -16,7 +16,7 @@ import robot.instance_functions as pif
 
 import robot.visual as vis
 
-if __name__ == "__main__":
+def setup():
   with Timer('Initialize Window') as t:
     window = vis.Window(750, 750, "robotpy")
 
@@ -62,5 +62,10 @@ if __name__ == "__main__":
   ))
 
   renderer.ubos = [matrix_ub, light_ub]
+
+  return window, renderer
+
+if __name__ == "__main__":
+  window, renderer = setup()
 
   window.run(fps_limit = 60)
