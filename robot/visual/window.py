@@ -69,6 +69,7 @@ class Window():
     cursor = Vector3(x, y)
 
     if self.last_cursor_position:
+      # TODO: This is backwards. Needs to be current - previous.
       cursor_delta = (self.last_cursor_position - cursor)
 
     self.last_cursor_position = cursor
