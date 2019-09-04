@@ -45,6 +45,10 @@ class Serial:
     correctElbow = math.isclose(self.links[2].joint.dh.alpha, 0) or math.isclose(self.links[2].joint.dh.alpha, math.pi)
     assert correctElbow, 'Robot does not have a recognized elbow configuration'
 
+  @property
+  def meshes(self) -> Iterable[Mesh]:
+    return [link.mesh for link in self.links]
+
   # Temporary (probably) property
   @property
   def joints(self) -> Iterable[Joint]:
