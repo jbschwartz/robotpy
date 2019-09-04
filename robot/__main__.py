@@ -19,7 +19,7 @@ import robot.visual as vis
 
 def setup():
   with Timer('Initialize Window') as t:
-    window = vis.Window(750, 750, "robotpy")
+    window = vis.Window(1500, 750, "robotpy")
 
   sim = Simulation()
 
