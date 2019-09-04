@@ -77,6 +77,13 @@ class Serial:
 
     self.update_link_transforms()
 
+  def set_joint_angle(self, joint_index: int, value: float, normalized: bool = False) -> None:
+    """Set the corresponding joint angle.
+
+    Joints are indexed starting with 0 but Joint 0 is the base joint (and it's immovable)."""
+    self.links[joint_index].joint.set_angle(value, normalized)
+    self.update_link_transforms()
+
   @property
   def aabb(self) -> AABB:
     aabb = AABB.from_points([link.aabb for link in self.links])
