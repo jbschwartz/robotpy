@@ -2,11 +2,15 @@ from robot.spatial import Vector3
 
 class Widget():
   """Base class for all GUI objects."""
-  def __init__(self, name: str, position: Vector3 = None, width: float = 1, height: float = 1) -> None:
+  def __init__(self, name: str, position: Vector3 = None, width: float = 1, height: float = 1, color = None) -> None:
+  # def __init__(self, **options: dict) -> None:
     self.name      = name
     self._position = position or Vector3()
     self._width    = width
     self._height   = height
+    self.color     = color or [1, 1, 1]
+    self.visible   = True
+    self.hover     = False
 
     self.parent   = None
     self.children = {}

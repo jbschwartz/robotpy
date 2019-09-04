@@ -1,1 +1,1 @@
-from .rectangle import Rectangle
+from .widget    import Widget
