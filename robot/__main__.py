@@ -121,11 +121,6 @@ if __name__ == "__main__":
     ))
     y += slider_height + space_height
 
-  rectangles = [
-    Widget('Large', Vector3(0, 0), 0.25, 0.25, color=[0.65] * 3),
-    Widget('Small', Vector3(0.5, 0.5), 0.25, 0.25, color=[0.25] * 3)
-  ]
-
   rectangle_buffer = Buffer.from_points([
     Vector3( 1,  0),
     Vector3( 0,  0),
