@@ -67,12 +67,17 @@ class Renderer():
   def draw(self):
     self.update_environment()
 
-    for entity in self.entities.values():
+    for name, entity in self.entities.items():
+      if name == 'rectangle':
+        glDisable(GL_DEPTH_TEST)
+      else:
+        glEnable(GL_DEPTH_TEST)
+
       with entity.shader as sp, entity.buffer:
         for instance, kwargs in entity.instances:
-          entity.per_instance(instance, sp, **kwargs)
-
-          glDrawArrays(entity.draw_mode, 0, len(entity.buffer))
+          skip = entity.per_instance(instance, sp, **kwargs)
+          if not skip:
+            glDrawArrays(entity.draw_mode, 0, len(entity.buffer))
 
   @listen(Event.WINDOW_RESIZE)
   def window_resize(self, width, height):
