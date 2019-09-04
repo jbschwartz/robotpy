@@ -19,7 +19,7 @@ class Joint:
   def __init__(self, dh: DenavitHartenberg, limits: JointLimits = None) -> None:
     self.dh = dh
 
-    self._angle = 0
+    self.angle = 0
 
     self.limits = limits or JointLimits()
 
@@ -62,16 +62,16 @@ class Joint:
 
     return cls(dh, joint_limits)
 
-  @property
-  def angle(self) -> float:
-    return self._angle
+  def set_angle(self, value, normalized: bool = False) -> None:
+    if normalized:
+      assert 0 <= value <=1, "Normalized values must be between 0 and 1"
 
-  @angle.setter
-  def angle(self, value) -> None:
-    if not self.within_limits(value):
-      raise InvalidJointAngleError(f"{value} outside of joint limits [{self.limits.low}, {self.limits.high}]")
+      self.angle = value * self.travel + self.limits.low
+    else:
+      if not self.within_limits(value):
+        raise InvalidJointAngleError(f"{value} outside of joint limits [{self.limits.low}, {self.limits.high}]")
 
-    self._angle = value
+      self.angle = value
 
   @property
   def transform(self) -> Transform:
