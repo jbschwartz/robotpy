@@ -88,18 +88,32 @@ class TestJoint(unittest.TestCase):
         with self.subTest(msg=f"{test.name}: `{field}` not as expected"):
           self.assertEqual(getattr(joint.limits, field), expecteds.get(field))
 
-  def test_angle_property_accepts_valid_angles_and_raises_for_exceeding_limits(self):
+  def test_set_angle_set_valid_angles_and_raises_for_exceeding_limits(self):
     with self.subTest(f"Valid angle is accepted"):
       valid_angle = (self.joint.limits.high + self.joint.limits.low) / 2
 
-      self.joint.angle = valid_angle
+      self.joint.set_angle(valid_angle)
       self.assertAlmostEqual(self.joint.angle, valid_angle)
 
     with self.subTest(f"Invalid angle raises exception"):
       invalid_angle = self.joint.limits.high + abs(self.joint.limits.low)
 
       with self.assertRaises(InvalidJointAngleError):
-        self.joint.angle = invalid_angle
+        self.joint.set_angle(invalid_angle)
+
+  def test_set_angle_accepts_normalized_values(self):
+    valid_angles = [0, 0.5, 1]
+    for valid_angle in valid_angles:
+      with self.subTest(f'Valid value {valid_angle}'):
+        self.joint.set_angle(valid_angle, normalized=True)
+        normalized = valid_angle * self.joint.travel + self.joint.limits.low
+        self.assertAlmostEqual(self.joint.angle, normalized)
+
+    invalid_angles = [-1, 2]
+    for invalid_angle in invalid_angles:
+      with self.subTest(f'Invalid angle {invalid_angle}'):
+        with self.assertRaises(AssertionError):
+          self.joint.set_angle(invalid_angle, normalized=True)
 
   def test_transform_constructs_transform_for_joint_angle(self):
     self.joint.angle = math.radians(30)
