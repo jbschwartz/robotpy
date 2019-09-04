@@ -32,6 +32,10 @@ def setup():
     Vector3( 0.5,  0.5,  0,)
   ])
 
+  p = STLParser()
+  mesh = Mesh.from_file(p, './robot/visual/meshes/frame.stl')
+  frame_buffer = Buffer.from_meshes(mesh)
+
   camera = vis.Camera(Vector3(0, -1250, 375), Vector3(0, 0, 350), Vector3(0, 0, 1))
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
   renderer = vis.Renderer(camera, light)
@@ -40,6 +44,13 @@ def setup():
     name         = 'grid',
     buffer       = grid_buffer,
     per_instance = pif.grid
+  )
+
+  renderer.register_entity_type(
+    name         = 'frame',
+    shader_name  = 'frame',
+    buffer       = frame_buffer,
+    per_instance = pif.frame
   )
 
   renderer.add('grid', None, None, scale=10000)
