@@ -14,13 +14,13 @@ class TestFrozenDict(unittest.TestCase):
   def test_frozen_dict_accesses_with_dot_notation(self):
     for key, value in self.underlying.items():
       with self.subTest(f'Dictionary key {key}'):
-        self.assertEquals(getattr(self.fd, key), value)
+        self.assertEqual(getattr(self.fd, key), value)
 
   def test_frozen_dict_sets_valid_keys(self):
     for key, value in self.underlying.items():
       new_value = value ** 2
       setattr(self.fd, key, new_value)
-      self.assertEquals(getattr(self.fd, key), new_value)
+      self.assertEqual(getattr(self.fd, key), new_value)
 
   def test_frozen_dict_raises_getting_invalid_keys(self):
     with self.assertRaises(AttributeError):
