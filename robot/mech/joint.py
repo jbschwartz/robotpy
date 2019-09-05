@@ -16,10 +16,10 @@ JointLimits = namedtuple('JointLimits', 'low high', defaults=(-math.inf, math.in
 #   through DH parameters.
 
 class Joint:
-  def __init__(self, dh: DenavitHartenberg, limits: JointLimits = None) -> None:
-    self.dh = dh
-
-    self.angle = 0
+  def __init__(self, dh: DenavitHartenberg, limits: JointLimits = None, home: float = 0) -> None:
+    self.dh    = dh
+    self.home  = home or 0
+    self.angle = self.home
 
     self.limits = limits or JointLimits()
 
@@ -60,7 +60,8 @@ class Joint:
 
     joint_limits = JointLimits(**limit_dictionary)
 
-    return cls(dh, joint_limits)
+    home_angle = math.radians(d.get('home', None))
+    return cls(dh, joint_limits, home_angle)
 
   def set_angle(self, value, normalized: bool = False) -> None:
     if normalized:
