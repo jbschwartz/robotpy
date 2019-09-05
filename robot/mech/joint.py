@@ -17,15 +17,17 @@ JointLimits = namedtuple('JointLimits', 'low high', defaults=(-math.inf, math.in
 
 class Joint:
   def __init__(self, dh: DenavitHartenberg, limits: JointLimits = None, home: float = None) -> None:
-    self.dh    = dh
-    self.home  = home or 0
-    self.angle = self.home
-
+    self.dh     = dh
     self.limits = limits or JointLimits()
-
     # Swap limits if they are out of order
     if limits.low > limits.high:
       self.limits = JointLimits(limits.high, limits.low)
+
+    self.home = home or 0
+    if not self.within_limits(self.home):
+      self.home = self.limits.low
+
+    self.angle = self.home
 
   @classmethod
   def Immovable(cls) -> 'Joint':
