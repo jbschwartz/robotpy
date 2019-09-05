@@ -7,29 +7,51 @@ from robot.mech.exceptions   import InvalidJointAngleError, InvalidJointDictErro
 from robot.mech.joint        import DenavitHartenberg, JointLimits, Joint
 from robot.spatial           import Transform, Vector3
 
-def create_dummy_dict(dh: dict = None, limits: dict = None):
+def create_dummy_dict(dh: dict = None, limits: dict = None, home: int = None):
   """Create a sample dictionary with all of the DH fields present."""
   defaults = {
     tup: {k: v for k, v in zip(tup._fields, range(0, len(tup._fields)))}
     for tup in (DenavitHartenberg, JointLimits)
   }
 
+  defaults['home'] = 0
+
   return {
     'dh': dh if dh is not None else defaults[DenavitHartenberg],
-    'limits': limits if limits is not None else defaults[JointLimits]
+    'limits': limits if limits is not None else defaults[JointLimits],
+    'home': home if home is not None else defaults['home']
   }
 
 class TestJoint(unittest.TestCase):
   def setUp(self):
     dh     = DenavitHartenberg(math.radians(45), 50, math.radians( 180), 72)
     limits = JointLimits(math.radians(400), math.radians(-400))
-    self.joint = Joint(dh, limits)
+    home   = math.radians(45)
+    self.joint = Joint(dh, limits, home)
 
   def test_init_swaps_limits(self):
     expected = JointLimits(math.radians(-400), math.radians(400))
 
     for component in self.joint.limits._fields:
       self.assertEqual(getattr(self.joint.limits, component), getattr(expected, component))
+
+  def test_joint_angle_defaults_to_home_value(self):
+    self.assertEqual(self.joint.angle, self.joint.home)
+
+  def test_joint_home_defaults_to_zero(self):
+    d = create_dummy_dict()
+
+    del d['home']
+    joint = Joint.from_dict(d)
+
+    self.assertAlmostEqual(joint.home, 0)
+
+  def test_init_home_defaults_to_lower_limit_if_home_is_outside_joint_limits(self):
+    d = create_dummy_dict(home = 100)
+
+    joint = Joint.from_dict(d)
+
+    self.assertAlmostEqual(joint.home, joint.limits.low)
 
   def test_immovable_is_identity_transform(self):
     joint = Joint.Immovable()
@@ -45,6 +67,7 @@ class TestJoint(unittest.TestCase):
     self.assertAlmostEqual(joint.dh.theta,    math.radians(d['dh']['theta']))
     self.assertAlmostEqual(joint.limits.low,  math.radians(d['limits']['low']))
     self.assertAlmostEqual(joint.limits.high, math.radians(d['limits']['high']))
+    self.assertAlmostEqual(joint.home,        math.radians(d['home']))
 
   def test_from_dict_raises_on_missing_dh_key(self):
     fields = self.joint.dh._fields
@@ -114,6 +137,19 @@ class TestJoint(unittest.TestCase):
       with self.subTest(f'Invalid angle {invalid_angle}'):
         with self.assertRaises(AssertionError):
           self.joint.set_angle(invalid_angle, normalized=True)
+
+  def test_normalized_angle_returns_value_between_zero_and_one(self):
+    angles = [
+      (self.joint.limits.low,  0),
+      (self.joint.limits.high, 1),
+      (self.joint.travel / 4 + self.joint.limits.low, 0.25),
+    ]
+
+    for angle, normalized_angle in angles:
+      with self.subTest(f'Angle {math.degrees(angle)}'):
+        self.joint.set_angle(angle)
+        self.assertAlmostEqual(normalized_angle, self.joint.normalized_angle)
+
 
   def test_transform_constructs_transform_for_joint_angle(self):
     self.joint.angle = math.radians(30)

@@ -16,16 +16,18 @@ JointLimits = namedtuple('JointLimits', 'low high', defaults=(-math.inf, math.in
 #   through DH parameters.
 
 class Joint:
-  def __init__(self, dh: DenavitHartenberg, limits: JointLimits = None) -> None:
-    self.dh = dh
-
-    self.angle = 0
-
+  def __init__(self, dh: DenavitHartenberg, limits: JointLimits = None, home: float = None) -> None:
+    self.dh     = dh
     self.limits = limits or JointLimits()
-
     # Swap limits if they are out of order
     if limits.low > limits.high:
       self.limits = JointLimits(limits.high, limits.low)
+
+    self.home = home or 0
+    if not self.within_limits(self.home):
+      self.home = self.limits.low
+
+    self.angle = self.home
 
   @classmethod
   def Immovable(cls) -> 'Joint':
@@ -60,7 +62,12 @@ class Joint:
 
     joint_limits = JointLimits(**limit_dictionary)
 
-    return cls(dh, joint_limits)
+    home_angle = math.radians(d.get('home', 0))
+    return cls(dh, joint_limits, home_angle)
+
+  @property
+  def normalized_angle(self) -> float:
+    return (self.angle - self.limits.low) / self.travel
 
   def set_angle(self, value, normalized: bool = False) -> None:
     if normalized:

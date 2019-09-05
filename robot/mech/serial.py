@@ -77,6 +77,10 @@ class Serial:
 
     self.update_link_transforms()
 
+  def home(self) -> None:
+    for index, joint in enumerate(self.joints, 1):
+      self.set_joint_angle(index, joint.home)
+
   def set_joint_angle(self, joint_index: int, value: float, normalized: bool = False) -> None:
     """Set the corresponding joint angle.
 
