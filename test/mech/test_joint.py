@@ -24,7 +24,8 @@ class TestJoint(unittest.TestCase):
   def setUp(self):
     dh     = DenavitHartenberg(math.radians(45), 50, math.radians( 180), 72)
     limits = JointLimits(math.radians(400), math.radians(-400))
-    self.joint = Joint(dh, limits)
+    home   = math.radians(45)
+    self.joint = Joint(dh, limits, home)
 
   def test_init_swaps_limits(self):
     expected = JointLimits(math.radians(-400), math.radians(400))
@@ -115,6 +116,19 @@ class TestJoint(unittest.TestCase):
       with self.subTest(f'Invalid angle {invalid_angle}'):
         with self.assertRaises(AssertionError):
           self.joint.set_angle(invalid_angle, normalized=True)
+
+  def test_normalized_angle_returns_value_between_zero_and_one(self):
+    angles = [
+      (self.joint.limits.low,  0),
+      (self.joint.limits.high, 1),
+      (self.joint.travel / 4 + self.joint.limits.low, 0.25),
+    ]
+
+    for angle, normalized_angle in angles:
+      with self.subTest(f'Angle {math.degrees(angle)}'):
+        self.joint.set_angle(angle)
+        self.assertAlmostEqual(normalized_angle, self.joint.normalized_angle)
+
 
   def test_transform_constructs_transform_for_joint_angle(self):
     self.joint.angle = math.radians(30)
