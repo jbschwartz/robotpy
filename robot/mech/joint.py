@@ -63,6 +63,10 @@ class Joint:
     home_angle = math.radians(d.get('home', None))
     return cls(dh, joint_limits, home_angle)
 
+  @property
+  def normalized_angle(self) -> float:
+    return (self.angle - self.limits.low) / self.travel
+
   def set_angle(self, value, normalized: bool = False) -> None:
     if normalized:
       assert 0 <= value <=1, "Normalized values must be between 0 and 1"
