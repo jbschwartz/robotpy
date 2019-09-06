@@ -104,7 +104,26 @@ class AABB:
     return left, right
 
   @property
+  def is_empty(self) -> bool:
+    # It's enough to check that one component is infinite to determine
+    # that all of them are (assuming that the AABB is only manipulated
+    # by calls to AABB.expand)
+    if not math.isinf(self.min[0]):
+      return False
+
+    assert all([
+      math.isinf(c)
+      for v in (self.min, self.max)
+      for c in v
+    ]), "If one AABB component is infinite, all components should be infinite"
+
+    return True
+
+  @property
   def center(self):
+    if self.is_empty:
+      return Vector3(0, 0, 0)
+
     return self.min + (self.size / 2)
 
   @property
