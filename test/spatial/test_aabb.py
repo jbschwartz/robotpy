@@ -61,6 +61,14 @@ class TestAABB(unittest.TestCase):
 
     self.assertAlmostEquals(empty.center, Vector3(0, 0, 0))
 
+  def test_is_empty_is_true_for_default_constructed_aabb(self):
+    empty = AABB()
+
+    self.assertTrue(empty.is_empty)
+
+  def test_is_empty_is_false_for_expanded_aabb(self):
+    self.assertFalse(self.aabb.is_empty)
+
   def test_contains(self):
     # Test contains with points
     self.assertTrue(self.aabb.contains(self.v3))
