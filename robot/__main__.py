@@ -88,7 +88,7 @@ def load_serial(load_mesh: bool = True) -> Serial:
 
     return Serial.from_dict_meshes(serial_dictionary, meshes)
 
-from robot.visual.gui                import Widget
+from robot.visual.gui                import Interface, Widget
 from robot.visual.gui.widgets.slider import Slider
 
 if __name__ == "__main__":
@@ -97,8 +97,7 @@ if __name__ == "__main__":
   serial = load_serial()
 
   serial_buffer = Buffer.from_meshes(serial.meshes)
-
-  controller = SerialController(serial)
+  interface = Interface()
 
   number_of_sliders = 6
   slider_height     = 0.1
@@ -110,14 +109,15 @@ if __name__ == "__main__":
   y = space_height
   for joint_index in range(1, number_of_sliders + 1):
 
-    sliders.append(Slider(
+    interface.add_joint_controller(joint_index, Slider(
       f'Axis #{joint_index}',
       Vector3(0.05, y),
       width    = slider_width,
-      height   = slider_height,
-      callback = controller.joint_controller_factory(joint_index)
+      height   = slider_height
     ))
     y += slider_height + space_height
+
+  controller = SerialController(serial, interface)
 
   rectangle_buffer = Buffer.from_points([
     Vector3( 1,  0),
@@ -156,7 +156,7 @@ if __name__ == "__main__":
   )
 
   renderer.add('serial', serial, None, color=[1, 0.5, 0])
-  renderer.add_many('rectangle', sliders, None)
+  renderer.add_many('rectangle', interface.joint_controllers.values(), None)
 
   sim.entities.append(serial)
 
