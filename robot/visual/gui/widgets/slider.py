@@ -45,6 +45,8 @@ class Slider(Widget):
 
     assert 0 <= self._value <= 1
 
+    self.children['Button']._position.x = self._value * (1 - self.children['Button']._width)
+
   def screen_cursor(self, cursor: Vector3) -> Vector3:
     return Vector3(cursor.x / self.window_width, cursor.y / self.window_height)
 
