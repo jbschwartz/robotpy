@@ -56,6 +56,11 @@ class TestAABB(unittest.TestCase):
 
     self.assertAlmostEqual(self.aabb.center, expected)
 
+  def test_center_on_empty_aabb_is_origin(self):
+    empty = AABB()
+
+    self.assertAlmostEquals(empty.center, Vector3(0, 0, 0))
+
   def test_contains(self):
     # Test contains with points
     self.assertTrue(self.aabb.contains(self.v3))
