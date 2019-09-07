@@ -1,5 +1,10 @@
 import glfw, math
 
+from typing import Callable, Iterable
+
+from robot.mech                      import Serial
+from robot.spatial                   import Intersection, Ray
+from robot.visual.gui                import Widget, Interface
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
 
@@ -11,6 +16,13 @@ class SerialController():
 
     self.register_callbacks()
     self.update_controllers()
+
+  @property
+  def entity(self) -> Serial:
+    return self.serial
+
+  def intersect(self, ray: Ray) -> Intersection:
+    return self.serial.intersect(ray)
 
   def update_controllers(self):
     for joint, controller in zip(self.serial.joints, self.interface.joint_controllers.values()):

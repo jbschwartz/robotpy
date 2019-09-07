@@ -10,28 +10,28 @@ from robot.visual.messaging.event    import Event
 @listener
 class Simulation():
   def __init__(self) -> None:
-    self.entities  = []
+    self.controllers  = []
     self.is_paused = False
 
     self.tick_samples = deque([], maxlen = 20)
 
   @property
   def aabb(self) -> AABB:
-    """Get the AABB for all simulation entities."""
+    """Get the AABB for all simulation controllers."""
     aabbs = [
-      entity.aabb
-      for entity in self.entities
-      if hasattr(entity, 'aabb')
+      controller.entity.aabb
+      for controller in self.controllers
+      if hasattr(controller.entity, 'aabb')
     ]
 
     return AABB.from_aabbs(aabbs)
 
   def intersect(self, ray: Ray) -> Intersection:
-    """Intersect a ray with all Simulation entities and return closest found Intersection. Return Intersection.Miss() for no intersection."""
+    """Intersect a ray with all Simulation controllers and return closest found Intersection. Return Intersection.Miss() for no intersection."""
     if not self.aabb.intersect(ray):
       return Intersection.Miss()
 
-    return ray.closest_intersection(self.entities)
+    return ray.closest_intersection(self.controllers)
 
   @listen(Event.KEY)
   def pause(self, key, action, modifiers) -> None:
@@ -48,7 +48,8 @@ class Simulation():
 
     self.tick_samples.append(1 / delta)
 
-    for entity in self.entities:
+    for controller in self.controllers:
+      entity = controller.entity
       if hasattr(entity, 'traj'):
         result = entity.traj.advance(delta)
         entity.angles = result

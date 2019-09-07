@@ -88,7 +88,7 @@ def load_serial(load_mesh: bool = True) -> Serial:
     else:
       meshes = []
 
-    return Serial.from_dict_meshes(serial_dictionary, meshes)
+    return [Serial.from_dict_meshes(serial_dictionary, meshes) for _ in range(2)]
 
 from robot.visual.gui                import Interface, Widget
 from robot.visual.gui.widgets.slider import Slider
@@ -96,8 +96,12 @@ from robot.visual.gui.widgets.slider import Slider
 if __name__ == "__main__":
   window, sim, renderer = setup()
 
-  serial = load_serial()
-
+  serials = load_serial()
+  serial  = serials[0]
+  serial1 = serials[1]
+  serial1.to_world = Transform.from_axis_angle_translation(
+    translation=Vector3(500, 500, 0)
+  )
   serial_buffer = Buffer.from_meshes(serial.meshes)
   interface = Interface()
 
@@ -119,7 +123,6 @@ if __name__ == "__main__":
     ))
     y += slider_height + space_height
 
-  controller = SerialController(serial, interface)
 
   rectangle_buffer = Buffer.from_points([
     Vector3( 1,  0),
@@ -157,9 +160,14 @@ if __name__ == "__main__":
     add_children = rectangle_add_children
   )
 
+  controller = SerialController(serial, interface)
+  controller1 = SerialController(serial1, interface)
+
   renderer.add('serial', serial, None, color=[1, 0.5, 0])
+  renderer.add('serial', serial1, None, color=[1, 0.5, 0])
   renderer.add_many('rectangle', interface.joint_controllers.values(), None)
 
-  sim.entities.append(serial)
+  sim.controllers.append(controller)
+  sim.controllers.append(controller1)
 
   window.run(fps_limit = 60)
