@@ -74,10 +74,7 @@ class CameraController():
     self.scene = scene
     self.window = window
 
-    if len(self.scene.entities) > 0:
-      self.target = self.scene.aabb.center
-    else:
-      self.target = Vector3()
+    self.target = self.scene.aabb.center
 
     self.is_selecting = None
     self.orbit_type = OrbitType.CONSTRAINED
@@ -100,8 +97,7 @@ class CameraController():
       if x.hit:
         self.target = r.evaluate(x.t)
       else:
-        if len(self.scene.entities) > 0:
-          self.target = self.scene.aabb.center
+        self.target = self.scene.aabb.center
 
         assert self.target is not None, "There must always be a valid camera target."
         assert isinstance(self.target, Vector3), "Camera target must be a Vector3."
@@ -188,6 +184,7 @@ class CameraController():
       self.camera.projection.aspect = width / height
 
   def normal_to(self):
+    # TODO: This needs to be fixed. It's broken.
     minimum = math.radians(180)
     direction = Vector3()
     forward = self.camera.camera_to_world(Vector3.Z(), as_type="vector")
