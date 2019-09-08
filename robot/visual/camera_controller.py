@@ -79,18 +79,21 @@ class CameraController():
     self.is_selecting = None
     self.orbit_type = OrbitType.CONSTRAINED
 
+  def cursor_ndc(self, cursor) -> Vector3:
+    return Vector3(2 * cursor.x - 1, 1 - 2 * cursor.y)
+
   @listen(Event.CLICK)
   def click(self, button, action, cursor, mods):
     if button == glfw.MOUSE_BUTTON_LEFT:
       if action == glfw.PRESS:
-        self.is_selecting = self.window.ndc(cursor)
+        self.is_selecting = self.cursor_ndc(cursor)
       else:
-        end = self.window.ndc(cursor)
+        end = self.cursor_ndc(cursor)
         self.is_selecting = None
 
     if button in [glfw.MOUSE_BUTTON_LEFT, glfw.MOUSE_BUTTON_MIDDLE] and action == glfw.PRESS:
 
-      r = self.camera.cast_ray(self.window.ndc(cursor))
+      r = self.camera.cast_ray(self.cursor_ndc(cursor))
       with Timer('Ray Intersection'):
         x = self.scene.intersect(r)
 
@@ -273,7 +276,7 @@ class CameraController():
 
     That is, calculate the distance in cursor distance in NDC and convert that to camera motion.
     '''
-    delta_ndc = self.window.ndc(cursor) - self.window.ndc(cursor + cursor_delta)
+    delta_ndc = self.cursor_ndc(cursor) - self.cursor_ndc(cursor + cursor_delta)
 
     delta = self.camera.camera_space(delta_ndc)
 
@@ -283,7 +286,7 @@ class CameraController():
     self.camera.track(v = -delta)
 
   def scale_to_cursor(self, cursor, direction):
-    ndc = self.window.ndc(cursor)
+    ndc = self.cursor_ndc(cursor)
 
     cursor_camera_point = self.camera.camera_space(ndc)
 
