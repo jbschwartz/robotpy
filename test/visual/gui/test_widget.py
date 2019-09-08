@@ -5,12 +5,12 @@ from robot.visual.gui  import Widget
 
 class TestWidget(unittest.TestCase):
   def setUp(self):
-    self.parent       = Widget('Parent')
-    self.child        = Widget('Child')
-    self.grand_child  = Widget('Grand Child')
+    self.parent       = Widget()
+    self.child        = Widget()
+    self.grand_child  = Widget()
 
   def test_widget_defaults_to_full_size(self):
-    default = Widget('Default')
+    default = Widget()
 
     self.assertAlmostEqual(default.position, Vector3())
     self.assertEqual(default.width,  1.)
@@ -59,7 +59,7 @@ class TestWidget(unittest.TestCase):
         self.assertAlmostEqual(self.parent.width, self.grand_child.width)
 
   def test_widget_contains_returns_true_for_points_inside(self):
-    w = Widget('Widget', Vector3(), 0.5, 0.5)
+    w = Widget(position=Vector3(), height=0.5, width=0.5)
 
     test_points = [
       (Vector3(0, 0),       True),

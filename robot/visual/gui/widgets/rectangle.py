@@ -6,7 +6,7 @@ from robot.visual.opengl.shader_program import ShaderProgram
 
 class Rectangle(Widget):
   def __init__(self, name: str, position: Vector3 = None, width: float = 1, height: float = 1, color = None):
-    super().__init__(name, position, width, height, color)
+    super().__init__(name=name, position=position, width=width, height=height, color=color)
 
   def prepare(self, sp: ShaderProgram):
     gl.glDisable(gl.GL_DEPTH_TEST)
