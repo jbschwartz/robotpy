@@ -133,39 +133,24 @@ if __name__ == "__main__":
     Vector3( 1,  0)
   ])
 
-  def rectangle_instance(widget: Widget, sp: ShaderProgram):
-    gl.glDisable(gl.GL_DEPTH_TEST)
-    if isinstance(widget, Slider):
-      return True
-
-    sp.uniforms.color        = widget.color if not widget.hover else [0, 1, 1]
-    sp.uniforms.position     = widget.position
-    sp.uniforms.scale_matrix = Matrix4.from_scale(Vector3(widget.width, widget.height, 1))
-
-  def rectangle_add_children(renderer: renderer, rectangle):
-    if isinstance(rectangle, Slider):
-      renderer.add_many('rectangle', rectangle.children.values(), None)
-
   renderer.register_entity_type(
     name         = 'serial',
     buffer       = serial_buffer,
-    per_instance = pif.serial,
     add_children = pif.serial_add_children
   )
 
   renderer.register_entity_type(
     name         = 'rectangle',
     buffer       = rectangle_buffer,
-    per_instance = rectangle_instance,
-    add_children = rectangle_add_children
   )
 
   controller = SerialController(serial, interface)
   controller1 = SerialController(serial1, interface)
 
-  renderer.add('serial', serial, None, color=[1, 0.5, 0])
-  renderer.add('serial', serial1, None, color=[1, 0.5, 0])
-  renderer.add_many('rectangle', interface.joint_controllers.values(), None)
+  renderer.add('serial', controller.view)
+  renderer.add('serial', controller1.view)
+  for slider in interface.joint_controllers.values():
+    renderer.add_many('rectangle', slider.children.values())
 
   sim.controllers.append(controller)
   sim.controllers.append(controller1)
