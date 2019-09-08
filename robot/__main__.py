@@ -116,8 +116,8 @@ if __name__ == "__main__":
   for joint_index in range(1, number_of_sliders + 1):
 
     interface.add_joint_controller(joint_index, Slider(
-      f'Axis #{joint_index}',
-      Vector3(0.05, y),
+      name     = f'Axis #{joint_index}',
+      position = Vector3(0.05, y),
       width    = slider_width,
       height   = slider_height
     ))
