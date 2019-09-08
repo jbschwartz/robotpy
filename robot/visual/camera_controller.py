@@ -179,7 +179,7 @@ class CameraController():
     if horizontal:
       self.camera.orbit(self.target, 0, self.settings.ORBIT_STEP * horizontal, self.orbit_type)
     if vertical:
-      self.scale_to_cursor(self.window.get_cursor(), vertical * self.settings.SCALE_IN)
+      self.scale_to_cursor(self.window.cursor, vertical * self.settings.SCALE_IN)
 
   @listen(Event.WINDOW_RESIZE)
   def window_resize(self, width, height):

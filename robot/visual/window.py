@@ -36,7 +36,9 @@ class Window():
     glfw.make_context_current(self.window)
     glfw.swap_interval(0)
 
-    self.last_cursor_position = self.get_cursor()
+    x, y = glfw.get_cursor_pos(self.window)
+    self.cursor = Vector3(x / self.width, y / self.height)
+    self.last_cursor_position = self.cursor
 
   def window_hints(self):
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
@@ -60,35 +62,26 @@ class Window():
     self.emit(Event.SCROLL, sign(x_direction), sign(y_direction))
 
   def mouse_button_callback(self, window, button, action, mods):
-    self.emit(Event.CLICK, button, action, self.get_cursor(), mods)
+    self.emit(Event.CLICK, button, action, self.cursor, mods)
 
     # Record which mouse button is being dragged
     self.dragging = button if action == glfw.PRESS else None
 
   def cursor_pos_callback(self, window, x, y):
-    cursor = Vector3(x / self.width, y / self.height)
+    self.cursor = Vector3(x / self.width, y / self.height)
 
     if self.last_cursor_position:
-      # TODO: This is backwards. Needs to be current - previous.
-      cursor_delta = (self.last_cursor_position - cursor)
+      cursor_delta = (self.last_cursor_position - self.cursor)
 
-    self.last_cursor_position = cursor
+    self.last_cursor_position = self.cursor
 
     event = Event.DRAG if self.dragging is not None else Event.CURSOR
-    self.emit(event, self.dragging, cursor, cursor_delta, self.modifiers)
+    self.emit(event, self.dragging, self.cursor, cursor_delta, self.modifiers)
 
   def window_callback(self, window, width, height):
     self.width = width
     self.height = height
     self.emit(Event.WINDOW_RESIZE, width, height)
-
-  # TODO: Remove this function (in favor of a property?). It's probably not necessary since the cursor_pos callback is constantly updating last_cursor_position
-  def get_cursor(self):
-    x, y = glfw.get_cursor_pos(self.window)
-    return Vector3(x / self.width, y / self.height)
-
-  def ndc(self, cursor):
-    return Vector3(2 * cursor.x / self.width - 1, 1 - 2 * cursor.y / self.height)
 
   def run(self, fps_limit: Optional[int] = None):
     # Send a window resize event so observers are provided the initial window size
