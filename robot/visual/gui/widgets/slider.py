@@ -36,28 +36,18 @@ class Slider(Widget):
 
     self.children['Button']._position.x = self._value * (1 - self.children['Button']._width)
 
-  def screen_cursor(self, cursor: Vector3) -> Vector3:
-    return Vector3(cursor.x / self.window_width, cursor.y / self.window_height)
-
-  @listen(Event.WINDOW_RESIZE)
-  def window_size(self, width, height):
-    self.window_width  = width
-    self.window_height = height
-
   @listen(Event.CURSOR)
   def on_mouse(self, button, cursor, cursor_delta, modifiers):
-    self.children['Button'].hover = self.children['Button'].contains(self.screen_cursor(cursor))
+    self.children['Button'].hover = self.children['Button'].contains(cursor)
 
   @listen(Event.DRAG)
   def on_drag(self, button, cursor, cursor_delta, modifiers):
     if button == glfw.MOUSE_BUTTON_LEFT and self.children['Button'].hover:
-      cursor_delta.y = 0
-
-      delta = self.screen_cursor(cursor_delta)
-      self.children['Button']._position.x -= delta.x / self.width
+      self.children['Button']._position.x -= cursor_delta.x / self.width
       if self.children['Button']._position.x < 0:
         self.children['Button']._position.x = 0
       elif self.children['Button']._position.x > 1 - self.children['Button']._width:
         self.children['Button']._position.x = 1 - self.children['Button']._width
 
-      self.callback(self.name, self.value)
+      if self.callback is not None:
+        self.callback(self.name, self.value)

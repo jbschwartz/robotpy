@@ -66,7 +66,7 @@ class Window():
     self.dragging = button if action == glfw.PRESS else None
 
   def cursor_pos_callback(self, window, x, y):
-    cursor = Vector3(x, y)
+    cursor = Vector3(x / self.width, y / self.height)
 
     if self.last_cursor_position:
       # TODO: This is backwards. Needs to be current - previous.
@@ -84,7 +84,8 @@ class Window():
 
   # TODO: Remove this function (in favor of a property?). It's probably not necessary since the cursor_pos callback is constantly updating last_cursor_position
   def get_cursor(self):
-    return Vector3(*glfw.get_cursor_pos(self.window), 0)
+    x, y = glfw.get_cursor_pos(self.window)
+    return Vector3(x / self.width, y / self.height)
 
   def ndc(self, cursor):
     return Vector3(2 * cursor.x / self.width - 1, 1 - 2 * cursor.y / self.height)
