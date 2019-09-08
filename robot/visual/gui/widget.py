@@ -9,7 +9,7 @@ class Widget():
     self._width    = width
     self._height   = height
     self.color     = color or [1, 1, 1]
-    self.visible   = True
+    self._visible   = True
     self.hover     = False
 
     self.parent   = None
@@ -64,6 +64,17 @@ class Widget():
   @position.setter
   def position(self, position: Vector3) -> None:
     self._position = position
+
+  @property
+  def visible(self) -> bool:
+    if self.parent is not None:
+      return self._visible and self.parent.visible
+    else:
+      return self._visible
+
+  @visible.setter
+  def visible(self, visible: bool) -> None:
+    self._visible = visible
 
   def contains(self, point: Vector3) -> bool:
     """Return True if the point is inside the Widget."""
