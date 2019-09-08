@@ -113,8 +113,4 @@ class Link:
     world_to_link = self.to_world.inverse()
 
     facet = self.mesh.intersect(world_ray.transform(world_to_link))
-    if facet.hit:
-      # If we hit a facet, repackage the Intersection to report the Link being intersected
-      return Intersection(facet.t, self)
-    else:
-      return facet
+    return Intersection.from_previous(self, facet)

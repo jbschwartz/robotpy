@@ -22,7 +22,7 @@ class SerialController():
     return self.serial
 
   def intersect(self, ray: Ray) -> Intersection:
-    return self.serial.intersect(ray)
+    return Intersection.from_previous(self, self.serial.intersect(ray))
 
   def update_controllers(self):
     for joint, controller in zip(self.serial.joints, self.interface.joint_controllers.values()):

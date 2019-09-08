@@ -116,7 +116,7 @@ class Serial:
     if self.tool:
       components.append(self.tool)
 
-    return ray.closest_intersection(components)
+    return Intersection.from_previous(self, ray.closest_intersection(components))
 
   def update_link_transforms(self):
     # Walk the chain updating each link with it's previous neighbors transform

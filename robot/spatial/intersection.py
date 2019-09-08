@@ -1,20 +1,20 @@
 from collections import namedtuple
 from typing      import Any, Optional
 
-class Intersection(namedtuple('Intersection', 't obj')):
+class Intersection(namedtuple('Intersection', 't obj previous')):
   __slots__ = ()
 
-  # TODO: It may be necessary to include the chain of intersections that occur to the caller.
-  # e.g. Facet -> Mesh -> Link -> Serial
-  # This could maybe be implemented with a `previous` attribute on the tuple
-  # i.e. __new__(..., previous: 'Intersection')
-  def __new__(cls, t: Optional[float], obj: Optional[Any]):
+  def __new__(cls, t: float, obj: Any, previous: Optional['Intersection'] = None):
     assert t is None or t >= 0, "Intersection can not be behind ray"
-    return super().__new__(cls, t, obj)
+    return super().__new__(cls, t, obj, previous)
+
+  @classmethod
+  def from_previous(cls, parent: Any, previous: 'Intersection') -> 'Intersection':
+    return cls(previous.t, parent, previous)
 
   @classmethod
   def Miss(cls) -> 'Intersection':
-    return cls(None, None)
+    return cls(None, None, None)
 
   @property
   def hit(self) -> bool:
