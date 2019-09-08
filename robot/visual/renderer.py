@@ -127,31 +127,22 @@ class Renderer():
       add_children = add_children
     )
 
-  def add(self, entity_type: str, instance, parent = None, **kwargs) -> None:
-    entity = self.entities.get(entity_type, None)
-    if entity is None:
+  def add(self, entity_type: str, instance) -> None:
+    if entity_type not in self.entities:
       return logger.error(f'No entity type `{entity_type}` found when adding entity')
 
+    entity = self.entities.get(entity_type)
     entity.instances.append(instance)
 
     if entity.add_children is not None:
       entity.add_children(self, instance)
 
-  def add_many(self, entity_type: str, instances: Iterable, parent = None, **kwargs) -> None:
+  def add_many(self, entity_type: str, instances: Iterable) -> None:
     if entity_type not in self.entities:
       return logger.error(f'No entity type `{entity_type}` found when adding entity')
 
-    for index, instance in enumerate(instances):
-      # Keyword arguments are provided as iterables, one for each instance in instances
-      # For the nth instance, collect all of the nth keyword argument values
-      # Ignore keyword arguments if they are not provided or explicitly `None`
-      per_instance_kwargs = {
-        k: v[index]
-        for k, v in kwargs.items()
-        if index < len(v) and v[index] is not None
-      }
-
-      self.add(entity_type, instance, parent, **per_instance_kwargs)
+    for instance in instances:
+      self.add(entity_type, instance)
 
   def update_environment(self) -> None:
     self.light.position = self.camera.position
