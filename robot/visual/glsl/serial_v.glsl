@@ -13,18 +13,11 @@ layout (std140) uniform Matrices
 };
 
 uniform mat4 model_matrices[7];
-
-uniform bool use_link_colors;
 uniform vec3 link_colors[7];
-uniform vec3 robot_color;
 
 void main(void)
 {
-  if(use_link_colors) {
-    vout_color = link_colors[vin_mesh_index];
-  } else {
-    vout_color = robot_color;
-  }
+  vout_color = link_colors[vin_mesh_index];
 
   mat4 model_matrix = model_matrices[vin_mesh_index];
 
