@@ -9,12 +9,34 @@ class TestWidget(unittest.TestCase):
     self.child        = Widget()
     self.grand_child  = Widget()
 
-  def test_widget_defaults_to_full_size(self):
+  def test_widget_defaults(self):
     default = Widget()
 
-    self.assertAlmostEqual(default.position, Vector3())
-    self.assertEqual(default.width,  1.)
-    self.assertEqual(default.height, 1.)
+    with self.subTest('To no name'):
+      self.assertIsNone(default.name)
+
+    with self.subTest('To white'):
+      self.assertEqual(default.color, [1, 1, 1])
+
+    with self.subTest('To not hovered'):
+      self.assertFalse(default.hover)
+
+    with self.subTest('To origin'):
+      self.assertEqual(default.position, Vector3())
+
+    with self.subTest('To full size of parent'):
+      self.assertAlmostEqual(default.position, Vector3())
+      self.assertEqual(default.width,  1.)
+      self.assertEqual(default.height, 1.)
+
+    with self.subTest('To visible'):
+      self.assertTrue(default.visible)
+
+    with self.subTest('To no parent'):
+      self.assertIsNone(default.parent)
+
+    with self.subTest('To no children'):
+      self.assertEqual(len(default.children), 0)
 
   def test_widget_adds_child_with_name_as_key(self):
     self.parent.add(self.child)
