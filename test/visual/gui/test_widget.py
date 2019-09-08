@@ -80,6 +80,17 @@ class TestWidget(unittest.TestCase):
       with self.subTest('Width'):
         self.assertAlmostEqual(self.parent.width, self.grand_child.width)
 
+  def test_widget_hides_children_with_it(self):
+    self.parent.add(self.child)
+
+    self.assertTrue(self.parent.visible)
+    self.assertTrue(self.child.visible)
+
+    self.parent.visible = False
+
+    self.assertFalse(self.parent.visible)
+    self.assertFalse(self.child.visible)
+
   def test_widget_contains_returns_true_for_points_inside(self):
     w = Widget(position=Vector3(), height=0.5, width=0.5)
 
