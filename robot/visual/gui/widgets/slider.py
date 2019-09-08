@@ -9,6 +9,8 @@ from robot.visual.gui.widget         import Widget
 from robot.visual.messaging.event    import Event
 from robot.visual.messaging.listener import listener, listen
 
+from .rectangle import Rectangle
+
 SliderInterval = namedtuple('SliderInterval', 'min max')
 
 class SliderType(enum.Enum):
@@ -32,8 +34,8 @@ class Slider(Widget):
     self.slider_type = slider_type
     self.callback    = callback or None
 
-    self.add(Widget('Range', Vector3(0, 0.45), width=1, height=0.1, color=[0.65] * 3))
-    self.add(Widget('Button', Vector3(0.5-0.125, 0.5-0.125), width=0.25, height=0.25, color=[0.25] * 3))
+    self.add(Rectangle('Range', Vector3(0, 0.45), width=1, height=0.1, color=[0.65] * 3))
+    self.add(Rectangle('Button', Vector3(0.5-0.125, 0.5-0.125), width=0.25, height=0.25, color=[0.25] * 3))
 
   @property
   def value(self) -> float:
