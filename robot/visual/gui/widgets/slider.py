@@ -19,20 +19,18 @@ class SliderType(enum.Enum):
 
 @listener
 class Slider(Widget):
-  def __init__(self,
-               name: str,
-               position: Vector3 = None,
-               width: float = 1.0,
-               height: float = 1.0,
-               color = None,
-               callback: Callable = None,
-               value: float = 0.5,
-               slider_type: SliderType = SliderType.HORIZONTAL) -> None:
-    super().__init__(name=name, position=position, width=width, height=height, color=color)
+  def __init__(
+    self,
+    callback: Callable = None,
+    value: float = None,
+    slider_type: SliderType = None,
+    **options: dict
+  ) -> None:
+    super().__init__(**options)
 
-    self._value      = value
-    self.slider_type = slider_type
-    self.callback    = callback or None
+    self._value      = value       or 0.5
+    self.slider_type = slider_type or SliderType.HORIZONTAL
+    self.callback    = callback    or None
 
     self.add(Rectangle('Range', position=Vector3(0, 0.45), width=1, height=0.1, color=[0.65] * 3))
     self.add(Rectangle('Button', position=Vector3(0.5-0.125, 0.5-0.125), width=0.25, height=0.25, color=[0.25] * 3))
