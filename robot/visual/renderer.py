@@ -11,7 +11,7 @@ from .opengl.buffer         import Buffer
 from .opengl.shader_program import ShaderProgram
 from .opengl.shader         import ShaderType
 
-Entity = namedtuple('Entity', 'name shader draw_mode buffer instances per_instance add_children')
+Entity = namedtuple('Entity', 'name shader draw_mode buffer instances add_children')
 
 @listener
 class Renderer():
@@ -74,9 +74,10 @@ class Renderer():
         glEnable(GL_DEPTH_TEST)
 
       with entity.shader as sp, entity.buffer:
-        for instance, kwargs in entity.instances:
-          skip = entity.per_instance(instance, sp, **kwargs)
-          if not skip:
+        for instance in entity.instances:
+          if instance.visible:
+            instance.prepare(sp)
+
             glDrawArrays(entity.draw_mode, 0, len(entity.buffer))
 
   @listen(Event.WINDOW_RESIZE)
@@ -105,7 +106,7 @@ class Renderer():
         logger.error(f'Shader program `{shader_name}` not found')
         raise
 
-  def register_entity_type(self, name: str, buffer: Buffer, per_instance: Callable, add_children: Callable = None, shader_name: str = None, draw_mode: int = None) -> None:
+  def register_entity_type(self, name: str, buffer: Buffer, add_children: Callable = None, shader_name: str = None, draw_mode: int = None) -> None:
     if self.entities.get(name, None) is not None:
       return logger.warn(f'Entity type `{name}` already registered. Keeping original values')
 
@@ -123,7 +124,6 @@ class Renderer():
       draw_mode    = draw_mode or GL_TRIANGLES,
       buffer       = buffer,
       instances    = [],
-      per_instance = per_instance,
       add_children = add_children
     )
 
@@ -132,10 +132,7 @@ class Renderer():
     if entity is None:
       return logger.error(f'No entity type `{entity_type}` found when adding entity')
 
-    entity.instances.append((
-      instance,
-      kwargs
-    ))
+    entity.instances.append(instance)
 
     if entity.add_children is not None:
       entity.add_children(self, instance)

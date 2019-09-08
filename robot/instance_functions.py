@@ -5,14 +5,6 @@ from robot.spatial                      import Matrix4, Transform
 from robot.visual                       import Camera, Renderer
 from robot.visual.opengl.shader_program import ShaderProgram
 
-def serial(serial: Serial, sp: ShaderProgram, color = None):
-  color = color or [1, 1, 1]
-
-  sp.uniforms.model_matrices  = serial.poses()
-  sp.uniforms.use_link_colors = False
-  sp.uniforms.link_colors     = [link.color for link in serial.links]
-  sp.uniforms.robot_color     = color
-
 def serial_add_children(renderer: Renderer, serial: Serial):
   # renderer.add_many('frame', serial.links, None, scale=(15,) * len(serial.links))
   # renderer.add_many('com', serial.links, None)
