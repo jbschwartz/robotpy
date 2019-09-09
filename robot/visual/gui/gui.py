@@ -9,7 +9,7 @@ class GUI(Widget):
 
   @listen(Event.CLICK)
   def click(self, button, action, cursor, mods):
-    self.propagate_click(button, action, cursor, mods)
+    self.propagate('click', cursor, button, action, cursor, mods)
 
     x = self.children['Viewport'].selected
 
@@ -24,8 +24,8 @@ class GUI(Widget):
 
   @listen(Event.DRAG)
   def drag(self, button, cursor, cursor_delta, modifiers):
-    self.propagate_drag(button, cursor, cursor_delta, modifiers)
+    self.propagate('drag', cursor, button, cursor, cursor_delta, modifiers)
 
   @listen(Event.CURSOR)
   def cursor(self, button, cursor, cursor_delta, modifiers):
-    self.propagate_cursor(button, cursor, cursor_delta, modifiers)
+    self.propagate('cursor', cursor, button, cursor, cursor_delta, modifiers)
