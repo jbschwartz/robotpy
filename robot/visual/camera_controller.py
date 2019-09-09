@@ -82,7 +82,6 @@ class CameraController():
   def cursor_ndc(self, cursor) -> Vector3:
     return Vector3(2 * cursor.x - 1, 1 - 2 * cursor.y)
 
-  @listen(Event.CLICK)
   def click(self, button, action, cursor, mods):
     if button in [glfw.MOUSE_BUTTON_LEFT, glfw.MOUSE_BUTTON_MIDDLE] and action == glfw.PRESS:
 
@@ -103,7 +102,6 @@ class CameraController():
         self.camera.target = self.target
       return x
 
-  @listen(Event.DRAG)
   def drag(self, button, cursor, cursor_delta, modifiers):
     command = self.bindings.get_command((modifiers, button))
 

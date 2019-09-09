@@ -1,7 +1,7 @@
 import OpenGL.GL as gl
 
 from robot.spatial                      import Matrix4, Vector3
-from robot.visual.gui                   import Widget
+from robot.visual.gui.widget            import Widget
 from robot.visual.opengl.shader_program import ShaderProgram
 
 class Rectangle(Widget):
