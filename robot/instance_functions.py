@@ -5,16 +5,6 @@ from robot.spatial                      import Matrix4, Transform
 from robot.visual                       import Camera, Renderer
 from robot.visual.opengl.shader_program import ShaderProgram
 
-def serial_add_children(renderer: Renderer, serial: Serial):
-  # renderer.add_many('frame', serial.links, None, scale=(15,) * len(serial.links))
-  # renderer.add_many('com', serial.links, None)
-
-  if serial.tool is not None:
-    renderer.add('tool', serial.tool, None)
-    renderer.add('frame', serial.tool, None, scale=15)
-  else:
-    renderer.add('frame', serial.links[-1], None, scale=15)
-
 def frame(component: Union[Link, Tool], sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
   if isinstance(component, Link):
     sp.uniforms.model_matrix = component.to_world
