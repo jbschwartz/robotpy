@@ -84,13 +84,6 @@ class CameraController():
 
   @listen(Event.CLICK)
   def click(self, button, action, cursor, mods):
-    if button == glfw.MOUSE_BUTTON_LEFT:
-      if action == glfw.PRESS:
-        self.is_selecting = self.cursor_ndc(cursor)
-      else:
-        end = self.cursor_ndc(cursor)
-        self.is_selecting = None
-
     if button in [glfw.MOUSE_BUTTON_LEFT, glfw.MOUSE_BUTTON_MIDDLE] and action == glfw.PRESS:
 
       r = self.camera.cast_ray(self.cursor_ndc(cursor))
@@ -108,6 +101,7 @@ class CameraController():
         # TODO: Do I really mean to be putting a target attribute onto the camera instance?
         # What happened to self.target?
         self.camera.target = self.target
+      return x
 
   @listen(Event.DRAG)
   def drag(self, button, cursor, cursor_delta, modifiers):
