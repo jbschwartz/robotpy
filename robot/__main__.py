@@ -41,20 +41,20 @@ def setup():
   light = vis.AmbientLight(Vector3(0, -750, 350), Vector3(1, 1, 1), 0.3)
   renderer = vis.Renderer(camera, light)
 
-  renderer.register_entity_type(
-    name         = 'grid',
-    buffer       = grid_buffer,
-    per_instance = pif.grid
-  )
+  # renderer.register_entity_type(
+  #   name         = 'grid',
+  #   buffer       = grid_buffer,
+  #   per_instance = pif.grid
+  # )
 
-  renderer.register_entity_type(
-    name         = 'frame',
-    shader_name  = 'frame',
-    buffer       = frame_buffer,
-    per_instance = pif.frame
-  )
+  # renderer.register_entity_type(
+  #   name         = 'frame',
+  #   shader_name  = 'frame',
+  #   buffer       = frame_buffer,
+  #   per_instance = pif.frame
+  # )
 
-  renderer.add('grid', None, None, scale=10000)
+  # renderer.add('grid', None, None, scale=10000)
 
   renderer.add('trajectory', serials[0], None)
 
@@ -76,7 +76,7 @@ def setup():
 
   renderer.ubos = [matrix_ub, light_ub]
 
-  return window, sim, renderer
+  return window, sim, renderer, camera_controller
 
 def load_serial(load_mesh: bool = True) -> Serial:
   with Timer('Load Robot and Construct Mesh') as t:
@@ -90,11 +90,13 @@ def load_serial(load_mesh: bool = True) -> Serial:
 
     return [Serial.from_dict_meshes(serial_dictionary, meshes) for _ in range(2)]
 
-from robot.visual.gui                import Interface, Widget
+from robot.visual.gui import GUI, Widget
+from robot.visual.gui.widgets.interface import Interface
+from robot.visual.gui.widgets.viewport import Viewport
 from robot.visual.gui.widgets.slider import Slider
 
 if __name__ == "__main__":
-  window, sim, renderer = setup()
+  window, sim, renderer, camera_controller = setup()
 
   serials = load_serial()
   serial  = serials[0]
@@ -104,10 +106,11 @@ if __name__ == "__main__":
   )
   serial_buffer = Buffer.from_meshes(serial.meshes)
   interface = Interface()
+  interface.width = 0.1875
 
   number_of_sliders = 6
   slider_height     = 0.1
-  slider_width      = 0.1875
+  slider_width      = 1
   space_height      = (1 - number_of_sliders * slider_height) / (number_of_sliders + 1)
 
   sliders = []
@@ -118,7 +121,7 @@ if __name__ == "__main__":
     interface.add_joint_controller(joint_index, Slider(
       name     = f'Axis #{joint_index}',
       position = Vector3(0.05, y),
-      width    = slider_width,
+      width    = slider_width - 0.1,
       height   = slider_height
     ))
     y += slider_height + space_height
@@ -136,7 +139,6 @@ if __name__ == "__main__":
   renderer.register_entity_type(
     name         = 'serial',
     buffer       = serial_buffer,
-    add_children = pif.serial_add_children
   )
 
   renderer.register_entity_type(
@@ -144,11 +146,18 @@ if __name__ == "__main__":
     buffer       = rectangle_buffer,
   )
 
-  controller = SerialController(serial, interface)
-  controller1 = SerialController(serial1, interface)
+  controller = SerialController(serial)
+  controller1 = SerialController(serial1)
+  g = GUI()
+  vp = Viewport(camera_controller)
+  vp.width = 0.8125
+  vp.position.x = 0.1875
+  g.add(vp)
+  g.add(interface)
 
   renderer.add('serial', controller.view)
   renderer.add('serial', controller1.view)
+  renderer.add('rectangle', interface.children['bg'])
   for slider in interface.joint_controllers.values():
     renderer.add_many('rectangle', slider.children.values())
 
