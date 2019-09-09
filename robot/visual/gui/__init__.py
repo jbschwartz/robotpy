@@ -1,2 +1,2 @@
-from .interface import Interface
+from .gui       import GUI
 from .widget    import Widget
