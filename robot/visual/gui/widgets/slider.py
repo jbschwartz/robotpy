@@ -36,13 +36,18 @@ class Slider(Widget):
 
     self.children['Button']._position.x = self._value * (1 - self.children['Button']._width)
 
-  @listen(Event.CURSOR)
   def cursor(self, button, cursor, cursor_delta, modifiers):
     self.children['Button'].hover = self.children['Button'].contains(cursor)
 
-  @listen(Event.DRAG)
+  def click(self, button, action, cursor, mods):
+    if self.children['Button'].hover and button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
+      self.is_clicked = True
+    elif button == glfw.MOUSE_BUTTON_LEFT and action == glfw.RELEASE:
+      self.is_clicked = False
+      self.children['Button'].hover = False
+
   def drag(self, button, cursor, cursor_delta, modifiers):
-    if button == glfw.MOUSE_BUTTON_LEFT and self.children['Button'].hover:
+    if button == glfw.MOUSE_BUTTON_LEFT and self.is_clicked:
       self.children['Button']._position.x -= cursor_delta.x / self.width
       if self.children['Button']._position.x < 0:
         self.children['Button']._position.x = 0
