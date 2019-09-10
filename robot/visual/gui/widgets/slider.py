@@ -36,12 +36,32 @@ class Slider(Widget):
 
     self.children['Button']._position.x = self._value * (1 - self.children['Button']._width)
 
+  def left_click_down(self, cursor, mods) -> None:
+    if self.children['Button'].hover:
+      self.is_clicked = True
+    else:
+      if self.children['Range'].contains(cursor):
+        normalized = (cursor.x - self.position.x) / (self.width)
+        if normalized > (self.children['Button']._position.x + self.children['Button']._width):
+          self.children['Button']._position.x += 0.05
+        elif normalized < self.children['Button']._position.x:
+          self.children['Button']._position.x -= 0.05
+
+        if self.children['Button']._position.x < 0:
+          self.children['Button']._position.x = 0
+        elif self.children['Button']._position.x > 1 - self.children['Button']._width:
+          self.children['Button']._position.x = 1 - self.children['Button']._width
+
+        if self.callback is not None:
+          self.callback(self.name, self.value)
+
   def cursor(self, button, cursor, cursor_delta, modifiers):
     self.children['Button'].hover = self.children['Button'].contains(cursor)
 
   def click(self, button, action, cursor, mods):
-    if self.children['Button'].hover and button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
-      self.is_clicked = True
+    if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
+      self.left_click_down(cursor, mods)
+
     elif button == glfw.MOUSE_BUTTON_LEFT and action == glfw.RELEASE:
       self.is_clicked = False
       if not self.children['Button'].contains(cursor):
