@@ -9,16 +9,15 @@ class Viewport(Widget):
     self.selected = None
     super().__init__(name='Viewport')
 
-  def click(self, *args) -> None:
-    x = self.camera_controller.click(*args)
-    if args[1] == glfw.PRESS:
-      self.is_clicked = True
+  def click(self, button, action, cursor, mods) -> None:
+    x = self.camera_controller.click(button, action, cursor, mods)
+
+    self.is_clicked = action == glfw.PRESS
+    if self.is_clicked:
       if x.hit and isinstance(x.obj, SerialController):
         self.selected = x
       else:
         self.selected = None
-    else:
-      self.is_clicked = False
 
   def drag(self, *args) -> None:
     if self.is_clicked:
