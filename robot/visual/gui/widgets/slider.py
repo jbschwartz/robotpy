@@ -44,7 +44,8 @@ class Slider(Widget):
       self.is_clicked = True
     elif button == glfw.MOUSE_BUTTON_LEFT and action == glfw.RELEASE:
       self.is_clicked = False
-      self.children['Button'].hover = False
+      if not self.children['Button'].contains(cursor):
+        self.children['Button'].hover = False
 
   def drag(self, button, cursor, cursor_delta, modifiers):
     if button == glfw.MOUSE_BUTTON_LEFT and self.is_clicked:
