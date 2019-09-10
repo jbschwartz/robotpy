@@ -13,6 +13,8 @@ class Widget():
     self._height   = options.get('height', 1.0)
     self._visible  = options.get('visible', True)
 
+    self._is_clicked = False
+
     self.parent   = None
     self.children = {}
 
@@ -77,6 +79,17 @@ class Widget():
   def visible(self, visible: bool) -> None:
     self._visible = visible
 
+  @property
+  def is_clicked(self) -> bool:
+    return self._is_clicked
+
+  @is_clicked.setter
+  def is_clicked(self, is_clicked: bool) -> None:
+    self._is_clicked = is_clicked
+
+    if self.parent is not None:
+      self.parent.is_clicked = self._is_clicked
+
   def click(self, *args) -> None:
     cursor = args[2]
     self.propagate('click', cursor, *args)
@@ -91,7 +104,7 @@ class Widget():
 
   def propagate(self, event, cursor, *args):
     for child in self.children.values():
-      if child.contains(cursor):
+      if child.contains(cursor) or child.is_clicked:
         if hasattr(child, event):
           fn = getattr(child, event)
           fn(*args)
