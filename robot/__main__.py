@@ -150,8 +150,6 @@ if __name__ == "__main__":
   controller1 = SerialController(serial1)
   g = GUI()
   vp = Viewport(camera_controller)
-  vp.width = 0.8125
-  vp.position.x = 0.1875
   g.add(vp)
   g.add(interface)
 
