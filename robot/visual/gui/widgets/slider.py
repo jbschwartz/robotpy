@@ -17,6 +17,9 @@ SliderInterval = namedtuple('SliderInterval', 'min max')
 class Slider(Widget):
   def __init__( self, callback: Callable = None, value: float = None, **options: dict) -> None:
     super().__init__(**options)
+    self.delta = 0
+    self._cursor = None
+    self.wait_time = 0.5
 
     self._value      = value    or 0.5
     self.callback    = callback or None
@@ -36,30 +39,43 @@ class Slider(Widget):
 
     self.children['Button']._position.x = self._value * (1 - self.children['Button']._width)
 
+  def seek(self) -> None:
+    normalized = (self._cursor.x - self.position.x) / (self.width)
+    if normalized > (self.children['Button']._position.x + self.children['Button']._width):
+      self.children['Button']._position.x += 0.05
+    elif normalized < self.children['Button']._position.x:
+      self.children['Button']._position.x -= 0.05
+
+    if self.children['Button']._position.x < 0:
+      self.children['Button']._position.x = 0
+    elif self.children['Button']._position.x > 1 - self.children['Button']._width:
+      self.children['Button']._position.x = 1 - self.children['Button']._width
+
+    if self.callback is not None:
+      self.callback(self.name, self.value)
+
+    self.delta = 0
+
   def left_click_down(self, cursor, mods) -> None:
     if self.children['Button'].hover:
       self.is_clicked = True
     else:
       if self.children['Range'].contains(cursor):
-        normalized = (cursor.x - self.position.x) / (self.width)
-        if normalized > (self.children['Button']._position.x + self.children['Button']._width):
-          self.children['Button']._position.x += 0.05
-        elif normalized < self.children['Button']._position.x:
-          self.children['Button']._position.x -= 0.05
-
-        if self.children['Button']._position.x < 0:
-          self.children['Button']._position.x = 0
-        elif self.children['Button']._position.x > 1 - self.children['Button']._width:
-          self.children['Button']._position.x = 1 - self.children['Button']._width
-
-        if self.callback is not None:
-          self.callback(self.name, self.value)
+        self.is_clicked = True
+        self._cursor = cursor
+        self.seek()
 
   def cursor(self, button, cursor, cursor_delta, modifiers):
     self.children['Button'].hover = self.children['Button'].contains(cursor)
 
   def click(self, button, action, cursor, mods):
+    if action == glfw.RELEASE:
+      self.delta = 0
+      self._cursor = None
+
     if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
+      self.left_click_down(cursor, mods)
+    elif button == glfw.MOUSE_BUTTON_LEFT and action == glfw.REPEAT:
       self.left_click_down(cursor, mods)
 
     elif button == glfw.MOUSE_BUTTON_LEFT and action == glfw.RELEASE:
@@ -68,7 +84,7 @@ class Slider(Widget):
         self.children['Button'].hover = False
 
   def drag(self, button, cursor, cursor_delta, modifiers):
-    if button == glfw.MOUSE_BUTTON_LEFT and self.is_clicked:
+    if button == glfw.MOUSE_BUTTON_LEFT and self.children['Button'].hover:
       self.children['Button']._position.x -= cursor_delta.x / self.width
       if self.children['Button']._position.x < 0:
         self.children['Button']._position.x = 0
@@ -77,3 +93,13 @@ class Slider(Widget):
 
       if self.callback is not None:
         self.callback(self.name, self.value)
+
+  def update(self, delta: float) -> None:
+    if self._cursor is not None:
+      self.delta += delta
+      if self.delta > self.wait_time:
+        if self.wait_time > 0.0625:
+          self.wait_time /= 2
+        self.seek()
+    else:
+      self.wait_time = 0.5
