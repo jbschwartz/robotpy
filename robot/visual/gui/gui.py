@@ -1,13 +1,18 @@
-import glfw
+import glfw, math
 
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
-from .widget import Widget
+from .animation import Animation
+from .widget    import Widget
 
 @listener
 class GUI(Widget):
   def __init__(self):
     super().__init__()
+
+    self.animations = {
+      'panel': Animation(0.25)
+    }
 
   @listen(Event.CLICK)
   def click(self, button, action, cursor, mods):
@@ -29,14 +34,25 @@ class GUI(Widget):
         interface.clear_callbacks()
 
   def show_panel(self):
-    self.children['Interface'].visible = True
-    self.children['Viewport']._width = 1 - self.children['Interface']._width
-    self.children['Viewport']._position.x = self.children['Interface']._width
+    if (not math.isclose(self.children['Interface']._position.x, 0, abs_tol=0.001)) or (not self.children['Interface'].visible):
+      self.children['Interface'].visible = True
+      self.animations['panel'].set_end_points(0, self.children['Interface']._width)
+      self.animations['panel'].reset()
 
   def hide_panel(self):
-    self.children['Interface'].visible = False
-    self.children['Viewport']._width = 1
-    self.children['Viewport']._position.x = 0
+    if math.isclose(self.children['Interface']._position.x, 0, abs_tol=0.001):
+      self.animations['panel'].reverse()
+      self.animations['panel'].reset()
+
+  def animate_panel(self):
+    if self.animations['panel'].is_done:
+      return
+
+    value = self.animations['panel'].value
+    self.children['Interface']._position.x = -self.children['Interface']._width + value
+
+    self.children['Viewport']._width = 1 - value
+    self.children['Viewport']._position.x = value
 
   @listen(Event.DRAG)
   def drag(self, button, cursor, cursor_delta, modifiers):
@@ -48,6 +64,12 @@ class GUI(Widget):
 
   @listen(Event.UPDATE)
   def update(self, delta: float = 0) -> None:
+    for animation in self.animations.values():
+      if not animation.is_done:
+        animation.update(delta)
+
+    self.animate_panel()
+
     update_fn = getattr(self.children['Interface'], 'update', None)
     if update_fn is not None:
       update_fn(delta)
