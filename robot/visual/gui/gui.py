@@ -45,3 +45,9 @@ class GUI(Widget):
   @listen(Event.CURSOR)
   def cursor(self, button, cursor, cursor_delta, modifiers):
     self.propagate('cursor', cursor, button, cursor, cursor_delta, modifiers)
+
+  @listen(Event.UPDATE)
+  def update(self, delta: float = 0) -> None:
+    update_fn = getattr(self.children['Interface'], 'update', None)
+    if update_fn is not None:
+      update_fn(delta)

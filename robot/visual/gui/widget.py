@@ -102,6 +102,12 @@ class Widget():
     cursor = args[1]
     self.propagate('cursor', cursor, *args)
 
+  def update(self, delta: float) -> None:
+    for child in self.children.values():
+      update_fn = getattr(child, 'update', None)
+      if update_fn is not None:
+        update_fn(delta)
+
   def propagate(self, event, cursor, *args):
     for child in self.children.values():
       if child.contains(cursor) or child.is_clicked:
