@@ -11,6 +11,7 @@ class Interface(Widget):
     super().__init__(name="Interface")
     self.add(Rectangle(name='bg', color=[0.85]*3))
     self.joint_controllers = {}
+    self.visible = False
 
   def add_joint_controller(self, joint_index: int, controller: Widget) -> None:
     self.add(controller)
