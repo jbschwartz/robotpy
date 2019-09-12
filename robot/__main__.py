@@ -44,12 +44,10 @@ def setup():
   # renderer.register_entity_type(
   #   name         = 'grid',
   #   buffer       = grid_buffer,
-  #   per_instance = pif.grid
   # )
 
   renderer.register_entity_type(
     name         = 'frame',
-    shader_name  = 'frame',
     buffer       = frame_buffer,
   )
 
