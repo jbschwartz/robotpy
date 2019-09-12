@@ -77,3 +77,9 @@ class SerialController():
     if glfw.KEY_G == key and self.view.highlighted:
       self.trajectory.starts = None
       self.trajectory.ends = None
+
+    if glfw.KEY_M == key and self.view.highlighted:
+      self.trajectory.duration += 0.25
+    if glfw.KEY_N == key and self.view.highlighted:
+      self.trajectory.duration -= 0.25
+
