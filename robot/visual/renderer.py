@@ -134,8 +134,9 @@ class Renderer():
     entity = self.entities.get(entity_type)
     entity.instances.append(instance)
 
-    if entity.add_children is not None:
-      entity.add_children(self, instance)
+    if len(instance.children) > 0:
+      for child in instance.children:
+        self.add(child.type, child)
 
   def add_many(self, entity_type: str, instances: Iterable) -> None:
     if entity_type not in self.entities:

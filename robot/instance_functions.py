@@ -5,21 +5,6 @@ from robot.spatial                      import Matrix4, Transform
 from robot.visual                       import Camera, Renderer
 from robot.visual.opengl.shader_program import ShaderProgram
 
-def frame(component: Union[Link, Tool], sp: ShaderProgram, scale: float = 1., opacity: float = 1.):
-  if isinstance(component, Link):
-    sp.uniforms.model_matrix = component.to_world
-  elif isinstance(component, Tool):
-    sp.uniforms.model_matrix = component.tip
-
-  # TODO: Make this happen at the buffer level so this does not need to be called per frame
-  # Unless we actually want per frame scaling (often times we don't)
-  sp.uniforms.scale_matrix = Matrix4([
-    scale, 0, 0, 0,
-    0, scale, 0, 0,
-    0, 0, scale, 0,
-    0, 0, 0, 1
-  ])
-
 def com(link: Link, sp: ShaderProgram, radius: float = 25.):
   sp.uniforms.radius   = radius
   sp.uniforms.position = link.properties.com
