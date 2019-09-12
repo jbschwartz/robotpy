@@ -4,10 +4,14 @@ from robot.mech import SerialController
 from robot.visual.gui.widget import Widget
 
 class Viewport(Widget):
-  def __init__(self, camera_controller = None) -> None:
+  def __init__(self, simulation, camera_controller = None) -> None:
     self.camera_controller = camera_controller
+    self.simulation = simulation
     self.selected = None
     super().__init__(name='Viewport')
+
+  def update(self, delta: float) -> None:
+    self.simulation.update(delta)
 
   def click(self, button, action, cursor, mods) -> None:
     x = self.camera_controller.click(button, action, cursor, mods)

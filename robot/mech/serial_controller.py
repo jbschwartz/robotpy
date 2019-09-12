@@ -5,6 +5,7 @@ from typing import Callable, Iterable
 from robot.mech                      import Serial
 from robot.mech.views                import SerialView
 from robot.spatial                   import Intersection, Ray
+from robot.traj                      import LinearJS
 from robot.visual.gui                import Widget
 from robot.visual.gui.widgets.interface  import Interface
 from robot.visual.messaging.listener import listen, listener
@@ -15,6 +16,9 @@ class SerialController():
   def __init__(self, serial: Serial) -> None:
     self.serial = serial
     self.view = SerialView(serial)
+    self.trajectory = LinearJS(None, None, 1)
+    self.paused = True
+    self.interface = None
 
   @property
   def entity(self) -> Serial:
@@ -24,6 +28,7 @@ class SerialController():
     return Intersection.from_previous(self, self.serial.intersect(ray))
 
   def update_controllers(self, interface):
+    self.interface = interface
     for joint, controller in zip(self.serial.joints, interface.joint_controllers.values()):
       controller.value = joint.normalized_angle
 
@@ -41,7 +46,34 @@ class SerialController():
   def deselect(self) -> None:
     self.view.deselect()
 
+  def update(self, delta: float) -> None:
+    if self.paused:
+      return
+
+    if self.trajectory.starts is not None and self.trajectory.ends is not None:
+      self.serial.angles = self.trajectory.advance(delta)
+
+      self.update_controllers(self.interface)
+
+    if self.trajectory.is_done():
+      self.paused = True
+
   @listen(Event.KEY)
   def key(self, key, action, modifiers) -> None:
+    if action != glfw.PRESS:
+      return
+
     if glfw.KEY_H == key and self.view.highlighted:
       self.serial.home()
+    if glfw.KEY_K == key and self.view.highlighted:
+      if self.trajectory.starts is None:
+        self.trajectory.starts = self.serial.angles
+      elif self.trajectory.ends is None:
+        self.trajectory.ends = self.serial.angles
+    if glfw.KEY_J == key:
+      if (modifiers & glfw.MOD_SHIFT) or self.view.highlighted:
+        self.trajectory.restart()
+        self.paused = False
+    if glfw.KEY_G == key and self.view.highlighted:
+      self.trajectory.starts = None
+      self.trajectory.ends = None
