@@ -149,9 +149,7 @@ if __name__ == "__main__":
   controller = SerialController(serial)
   controller1 = SerialController(serial1)
   g = GUI()
-  vp = Viewport(camera_controller)
-  g.add(vp)
-  g.add(interface)
+
 
   renderer.add('serial', controller.view)
   renderer.add('serial', controller1.view)
@@ -161,5 +159,9 @@ if __name__ == "__main__":
 
   sim.controllers.append(controller)
   sim.controllers.append(controller1)
+
+  vp = Viewport(sim, camera_controller)
+  g.add(vp)
+  g.add(interface)
 
   window.run(fps_limit = 60)

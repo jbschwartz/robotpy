@@ -49,11 +49,4 @@ class Simulation():
     self.tick_samples.append(1 / delta)
 
     for controller in self.controllers:
-      entity = controller.entity
-      if hasattr(entity, 'traj'):
-        result = entity.traj.advance(delta)
-        entity.angles = result
-
-        if entity.traj.is_done():
-          entity.traj.reverse()
-          entity.traj.restart()
+      controller.update(delta)
