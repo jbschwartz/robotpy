@@ -106,7 +106,7 @@ class Renderer():
         logger.error(f'Shader program `{shader_name}` not found')
         raise
 
-  def register_entity_type(self, name: str, buffer: Buffer, add_children: Callable = None, shader_name: str = None, draw_mode: int = None) -> None:
+  def register_entity_type(self, name: str, buffer: Buffer, shader_name: str = None, draw_mode: int = None) -> None:
     if self.entities.get(name, None) is not None:
       return logger.warn(f'Entity type `{name}` already registered. Keeping original values')
 
@@ -124,7 +124,6 @@ class Renderer():
       draw_mode    = draw_mode or GL_TRIANGLES,
       buffer       = buffer,
       instances    = [],
-      add_children = add_children
     )
 
   def add(self, entity_type: str, instance) -> None:
