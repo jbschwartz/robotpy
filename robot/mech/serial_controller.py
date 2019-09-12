@@ -43,5 +43,5 @@ class SerialController():
 
   @listen(Event.KEY)
   def key(self, key, action, modifiers) -> None:
-    if glfw.KEY_H == key:
+    if glfw.KEY_H == key and self.view.highlighted:
       self.serial.home()
