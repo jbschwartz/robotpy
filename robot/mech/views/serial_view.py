@@ -1,15 +1,20 @@
-from robot.visual.gui import Widget
 from robot.visual.opengl.shader_program import ShaderProgram
+from .frame_view                        import FrameView
 
 class SerialView():
   def __init__(self, serial):
+    # TODO: Decide if this should also be a Widget
+    # Or if there should be a View base class
+
     self.serial       = serial
     self.visible      = True
     self.visibilities = []
     self.color        = [1, 0.5, 0]
     self.colors       = []
     self.selected     = None
-    self.children     = []
+    self.children     = [
+      FrameView(self.serial)
+    ]
     self.highlighted  = False
 
   def select(self) -> None:
