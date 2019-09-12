@@ -35,6 +35,12 @@ class SerialController():
           self.serial.set_joint_angle(joint_index, value, normalized=True)
         controller.callback = callback
 
+  def select(self) -> None:
+    self.view.select()
+
+  def deselect(self) -> None:
+    self.view.deselect()
+
   @listen(Event.KEY)
   def key(self, key, action, modifiers) -> None:
     if glfw.KEY_H == key:

@@ -13,9 +13,13 @@ class Viewport(Widget):
     x = self.camera_controller.click(button, action, cursor, mods)
 
     self.is_clicked = action == glfw.PRESS
-    if self.is_clicked:
+    if self.is_clicked and button == glfw.MOUSE_BUTTON_LEFT:
+      if self.selected is not None:
+        self.selected.obj.deselect()
+
       if x.hit and isinstance(x.obj, SerialController):
         self.selected = x
+        x.obj.select()
       else:
         self.selected = None
 
