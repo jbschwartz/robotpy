@@ -5,7 +5,6 @@ class FrameView():
   def __init__(self, serial) -> None:
     self.serial = serial
     self.scale = 15
-    self.type = 'frame'
 
     self.children = []
     self.visible = True

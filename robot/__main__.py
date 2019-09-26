@@ -5,11 +5,13 @@ import OpenGL.GL as gl
 from robot.common          import Bindings, Timer
 from robot.mech            import Serial, Simulation
 from robot.mech            import tool
+from robot.mech.views      import SerialView, FrameView
 from robot.spatial.euler   import Axes, Order
 from robot.spatial         import Matrix4, Mesh, Transform, Quaternion, Vector3
 from robot.traj.linear_os  import LinearOS
 from robot.visual.renderer          import Renderer
 from robot.visual.filetypes.stl.stl_parser import STLParser
+from robot.visual.gui.widgets.rectangle import Rectangle
 from robot.visual.opengl.buffer            import Buffer
 from robot.visual.opengl.shader_program    import ShaderProgram
 from robot.visual.opengl.uniform_buffer    import Mapping, UniformBuffer
@@ -47,7 +49,8 @@ def setup():
   # )
 
   renderer.register_entity_type(
-    name         = 'frame',
+    view_type    = FrameView,
+    shader_name  = 'frame',
     buffer       = frame_buffer,
   )
 
@@ -134,12 +137,13 @@ if __name__ == "__main__":
   ])
 
   renderer.register_entity_type(
-    name         = 'serial',
+    view_type    = SerialView,
+    shader_name  = 'serial',
     buffer       = serial_buffer,
   )
 
   renderer.register_entity_type(
-    name         = 'rectangle',
+    view_type    = Rectangle,
     buffer       = rectangle_buffer,
   )
 
@@ -148,11 +152,11 @@ if __name__ == "__main__":
   g = GUI()
 
 
-  renderer.add('serial', controller.view)
-  renderer.add('serial', controller1.view)
-  renderer.add('rectangle', interface.children['bg'])
+  renderer.add(controller.view)
+  renderer.add(controller1.view)
+  renderer.add(interface.children['bg'])
   for slider in interface.joint_controllers.values():
-    renderer.add_many('rectangle', slider.children.values())
+    renderer.add_many(slider.children.values())
 
   sim.controllers.append(controller)
   sim.controllers.append(controller1)

@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing      import Callable, Iterable
+from typing      import Callable, Iterable, Type
 
 from OpenGL.GL import *
 
@@ -11,7 +11,7 @@ from .opengl.buffer         import Buffer
 from .opengl.shader_program import ShaderProgram
 from .opengl.shader         import ShaderType
 
-Entity = namedtuple('Entity', 'name shader draw_mode buffer instances add_children')
+Entity = namedtuple('Entity', 'shader draw_mode buffer instances')
 
 @listener
 class Renderer():
@@ -106,8 +106,9 @@ class Renderer():
         logger.error(f'Shader program `{shader_name}` not found')
         raise
 
-  def register_entity_type(self, name: str, buffer: Buffer, shader_name: str = None, draw_mode: int = None) -> None:
-    if self.entities.get(name, None) is not None:
+  def register_entity_type(self, view_type: Type, buffer: Buffer, shader_name: str = None, draw_mode: int = None) -> None:
+    name = view_type.__name__
+    if self.entities.get(view_type, None) is not None:
       return logger.warn(f'Entity type `{name}` already registered. Keeping original values')
 
     # If shader name is not provided, assume it is the same name as the entity
@@ -118,31 +119,27 @@ class Renderer():
     except FileNotFoundError:
       return logger.error(f'Entity type `{name}` creation failed')
 
-    self.entities[name] = Entity(
-      name         = name,
+    self.entities[view_type] = Entity(
       shader       = self.shaders.get(shader_name),
       draw_mode    = draw_mode or GL_TRIANGLES,
       buffer       = buffer,
       instances    = [],
     )
 
-  def add(self, entity_type: str, instance) -> None:
-    if entity_type not in self.entities:
-      return logger.error(f'No entity type `{entity_type}` found when adding entity')
+  def add(self, instance) -> None:
+    if type(instance) not in self.entities:
+      return logger.error(f'No entity type `{type(instance).__name__}` found when adding entity')
 
-    entity = self.entities.get(entity_type)
+    entity = self.entities.get(type(instance))
     entity.instances.append(instance)
 
     if len(instance.children) > 0:
       for child in instance.children:
-        self.add(child.type, child)
+        self.add(child)
 
-  def add_many(self, entity_type: str, instances: Iterable) -> None:
-    if entity_type not in self.entities:
-      return logger.error(f'No entity type `{entity_type}` found when adding entity')
-
+  def add_many(self, instances: Iterable) -> None:
     for instance in instances:
-      self.add(entity_type, instance)
+      self.add(instance)
 
   def update_environment(self) -> None:
     self.light.position = self.camera.position
