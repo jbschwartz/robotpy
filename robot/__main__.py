@@ -50,7 +50,6 @@ def setup():
 
   renderer.register_entity_type(
     view_type    = FrameView,
-    shader_name  = 'frame',
     buffer       = frame_buffer,
   )
 
@@ -138,7 +137,6 @@ if __name__ == "__main__":
 
   renderer.register_entity_type(
     view_type    = SerialView,
-    shader_name  = 'serial',
     buffer       = serial_buffer,
   )
 
