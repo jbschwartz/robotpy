@@ -1,3 +1,5 @@
+import re
+
 from collections import namedtuple
 from typing      import Callable, Iterable, Type
 
@@ -112,8 +114,8 @@ class Renderer():
     if self.entities.get(view_type, None) is not None:
       return logger.warn(f'Entity type `{name}` already registered. Keeping original values')
 
-    # If shader name is not provided, assume it is the same name as the entity
-    shader_name = shader_name or name
+    # If shader name is not provided, assume it is the same name as the type
+    shader_name = shader_name or re.sub('view$', '', name.lower())
 
     try:
       self.initialize_shader(shader_name)
