@@ -73,9 +73,7 @@ class Slider(Widget):
       self.delta = 0
       self._cursor = None
 
-    if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
-      self.left_click_down(cursor, mods)
-    elif button == glfw.MOUSE_BUTTON_LEFT and action == glfw.REPEAT:
+    if button == glfw.MOUSE_BUTTON_LEFT and action in [glfw.PRESS, glfw.REPEAT]:
       self.left_click_down(cursor, mods)
 
     elif button == glfw.MOUSE_BUTTON_LEFT and action == glfw.RELEASE:
