@@ -30,4 +30,6 @@ def listener(cls):
             else:
               registry[event] = [listener]
 
+  ListenerWrapper.__name__ = cls.__name__
+
   return ListenerWrapper
