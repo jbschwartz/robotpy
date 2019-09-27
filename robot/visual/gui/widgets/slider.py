@@ -40,6 +40,7 @@ class Slider(Widget):
     self.children['Button']._position.x = self._value * (1 - self.children['Button']._width)
 
   def seek(self) -> None:
+    """Adjust the value of the slider toward the cursor."""
     normalized = (self._cursor.x - self.position.x) / (self.width)
     if normalized > (self.children['Button']._position.x + self.children['Button']._width):
       self.children['Button']._position.x += 0.05
