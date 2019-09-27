@@ -47,9 +47,9 @@ class Renderer():
         shader.bind_ubo(ubo)
 
   def load_buffers(self):
-    for entity in self.entities.values():
+    for name, entity in self.entities.items():
       if len(entity.instances) == 0:
-        logger.warn(f'Entity `{entity.name}` has no instances')
+        logger.warn(f'Entity `{name}` has no instances')
 
       if not entity.buffer.is_procedural:
         entity.buffer.set_attribute_locations(entity.shader)
