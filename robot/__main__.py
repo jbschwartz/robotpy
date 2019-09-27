@@ -20,7 +20,6 @@ if __name__ == "__main__":
   with Timer('Initialize Window') as t:
     window = vis.Window(750, 750, "robotpy")
 
-
   with Timer('Load Robot and Construct Mesh') as t:
     with open('./robot/mech/robots/abb_irb_120.json') as json_file:
       serial_dictionary = json.load(json_file)
@@ -103,6 +102,23 @@ if __name__ == "__main__":
     per_instance = pif.tool
   )
 
+  trajectory_buffer = Buffer.from_points([
+    Vector3(150, 320, 630),
+    Vector3(374, 160, 430),
+    Vector3(374, 0, 630),
+    Vector3(275, -320, 330),
+    Vector3(500, 320, 330),
+    Vector3(150, 320, 630)
+  ])
+
+  renderer.register_entity_type(
+    name         = 'trajectory',
+    shader_name  = 'frame',
+    buffer       = trajectory_buffer,
+    per_instance = pif.trajectory,
+    draw_mode    = gl.GL_LINE_STRIP
+  )
+
   serials[0].to_world = Transform.from_orientation_translation(
     Quaternion.from_euler([math.radians(0), 0, 0], Axes.ZYZ, Order.INTRINSIC),
     Vector3(-400, 400, 0))
@@ -139,6 +155,8 @@ if __name__ == "__main__":
   renderer.add('triangle', camera, None, scale=20)
 
   renderer.add('grid', None, None, scale=10000)
+
+  renderer.add('trajectory', serials[0], None)
 
   # world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
 

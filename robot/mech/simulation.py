@@ -4,7 +4,7 @@ from collections import deque
 from typing      import Optional
 
 from robot.common                    import logger
-from robot.spatial                   import AABB, Ray
+from robot.spatial                   import AABB, Intersection, Ray
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
 
@@ -27,10 +27,10 @@ class Simulation():
 
     return AABB.from_aabbs(aabbs)
 
-  def intersect(self, ray: Ray) -> Optional[float]:
-    """Return the parametric distance along the ray to intersection with the nearest simulation entity, if any."""
+  def intersect(self, ray: Ray) -> Intersection:
+    """Intersect a ray with all Simulation entities and return closest found Intersection. Return Intersection.Miss() for no intersection."""
     if not self.aabb.intersect(ray):
-      return None
+      return Intersection.Miss()
 
     return ray.closest_intersection(self.entities)
 
@@ -50,10 +50,10 @@ class Simulation():
     self.tick_samples.append(1 / delta)
 
     for entity in self.entities:
-      if entity.traj:
+      if hasattr(entity, 'traj'):
         result = entity.traj.advance(delta)
         entity.angles = result
 
-      if entity.traj.is_done():
-        entity.traj.reverse()
-        entity.traj.restart()
+        if entity.traj.is_done():
+          entity.traj.reverse()
+          entity.traj.restart()

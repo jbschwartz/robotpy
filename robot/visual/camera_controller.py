@@ -73,12 +73,17 @@ class CameraController():
     self.bindings = bindings
     self.scene = scene
     self.window = window
-    self.target = self.scene.aabb.center
+
+    if len(self.scene.entities) > 0:
+      self.target = self.scene.aabb.center
+    else:
+      self.target = Vector3()
+
     self.is_selecting = None
     self.orbit_type = OrbitType.CONSTRAINED
 
   @listen(Event.CLICK)
-  def click(self, button, action, cursor):
+  def click(self, button, action, cursor, mods):
     if button == glfw.MOUSE_BUTTON_LEFT:
       if action == glfw.PRESS:
         self.is_selecting = self.window.ndc(cursor)
@@ -88,13 +93,14 @@ class CameraController():
 
     if button == glfw.MOUSE_BUTTON_MIDDLE and action == glfw.PRESS:
       r = self.camera.cast_ray(self.window.ndc(cursor))
-      with Timer('Ray Intersection') as tim:
-        t = self.scene.intersect(r)
+      with Timer('Ray Intersection'):
+        x = self.scene.intersect(r)
 
-      if t is not None:
-        self.target = r.evaluate(t)
+      if x.hit:
+        self.target = r.evaluate(x.t)
       else:
-        self.target = self.scene.aabb.center
+        if len(self.scene.entities) > 0:
+          self.target = self.scene.aabb.center
 
       assert self.target is not None, "There must always be a valid camera target."
       assert isinstance(self.target, Vector3), "Camera target must be a Vector3."

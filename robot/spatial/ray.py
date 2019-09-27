@@ -1,3 +1,7 @@
+from typing import Iterable
+
+from .intersection import Intersection
+
 class Ray():
   def __init__(self, origin, direction):
     self.origin = origin
@@ -11,16 +15,16 @@ class Ray():
 
     return Ray(new_origin, new_direction)
 
-  def closest_intersection(self, collection):
-    closest = None
+  def closest_intersection(self, collection: Iterable) -> Intersection:
+    closest = Intersection.Miss()
 
     for item in collection:
       # See if the item is intersectable, otherwise ignore it
       if callable(getattr(item, 'intersect', None)):
-        t = item.intersect(self)
+        x = item.intersect(self)
 
-        if t and (closest is None or t < closest):
-          closest = t
+        if x.closer_than(closest):
+          closest = x
 
     return closest
 

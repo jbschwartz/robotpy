@@ -1,6 +1,6 @@
 import math, unittest
 
-from robot.spatial import Facet, Ray, Vector3
+from robot.spatial import Facet, Intersection, Ray, Vector3
 
 class TestFacet(unittest.TestCase):
   def setUp(self):
@@ -45,11 +45,14 @@ class TestFacet(unittest.TestCase):
       Vector3(),
     ]
 
-    expecteds = [compute_t(ray, intersection) for ray, intersection in zip(rays, intersections)]
+    expecteds = [
+      Intersection(compute_t(ray, intersection), None)
+      for ray, intersection in zip(rays, intersections)
+    ]
 
     for (ray, expected) in zip(rays, expecteds):
       with self.subTest(f"Check {ray}"):
         result = self.facet.intersect(ray)
 
-        if expected is not None:
-          self.assertAlmostEqual(result, expected)
+        if expected.hit:
+          self.assertAlmostEqual(result.t, expected.t)

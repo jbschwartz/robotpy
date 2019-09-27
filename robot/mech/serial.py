@@ -2,7 +2,7 @@ import itertools, math
 
 from typing import Iterable
 
-from robot.spatial     import AABB, Mesh, Transform, Vector3
+from robot.spatial     import AABB, Intersection, Mesh, Ray, Transform, Vector3
 from .exceptions       import InvalidSerialDictError
 from .joint            import Joint
 from .link             import Link
@@ -79,7 +79,12 @@ class Serial:
 
   @property
   def aabb(self) -> AABB:
-    return AABB.from_points([link.aabb for link in self.links])
+    aabb = AABB.from_points([link.aabb for link in self.links])
+
+    if self.tool:
+      aabb.expand(self.tool.aabb)
+
+    return aabb
 
   def attach(self, tool: Tool = None):
     '''Attach the tool to the robot's end effector.'''
@@ -87,11 +92,16 @@ class Serial:
 
     self.update_link_transforms()
 
-  def intersect(self, ray):
-    if self.aabb.intersect(ray):
-      return ray.closest_intersection(self.links)
-    else:
-      return None
+  def intersect(self, ray: Ray) -> Intersection:
+    """Intersect a ray with all Links and return closest found Intersection. Return Intersection.Miss() for no intersection."""
+    if not self.aabb.intersect(ray):
+      return Intersection.Miss()
+
+    components = [*self.links]
+    if self.tool:
+      components.append(self.tool)
+
+    return ray.closest_intersection(components)
 
   def update_link_transforms(self):
     # Walk the chain updating each link with it's previous neighbors transform

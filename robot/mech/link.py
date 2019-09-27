@@ -1,9 +1,9 @@
 import math
 
 from collections import namedtuple
-from typing      import Iterable, Union
+from typing      import Iterable, Optional
 
-from robot.spatial import AABB, Mesh, Ray, Transform, Vector3
+from robot.spatial import AABB, Intersection, Mesh, Ray, Transform, Vector3
 from .joint        import Joint
 
 PhysicalProperties = namedtuple('PhysicalProperties', 'com moments volume', defaults=(None, None, None))
@@ -105,11 +105,16 @@ class Link:
       volume  = mesh_volume
     )
 
-  def intersect(self, world_ray : Ray) -> Union[bool, None]:
-    """Return whether or not the provided Ray in world space intersects the Link Mesh."""
-    if self.aabb.intersect(world_ray):
-      world_to_link = self.to_world.inverse()
+  def intersect(self, world_ray: Ray) -> Intersection:
+    """Intersect a ray with Link and return closest found Intersection. Return Intersection.Miss() for no intersection."""
+    if not self.aabb.intersect(world_ray):
+      return Intersection.Miss()
 
-      return self.mesh.intersect(world_ray.transform(world_to_link))
+    world_to_link = self.to_world.inverse()
 
-    return None
+    facet = self.mesh.intersect(world_ray.transform(world_to_link))
+    if facet.hit:
+      # If we hit a facet, repackage the Intersection to report the Link being intersected
+      return Intersection(facet.t, self)
+    else:
+      return facet
