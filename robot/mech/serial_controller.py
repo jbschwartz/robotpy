@@ -2,14 +2,15 @@ import glfw, math
 
 from typing import Callable, Iterable
 
-from robot.mech                      import Serial
-from robot.mech.views                import SerialView
-from robot.spatial                   import Intersection, Ray
-from robot.traj                      import LinearJS
-from robot.visual.gui                import Widget
-from robot.visual.gui.widgets.interface  import Interface
-from robot.visual.messaging.listener import listen, listener
-from robot.visual.messaging.event    import Event
+from robot.ik.angles                    import solve_angles
+from robot.mech                         import Serial
+from robot.mech.views                   import SerialView
+from robot.spatial                      import Intersection, Ray
+from robot.traj                         import LinearJS
+from robot.visual.gui                   import Widget
+from robot.visual.gui.widgets.interface import Interface
+from robot.visual.messaging.listener    import listen, listener
+from robot.visual.messaging.event       import Event
 
 @listener
 class SerialController():
@@ -19,6 +20,12 @@ class SerialController():
     self.trajectory = LinearJS(None, None, 1)
     self.paused = True
     self.interface = None
+    self.solve()
+    self.index = 0
+
+  def solve(self) -> None:
+    target = self.serial.pose()
+    self.solutions = solve_angles(target, self.serial)
 
   @property
   def entity(self) -> Serial:
@@ -38,6 +45,10 @@ class SerialController():
       for joint_index, controller in controllers.items():
         def callback(name: str, value: float, joint_index: int = joint_index) -> None:
           self.serial.set_joint_angle(joint_index, value, normalized=True)
+          target = self.serial.pose()
+          self.solutions = solve_angles(target, self.serial)
+          self.index = 0
+
         controller.callback = callback
 
   def select(self) -> None:
@@ -82,4 +93,12 @@ class SerialController():
       self.trajectory.duration += 0.25
     if glfw.KEY_N == key and self.view.highlighted:
       self.trajectory.duration -= 0.25
+
+    if glfw.KEY_C == key and self.view.highlighted:
+      self.index += 1
+      if self.index == len(self.solutions):
+        self.index = 0
+
+      self.serial.angles = self.solutions[self.index]
+      self.update_controllers(self.interface)
 
