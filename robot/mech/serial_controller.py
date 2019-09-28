@@ -71,12 +71,12 @@ class SerialController():
 
   @listen(Event.KEY)
   def key(self, key, action, modifiers) -> None:
-    if action != glfw.PRESS:
+    if action != glfw.PRESS or not self.view.highlighted:
       return
 
-    if glfw.KEY_H == key and self.view.highlighted:
+    if glfw.KEY_H == key:
       self.serial.home()
-    if glfw.KEY_K == key and self.view.highlighted:
+    if glfw.KEY_K == key:
       if self.trajectory.starts is None:
         self.trajectory.starts = self.serial.angles
       elif self.trajectory.ends is None:
@@ -85,16 +85,16 @@ class SerialController():
       if (modifiers & glfw.MOD_SHIFT) or self.view.highlighted:
         self.trajectory.restart()
         self.paused = False
-    if glfw.KEY_G == key and self.view.highlighted:
+    if glfw.KEY_G == key:
       self.trajectory.starts = None
       self.trajectory.ends = None
 
-    if glfw.KEY_M == key and self.view.highlighted:
+    if glfw.KEY_M == key:
       self.trajectory.duration += 0.25
-    if glfw.KEY_N == key and self.view.highlighted:
+    if glfw.KEY_N == key:
       self.trajectory.duration -= 0.25
 
-    if glfw.KEY_C == key and self.view.highlighted:
+    if glfw.KEY_C == key:
       self.index += 1
       if self.index == len(self.solutions):
         self.index = 0
