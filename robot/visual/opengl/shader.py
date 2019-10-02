@@ -27,4 +27,4 @@ class Shader():
 
     if glGetShaderiv(self.id, GL_COMPILE_STATUS) != GL_TRUE:
       msg = glGetShaderInfoLog(self.id).decode('unicode_escape')
-      raise RuntimeError(f'Shader compilation failed: {msg}')
+      raise RuntimeError(f'{shader_type.capitalize()} shader compilation failed: {msg}')

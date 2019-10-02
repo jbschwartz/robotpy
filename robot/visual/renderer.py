@@ -120,6 +120,8 @@ class Renderer():
       self.initialize_shader(shader_name)
     except FileNotFoundError:
       return logger.error(f'Entity type `{name}` creation failed')
+    except RuntimeError as e:
+      return logger.error(f'For `{name}`: {e}')
 
     self.entities[view_type] = Entity(
       shader       = self.shaders.get(shader_name),
