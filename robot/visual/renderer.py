@@ -78,6 +78,10 @@ class Renderer():
       with entity.shader as sp, entity.buffer:
         for instance in entity.instances:
           if instance.visible:
+            if getattr(instance, 'reload_buffer', False):
+              entity.buffer.reload(instance.buffer)
+              instance.reload_buffer = False
+
             instance.prepare(sp)
 
             glDrawArrays(entity.draw_mode, 0, len(entity.buffer))
