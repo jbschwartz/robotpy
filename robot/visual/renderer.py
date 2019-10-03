@@ -69,8 +69,8 @@ class Renderer():
   def draw(self):
     self.update_environment()
 
-    for name, entity in self.entities.items():
-      if name == 'rectangle':
+    for entity_type, entity in self.entities.items():
+      if entity_type.__name__.lower() in ['rectangle']:
         glDisable(GL_DEPTH_TEST)
       else:
         glEnable(GL_DEPTH_TEST)
