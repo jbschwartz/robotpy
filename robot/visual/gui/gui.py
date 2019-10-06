@@ -16,7 +16,7 @@ class GUI(Widget):
 
   @listen(Event.CLICK)
   def click(self, button, action, cursor, mods):
-    self.propagate('click', cursor, button, action, cursor, mods)
+    self.propagate('click', button, action, cursor, mods)
 
     if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
       interface = self.children['Interface']
@@ -56,11 +56,11 @@ class GUI(Widget):
 
   @listen(Event.DRAG)
   def drag(self, button, cursor, cursor_delta, modifiers):
-    self.propagate('drag', cursor, button, cursor, cursor_delta, modifiers)
+    self.propagate('drag', button, cursor, cursor_delta, modifiers)
 
   @listen(Event.CURSOR)
   def cursor(self, button, cursor, cursor_delta, modifiers):
-    self.propagate('cursor', cursor, button, cursor, cursor_delta, modifiers)
+    self.propagate('cursor', button, cursor, cursor_delta, modifiers)
 
   @listen(Event.UPDATE)
   def update(self, delta: float = 0) -> None:

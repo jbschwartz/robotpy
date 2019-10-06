@@ -14,6 +14,9 @@ class Viewport(Widget):
     self.simulation.update(delta)
 
   def click(self, button, action, cursor, mods) -> None:
+    if not self.contains(cursor):
+      return
+
     x = self.camera_controller.click(button, action, cursor, mods)
 
     self.is_clicked = action == glfw.PRESS
