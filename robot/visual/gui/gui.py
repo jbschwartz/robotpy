@@ -16,7 +16,7 @@ class GUI(Widget):
 
   @listen(Event.CLICK)
   def click(self, button, action, cursor, mods):
-    self.propagate('click', button, action, cursor, mods)
+    self.propagate(Event.CLICK, button, action, cursor, mods)
 
     if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
       interface = self.children['Interface']
@@ -54,13 +54,9 @@ class GUI(Widget):
     self.children['Viewport']._width = 1 - value
     self.children['Viewport']._position.x = value
 
-  @listen(Event.DRAG)
-  def drag(self, button, cursor, cursor_delta, modifiers):
-    self.propagate('drag', button, cursor, cursor_delta, modifiers)
-
-  @listen(Event.CURSOR)
-  def cursor(self, button, cursor, cursor_delta, modifiers):
-    self.propagate('cursor', button, cursor, cursor_delta, modifiers)
+  @listen(Event.DRAG, Event.CURSOR)
+  def pass_through(self, event, *args, **kwargs):
+    self.propagate(event, *args, **kwargs)
 
   @listen(Event.UPDATE)
   def update(self, delta: float = 0) -> None:
