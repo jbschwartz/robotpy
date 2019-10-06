@@ -1,6 +1,6 @@
 import math
 
-import numpy as np
+from typing import Iterable
 
 from .aabb         import AABB
 from .intersection import Intersection
@@ -37,19 +37,19 @@ class Mesh:
   def accelerator(self, accelerator):
     self._accelerator = accelerator(self)
 
-  def get_buffer_data(self, index: int = 0) -> np.array:
+  def get_buffer_data(self, index: int = 0) -> Iterable:
     """Return a numpy array of flattened, interleaved vertex position and normal floats.
 
     Index is useful for storing multiple meshes in a single OpenGL buffer.
     This allows the shader program to distinguish between meshes.
     """
     data = [
-      ([*vertex, *(facet.normal)], index)
+      ([*vertex], [*facet.normal], index)
       for facet in self.facets
       for vertex in facet.vertices
     ]
 
-    return np.array(data, dtype=[('', np.float32, 6),('', np.int32, 1)])
+    return data
 
   def transform(self, transform: 'Transform') -> 'Mesh':
     transformed_facets = [f.transform(transform) for f in self.facets]
