@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from robot.spatial import Vector3
 
 class Widget():
@@ -18,12 +20,13 @@ class Widget():
     self.parent   = None
     self.children = {}
 
-  def add(self, widget: 'Widget') -> None:
-    """Add a child Widget."""
-    assert isinstance(widget, Widget), "Child must be a (subclass of) Widget"
+  def add(self, *widgets: 'Widget') -> None:
+    """Add child Widgets."""
+    for widget in widgets:
+      assert isinstance(widget, Widget), "Child must be a (subclass of) Widget"
 
-    widget.parent = self
-    self.children[widget.name] = widget
+      widget.parent = self
+      self.children[widget.name] = widget
 
   @property
   def width(self) -> float:
