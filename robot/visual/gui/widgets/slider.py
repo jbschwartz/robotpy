@@ -21,7 +21,6 @@ class Slider(Widget):
     self._cursor = None
     self.wait_time = 0.5
 
-    self._value      = value    or 0.5
     self.callback    = callback or None
 
     self.add(Rectangle(name='Range', position=Vector3(0, 0.45), width=1, height=0.1, color=[0.65] * 3))
@@ -32,12 +31,10 @@ class Slider(Widget):
     return self.children['Button']._position.x / (1 - self.children['Button']._width)
 
   @value.setter
-  def value(self, new_value: float) -> None:
-    self._value = new_value
+  def value(self, value: float) -> None:
+    assert 0 <= value <= 1
 
-    assert 0 <= self._value <= 1
-
-    self.children['Button']._position.x = self._value * (1 - self.children['Button']._width)
+    self.children['Button']._position.x = value * (1 - self.children['Button']._width)
 
   def move_button(self, amount) -> None:
     self.children['Button']._position.x += amount
