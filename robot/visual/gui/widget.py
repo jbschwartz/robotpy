@@ -94,29 +94,22 @@ class Widget():
       self.parent.is_clicked = self._is_clicked
 
   def click(self, *args) -> None:
-    cursor = args[2]
-    self.propagate('click', cursor, *args)
+    self.propagate('click', *args)
 
   def drag(self, *args) -> None:
-    cursor = args[1]
-    self.propagate('drag', cursor, *args)
+    self.propagate('drag', *args)
 
   def cursor(self, *args) -> None:
-    cursor = args[1]
-    self.propagate('cursor', cursor, *args)
+    self.propagate('cursor', *args)
 
   def update(self, delta: float) -> None:
-    for child in self.children.values():
-      update_fn = getattr(child, 'update', None)
-      if update_fn is not None:
-        update_fn(delta)
+    self.propagate('update', delta)
 
-  def propagate(self, event, cursor, *args):
+  def propagate(self, event, *args):
     for child in self.children.values():
-      if child.contains(cursor) or child.is_clicked:
-        if hasattr(child, event):
-          fn = getattr(child, event)
-          fn(*args)
+      if child.visible and hasattr(child, event):
+        fn = getattr(child, event)
+        fn(*args)
 
   def contains(self, point: Vector3) -> bool:
     """Return True if the point is inside the Widget."""
