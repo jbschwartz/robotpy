@@ -46,6 +46,9 @@ class Slider(Widget):
     elif self.button._position.x > 1 - self.button._width:
       self.button._position.x = 1 - self.button._width
 
+    if self.callback is not None:
+      self.callback(self.name, self.value)
+
   def seek(self) -> None:
     """Adjust the value of the slider toward the cursor."""
     normalized = (self._cursor.x - self.position.x) / (self.width)
@@ -53,9 +56,6 @@ class Slider(Widget):
       self.move_button(0.05)
     elif normalized < self.button._position.x:
       self.move_button(-0.05)
-
-    if self.callback is not None:
-      self.callback(self.name, self.value)
 
     self.delta = 0
 
@@ -87,9 +87,6 @@ class Slider(Widget):
   def drag(self, button, cursor, cursor_delta, modifiers):
     if button == glfw.MOUSE_BUTTON_LEFT and self.button.hover:
       self.move_button(-cursor_delta.x / self.width)
-
-      if self.callback is not None:
-        self.callback(self.name, self.value)
 
   def update(self, delta: float) -> None:
     if self._cursor is not None:
