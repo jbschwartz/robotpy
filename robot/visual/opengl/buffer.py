@@ -1,152 +1,119 @@
-import numpy as np
+import numpy     as np
+import OpenGL.GL as gl
 
-from copy   import deepcopy
-from ctypes import c_void_p
-from typing import Iterable
+from collections import namedtuple
+from ctypes      import c_void_p
+from typing      import Iterable
 
 from robot.common    import logger
 from robot.spatial   import Mesh, Vector3
 from .shader_program import ShaderProgram
+from .               import constants
 
-from OpenGL.GL import *
-
-MESH_BUFFER_ATTRS = {
-  'position':   {'type': GL_FLOAT, 'number_of_components': 3},
-  'normal':     {'type': GL_FLOAT, 'number_of_components': 3},
-  'mesh_index': {'type': GL_INT,   'number_of_components': 1},
-}
-
-ATTRIBI_TYPES = (GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT)
+Attribute = namedtuple('Attribute', 'location, num_components, type, offset')
 
 class Buffer():
   """OpenGL Buffer instance."""
-  def __init__(self, data: np.array = None, attributes: dict = None, size: int = None) -> None:
-    self.vao = glGenVertexArrays(1)
+  def __init__(self, data: np.array, is_procedural: bool = False) -> None:
+    if len(data) == 0:
+      raise AttributeError("Buffer has no data.")
 
-    if data is not None:
-      if len(data) == 0 or attributes is None:
-        return logger.warn(f"Buffer given no data or no vertex attributes to access it.")
-      elif size is not None:
-        logger.warn(f"Buffer size passed but ignored (since data is provided).")
+    self.attributes    = []
+    self.data          = data
+    self.is_procedural = is_procedural
+    self.vao           = gl.glGenVertexArrays(1)
 
-      self.vbo        = glGenBuffers(1)
-      self.data       = data
-      self.attributes = attributes
-    else:
-      if size is None:
-        return logger.warn(f"Buffer given no data, attributes, or size.")
-
-      self._size = size
+    if not self.is_procedural:
+      self.vbo = gl.glGenBuffers(1)
 
   def __len__(self) -> int:
     """Return the number of elements in the buffer."""
-    if self.is_procedural:
-      return self._size
-    else:
-      return len(self.data)
+    return len(self.data)
 
   def __enter__(self) -> 'Buffer':
-    glBindVertexArray(self.vao)
+    gl.glBindVertexArray(self.vao)
     return self
 
-  def __exit__(self, exc_type, exc_value, exc_traceback) -> None:
-    glBindVertexArray(0)
+  def __exit__(self, *args) -> None:
+    gl.glBindVertexArray(0)
 
   @classmethod
   def from_mesh(cls, mesh: Mesh) -> 'Buffer':
     """Create a Buffer from a Mesh."""
-    data = np.array(mesh.get_buffer_data(), dtype=[('', np.float32, 6),('', np.int32)])
-    # TODO: Maybe there is something better than a deepcopy
-    return cls(data, deepcopy(MESH_BUFFER_ATTRS))
+    data = np.array(
+      mesh.get_buffer_data(),
+      dtype=[('position', '3f4'), ('normal', '3f4'), ('mesh_index', 'i4')]
+    )
+
+    return cls(data)
 
   @classmethod
   def from_meshes(cls, meshes: Iterable[Mesh]) -> 'Buffer':
     """Create one Buffer for a collection of Meshes."""
-    data = np.array([], dtype=[('', np.float32, 6),('', np.int32)])
+    mesh_data = []
     for mesh_index, mesh in enumerate(meshes):
-      mesh_data = mesh.get_buffer_data(mesh_index)
-      data = np.concatenate((data, mesh_data), axis=0)
+      mesh_data.extend(mesh.get_buffer_data(mesh_index))
 
-    # TODO: Maybe there is something better than a deepcopy
-    return cls(data, deepcopy(MESH_BUFFER_ATTRS))
+    data = np.array(
+      mesh_data,
+      dtype=[('position', '3f4'), ('normal', '3f4'), ('mesh_index', 'i4')]
+    )
+
+    return cls(data)
 
   @classmethod
   def from_points(cls, points: Iterable[Vector3]) -> 'Buffer':
     """Create one Buffer for a collection of Vector3 points."""
     data_list = [(point.xyz,) for point in points]
-    data = np.array(data_list, dtype=[('', np.float32, 3)])
 
-    return cls(data, {
-      'position': {'type': GL_FLOAT, 'number_of_components': 3}
-    })
+    return cls(np.array(data_list, dtype=[('position', '3f4')]))
 
   @classmethod
   def Procedural(cls, size) -> 'Buffer':
     """Create an empty buffer for 'procedural' shader programs."""
-    return cls(None, None, size)
-
-  @property
-  def is_procedural(self) -> bool:
-    return not (hasattr(self, 'data') and hasattr(self, 'attributes'))
+    return cls(np.empty(size), True)
 
   @property
   def stride(self) -> int:
     # np.itemsize gets the size of one element (read: vertex) in the data array
     return self.data.itemsize
 
-  def set_attribute_locations(self, sp: ShaderProgram) -> None:
+  def locate_attributes(self, sp: ShaderProgram) -> None:
+    """Locate attributes from the given Shader Program."""
     if self.is_procedural:
       return
-
-    for attribute_name in self.attributes.keys():
+    # Get necessary vertex attribute information from the numpy data type
+    for name, (attribute_type, offset) in self.data.dtype.fields.items():
       try:
-        self.attributes[attribute_name]['location'] = sp.attribute_location(f'vin_{attribute_name}')
+        location = sp.attribute_location(f'vin_{name}')
       except AttributeError:
-        logger.warn(f'Attribute `vin_{attribute_name}` not found in shader program `{sp.name}`')
-
-  def load(self) -> None:
-    if self.is_procedural:
-      return
-
-    assert any(
-      [
-        'location' in parameters
-        for parameters in self.attributes.values()
-      ]
-    ), "Buffer attribute locations must be set before the buffer can be loaded"
-
-    glBindVertexArray(self.vao)
-
-    glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-    glBufferData(GL_ARRAY_BUFFER, self.data.nbytes, self.data, GL_STATIC_DRAW)
-
-    offset = 0
-    for parameters in self.attributes.values():
-      if parameters.get('location', None) is None:
+        logger.warn(f'Attribute `vin_{name}` not found in shader program `{sp.name}`')
         continue
 
-      if parameters['type'] in ATTRIBI_TYPES:
-        glVertexAttribIPointer(
-          parameters['location'],
-          parameters['number_of_components'],
-          parameters['type'],
-          self.stride,
-          c_void_p(offset)
-        )
-      else:
-        glVertexAttribPointer(
-          parameters['location'],
-          parameters['number_of_components'],
-          parameters['type'],
-          GL_FALSE,
-          self.stride,
-          c_void_p(offset)
-        )
+      gl_type = constants.TYPE_NUMPY_TO_GL[attribute_type.base]
+      num_components = 1 if not attribute_type.shape else attribute_type.shape[0]
 
-      # TODO: Do not assume that all buffer values are four bytes
-      offset += 4 * parameters['number_of_components']
+      self.attributes.append(
+        Attribute(location, num_components, gl_type, c_void_p(offset))
+      )
 
-      glEnableVertexAttribArray(parameters['location'])
+  def load(self) -> None:
+    """Load the OpenGL buffer with the data and enable the attributes."""
+    if self.is_procedural:
+      return
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
-    glBindVertexArray(0)
+    gl.glBindVertexArray(self.vao)
+
+    gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vbo)
+    gl.glBufferData(gl.GL_ARRAY_BUFFER, self.data.nbytes, self.data, gl.GL_STATIC_DRAW)
+
+    for location, num_components, gl_type, offset in self.attributes:
+      if gl_type in constants.GL_INTEGER_TYPES:
+        gl.glVertexAttribIPointer(location, num_components, gl_type, self.stride, offset)
+      elif gl_type in constants.GL_FLOAT_TYPES:
+        gl.glVertexAttribPointer(location, num_components, gl_type, gl.GL_FALSE, self.stride, offset)
+
+      gl.glEnableVertexAttribArray(location)
+
+    gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)
+    gl.glBindVertexArray(0)

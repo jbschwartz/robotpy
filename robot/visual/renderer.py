@@ -52,7 +52,7 @@ class Renderer():
         logger.warn(f'Entity `{name}` has no instances')
 
       if not entity.buffer.is_procedural:
-        entity.buffer.set_attribute_locations(entity.shader)
+        entity.buffer.locate_attributes(entity.shader)
         entity.buffer.load()
 
   @listen(Event.START_FRAME)
