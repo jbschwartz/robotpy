@@ -23,33 +23,35 @@ class Slider(Widget):
 
     self.callback    = callback or None
 
-    self.add(Rectangle(name='Range', position=Vector3(0, 0.45), width=1, height=0.1, color=[0.65] * 3))
-    self.add(Rectangle(name='Button', position=Vector3(0.5-0.125, 0.5-0.125), width=0.25, height=0.25, color=[0.25] * 3))
+    self.range  = Rectangle(name='Range', position=Vector3(0, 0.45), width=1, height=0.1, color=[0.65] * 3)
+    self.button = Rectangle(name='Button', position=Vector3(0.5-0.125, 0.5-0.125), width=0.25, height=0.25, color=[0.25] * 3)
+
+    self.add(self.range, self.button)
 
   @property
   def value(self) -> float:
-    return self.children['Button']._position.x / (1 - self.children['Button']._width)
+    return self.button._position.x / (1 - self.button._width)
 
   @value.setter
   def value(self, value: float) -> None:
     assert 0 <= value <= 1
 
-    self.children['Button']._position.x = value * (1 - self.children['Button']._width)
+    self.button._position.x = value * (1 - self.button._width)
 
   def move_button(self, amount) -> None:
-    self.children['Button']._position.x += amount
+    self.button._position.x += amount
 
-    if self.children['Button']._position.x < 0:
-      self.children['Button']._position.x = 0
-    elif self.children['Button']._position.x > 1 - self.children['Button']._width:
-      self.children['Button']._position.x = 1 - self.children['Button']._width
+    if self.button._position.x < 0:
+      self.button._position.x = 0
+    elif self.button._position.x > 1 - self.button._width:
+      self.button._position.x = 1 - self.button._width
 
   def seek(self) -> None:
     """Adjust the value of the slider toward the cursor."""
     normalized = (self._cursor.x - self.position.x) / (self.width)
-    if normalized > (self.children['Button']._position.x + self.children['Button']._width):
+    if normalized > (self.button._position.x + self.button._width):
       self.move_button(0.05)
-    elif normalized < self.children['Button']._position.x:
+    elif normalized < self.button._position.x:
       self.move_button(-0.05)
 
     if self.callback is not None:
@@ -58,16 +60,16 @@ class Slider(Widget):
     self.delta = 0
 
   def left_click_down(self, cursor, mods) -> None:
-    if self.children['Button'].hover:
+    if self.button.hover:
       self.is_clicked = True
     else:
-      if self.children['Range'].contains(cursor):
+      if self.range.contains(cursor):
         self.is_clicked = True
         self._cursor = cursor
         self.seek()
 
   def cursor(self, button, cursor, cursor_delta, modifiers):
-    self.children['Button'].hover = self.children['Button'].contains(cursor)
+    self.button.hover = self.button.contains(cursor)
 
   def click(self, button, action, cursor, mods):
     if action == glfw.RELEASE:
@@ -79,11 +81,11 @@ class Slider(Widget):
 
     elif button == glfw.MOUSE_BUTTON_LEFT and action == glfw.RELEASE:
       self.is_clicked = False
-      if not self.children['Button'].contains(cursor):
-        self.children['Button'].hover = False
+      if not self.button.contains(cursor):
+        self.button.hover = False
 
   def drag(self, button, cursor, cursor_delta, modifiers):
-    if button == glfw.MOUSE_BUTTON_LEFT and self.children['Button'].hover:
+    if button == glfw.MOUSE_BUTTON_LEFT and self.button.hover:
       self.move_button(-cursor_delta.x / self.width)
 
       if self.callback is not None:
