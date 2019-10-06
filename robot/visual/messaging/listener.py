@@ -12,6 +12,12 @@ def listen(*events: Event) -> Callable:
     return func
   return decorator_listen
 
+def add_listener(event, listener) -> None:
+  if event in registry:
+    registry[event].append(listener)
+  else:
+    registry[event] = [listener]
+
 def listener(cls):
   """Listener class decorator registers all event handling methods."""
   class ListenerWrapper(cls):
@@ -24,11 +30,21 @@ def listener(cls):
       for name, method in cls.__dict__.items():
         if getattr(method, '_listen_to', None):
           listener = getattr(self, name)
-          for event in method._listen_to:
-            if registry.get(event):
-              registry[event].append(listener)
-            else:
-              registry[event] = [listener]
+
+          if len(method._listen_to) == 1:
+            add_listener(method._listen_to[0], listener)
+          else:
+            for event in method._listen_to:
+              # Use the binding of default function parameters to counteract
+              # the late binding closures
+              def multi_event_handler(e = event, l = listener):
+                def handler(*args, **kwargs):
+                  # If more than one event is registered to this listener,
+                  # the listener expects to receive the event first
+                  l(e, *args, **kwargs)
+                return handler
+
+              add_listener(event, multi_event_handler())
 
   ListenerWrapper.__name__ = cls.__name__
 

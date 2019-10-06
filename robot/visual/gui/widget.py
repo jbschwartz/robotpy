@@ -1,6 +1,7 @@
 from typing import Iterable
 
 from robot.spatial import Vector3
+from robot.visual.messaging.event import Event
 
 class Widget():
   """Base class for all GUI objects."""
@@ -94,22 +95,23 @@ class Widget():
       self.parent.is_clicked = self._is_clicked
 
   def click(self, *args) -> None:
-    self.propagate('click', *args)
+    self.propagate(Event.CLICK, *args)
 
   def drag(self, *args) -> None:
-    self.propagate('drag', *args)
+    self.propagate(Event.DRAG, *args)
 
   def cursor(self, *args) -> None:
-    self.propagate('cursor', *args)
+    self.propagate(Event.CURSOR, *args)
 
   def update(self, delta: float) -> None:
-    self.propagate('update', delta)
+    self.propagate(Event.UPDATE, delta)
 
-  def propagate(self, event, *args):
+  def propagate(self, event, *args, **kwargs):
+    fn_name = event.name.lower()
     for child in self.children.values():
-      if child.visible and hasattr(child, event):
-        fn = getattr(child, event)
-        fn(*args)
+      if child.visible and hasattr(child, fn_name):
+        fn = getattr(child, fn_name)
+        fn(*args, **kwargs)
 
   def contains(self, point: Vector3) -> bool:
     """Return True if the point is inside the Widget."""
