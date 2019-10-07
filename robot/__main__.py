@@ -105,12 +105,12 @@ if __name__ == "__main__":
   )
   serial_buffer = Buffer.from_meshes(serial.meshes)
   interface = Interface()
-  interface.width = 0.1875
+  interface.width = 0.25
 
   number_of_sliders = 6
-  slider_height     = 0.1
-  slider_width      = 1
-  space_height      = (1 - number_of_sliders * slider_height) / (number_of_sliders + 1)
+  # TODO: Need to create a "layout" feature so this is not hardcoded anymore
+  slider_height     = 24
+  space_height      = 60
 
   sliders = []
 
@@ -119,9 +119,9 @@ if __name__ == "__main__":
 
     interface.add_joint_controller(joint_index, Slider(
       name     = f'Axis #{joint_index}',
-      position = Vector3(0.05, y),
-      width    = slider_width - 0.1,
-      height   = slider_height
+      position = Vector3(20, y),
+      fixed_size = True,
+      scale     = 2,
     ))
     y += slider_height + space_height
 
@@ -147,8 +147,6 @@ if __name__ == "__main__":
 
   controller = SerialController(serial)
   controller1 = SerialController(serial1)
-  g = GUI()
-
 
   renderer.add(controller.view)
   renderer.add(controller1.view)
@@ -160,6 +158,7 @@ if __name__ == "__main__":
   sim.controllers.append(controller1)
 
   vp = Viewport(sim, camera_controller)
+  g = GUI()
   g.add(vp)
   g.add(interface)
 

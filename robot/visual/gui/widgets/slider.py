@@ -15,16 +15,41 @@ SliderInterval = namedtuple('SliderInterval', 'min max')
 
 @listener
 class Slider(Widget):
+  # Material design proportions
+  RANGE_WIDTH  = 160
+  BUTTON_SIZE  = 12
+  RANGE_HEIGHT = 2
+
   def __init__( self, callback: Callable = None, value: float = None, **options: dict) -> None:
     super().__init__(**options)
+
     self.delta = 0
     self._cursor = None
     self.wait_time = 0.5
 
     self.callback    = callback or None
 
-    self.range  = Rectangle(name='Range', position=Vector3(0, 0.45), width=1, height=0.1, color=[0.65] * 3)
-    self.button = Rectangle(name='Button', position=Vector3(0.5-0.125, 0.5-0.125), width=0.25, height=0.25, color=[0.25] * 3)
+    scale = options.get('scale', 1)
+
+    self.fixed_width = scale * Slider.RANGE_WIDTH
+    self.fixed_height = scale * Slider.RANGE_HEIGHT
+
+    self.range  = Rectangle(
+      name='Range',
+      fixed_size=True,
+      position=Vector3(0, scale / 2 * (Slider.BUTTON_SIZE - Slider.RANGE_HEIGHT)),
+      width=scale * Slider.RANGE_WIDTH,
+      height=scale * Slider.RANGE_HEIGHT,
+      color=[0.65] * 3
+    )
+    self.button = Rectangle(
+      name='Button',
+      fixed_size=True,
+      position=Vector3(scale / 2 * (Slider.RANGE_WIDTH - Slider.BUTTON_SIZE), 0),
+      width=scale * Slider.BUTTON_SIZE,
+      height=scale * Slider.BUTTON_SIZE,
+      color=[0.25] * 3
+    )
 
     self.add(self.range, self.button)
 
