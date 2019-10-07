@@ -9,11 +9,18 @@ class Widget():
     self.name  = options.get('name', None)
     self.color = options.get('color', [1, 1, 1])
     self.hover = False
+    self.fixed_size = options.get('fixed_size', False)
 
-    # Parent dependent properties; all use a getter and setter
-    self._position = options.get('position', Vector3())
-    self._width    = options.get('width', 1.0)
-    self._height   = options.get('height', 1.0)
+    if self.fixed_size:
+      self.fixed_width = options.get('width', 100)
+      self.fixed_height = options.get('height', 100)
+      self.fixed_position = options.get('position', Vector3())
+    else:
+      # Parent dependent properties; all use a getter and setter
+      self._width    = options.get('width', 1.0)
+      self._height   = options.get('height', 1.0)
+      self._position = options.get('position', Vector3())
+
     self._visible  = options.get('visible', True)
 
     self._is_clicked = False
@@ -94,6 +101,20 @@ class Widget():
     if self.parent is not None:
       self.parent.is_clicked = self._is_clicked
 
+  def window_resize(self, width, height) -> None:
+    if self.fixed_size:
+      self._width  = self.fixed_width  / width
+      self._height = self.fixed_height / height
+
+      # TODO: Take into account the current position of the widget. This currently places the widget at initialization
+      # position on every screen resize.
+      if self.parent:
+        self._width  /= self.parent.width
+        self._height /= self.parent.height
+        self._position = Vector3(self.fixed_position.x / (self.parent.width * width), self.fixed_position.y / (self.parent.height * height))
+
+    self.propagate(Event.WINDOW_RESIZE, width, height)
+
   def click(self, *args) -> None:
     self.propagate(Event.CLICK, *args)
 
@@ -109,7 +130,7 @@ class Widget():
   def propagate(self, event, *args, **kwargs):
     fn_name = event.name.lower()
     for child in self.children.values():
-      if child.visible and hasattr(child, fn_name):
+      if (child.visible or event == Event.WINDOW_RESIZE) and hasattr(child, fn_name):
         fn = getattr(child, fn_name)
         fn(*args, **kwargs)
 

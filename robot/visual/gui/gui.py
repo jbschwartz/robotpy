@@ -54,6 +54,10 @@ class GUI(Widget):
     self.children['Viewport']._width = 1 - value
     self.children['Viewport']._position.x = value
 
+  @listen(Event.WINDOW_RESIZE)
+  def resize_window(self, width, height) -> None:
+    self.propagate(Event.WINDOW_RESIZE, width, height)
+
   @listen(Event.DRAG, Event.CURSOR)
   def pass_through(self, event, *args, **kwargs):
     self.propagate(event, *args, **kwargs)
