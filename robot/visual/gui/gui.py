@@ -18,7 +18,7 @@ class GUI(Widget):
   def click(self, button, action, cursor, mods):
     self.propagate(Event.CLICK, button, action, cursor, mods)
 
-    if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
+    if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS and self.children['Viewport'].contains(cursor):
       interface = self.children['Interface']
       x = self.children['Viewport'].selected
       if x is not None:
