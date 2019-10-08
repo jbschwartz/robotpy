@@ -50,6 +50,8 @@ class SerialController():
           self.index = 0
 
         controller.callback = callback
+        delta = (self.serial.joints[joint_index-1].home - self.serial.joints[joint_index-1].limits.low) / self.serial.joints[joint_index-1].travel
+        controller.set_home(delta)
 
   def select(self) -> None:
     self.view.select()
