@@ -34,6 +34,14 @@ class Slider(Widget):
     self.fixed_width = scale * Slider.RANGE_WIDTH
     self.fixed_height = scale * Slider.RANGE_HEIGHT
 
+    self.home  = Rectangle(
+      name='Home',
+      fixed_size=True,
+      position=Vector3(scale / 2 * (Slider.RANGE_WIDTH - (Slider.BUTTON_SIZE / 2)),  scale * (Slider.BUTTON_SIZE / 2 - Slider.RANGE_HEIGHT)),
+      width=scale * Slider.RANGE_HEIGHT / 2,
+      height=scale * Slider.RANGE_HEIGHT * 2,
+      color=[0.45] * 3
+    )
     self.range  = Rectangle(
       name='Range',
       fixed_size=True,
@@ -51,7 +59,7 @@ class Slider(Widget):
       color=[0.25] * 3
     )
 
-    self.add(self.range, self.button)
+    self.add(self.range, self.home, self.button)
 
   @property
   def value(self) -> float:
@@ -62,6 +70,9 @@ class Slider(Widget):
     assert 0 <= value <= 1
 
     self.button._position.x = value * (1 - self.button._width)
+
+  def set_home(self, value) -> None:
+    self.home._position.x = value - (self.home._width / 2)
 
   def move_button(self, amount) -> None:
     self.button._position.x += amount
