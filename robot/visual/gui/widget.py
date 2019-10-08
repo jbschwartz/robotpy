@@ -106,12 +106,11 @@ class Widget():
       self._width  = self.fixed_width  / width
       self._height = self.fixed_height / height
 
-      # TODO: Take into account the current position of the widget. This currently places the widget at initialization
-      # position on every screen resize.
       if self.parent:
         self._width  /= self.parent.width
         self._height /= self.parent.height
-        self._position = Vector3(self.fixed_position.x / (self.parent.width * width), self.fixed_position.y / (self.parent.height * height))
+        if not hasattr(self, '_position'):
+          self._position = Vector3(self.fixed_position.x / (self.parent.width * width), self.fixed_position.y / (self.parent.height * height))
 
     self.propagate(Event.WINDOW_RESIZE, width, height)
 
