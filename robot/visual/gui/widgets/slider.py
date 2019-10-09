@@ -32,7 +32,7 @@ class Slider(Widget):
     scale = options.get('scale', 1)
 
     self.fixed_width = scale * Slider.RANGE_WIDTH
-    self.fixed_height = scale * Slider.RANGE_HEIGHT
+    self.fixed_height = scale * Slider.BUTTON_SIZE
 
     self.home  = Rectangle(
       name='Home',
