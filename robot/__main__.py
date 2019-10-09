@@ -104,27 +104,18 @@ if __name__ == "__main__":
     translation=Vector3(500, 500, 0)
   )
   serial_buffer = Buffer.from_meshes(serial.meshes)
-  interface = Interface()
-  interface.width = 0.25
 
-  number_of_sliders = 6
-  # TODO: Need to create a "layout" feature so this is not hardcoded anymore
-  slider_height     = 24
-  space_height      = 60
+  interface = Interface(fixed_size=True)
 
   sliders = []
-
-  y = space_height
-  for joint_index in range(1, number_of_sliders + 1):
-
+  for joint_index in range(1, 7):
     interface.add_joint_controller(joint_index, Slider(
       name     = f'Axis #{joint_index}',
-      position = Vector3(20, y),
       fixed_size = True,
       scale     = 2,
     ))
-    y += slider_height + space_height
 
+  interface.layout(5, 10, 15, 20)
 
   rectangle_buffer = Buffer.from_points([
     Vector3( 1,  0),
