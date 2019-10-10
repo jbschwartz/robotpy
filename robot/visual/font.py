@@ -32,6 +32,7 @@ class Font:
       26, 27, 28, 28, 28, 28, 28, 32, 28, 27, 27, 27, 27, 23, 28, 23]
 
     self.cell_size = 64
+    self.font_size = 64
 
     assert len(self.char_widths) == 256, "Not the correct number of widths"
 

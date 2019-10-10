@@ -18,13 +18,15 @@ class Text(Widget):
 
     self.string = string
     self.font = font
+    self.size = 32
+    self.scale = self.size / self.font.font_size
 
   def load(self):
-    self.widths = self.font.widths(self.string)
+    self.widths = [w * self.scale for w in self.font.widths(self.string)]
     self.total_width = sum(self.widths)
     self.widths = [w / self.total_width for w in self.widths]
     self.uvs = self.font.uvs(self.string)
-    self.pixel_height = 64
+    self.pixel_height = self.size
     self.reload_buffer = True
     self._width = self.total_width / self.screen_width
     self._height = self.pixel_height / self.screen_height
@@ -38,7 +40,7 @@ class Text(Widget):
   def character_buffer(self, width, offset, u, v) -> Iterable[float]:
     x_min = offset
     x_max = x_min + width
-    pixel_width = width * self.total_width
+    pixel_width = width * self.total_width / self.scale
     u_max = u + (pixel_width / 1024)
     v_max = v + (64 / 1024)
 
