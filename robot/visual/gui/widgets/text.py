@@ -43,12 +43,12 @@ class Text(Widget):
     v_max = v + (64 / 1024)
 
     return [
-      ([x_max,  0,  0,  u_max, v_max],), # Top Right
-      ([x_min,  0,  0,  u,     v_max],), # Top Left
-      ([x_min,  1,  0,  u,     v    ],), # Bottom Left
-      ([x_min,  1,  0,  u,     v    ],), # Bottom Left
-      ([x_max,  1,  0,  u_max, v    ],), # Bottom Right
-      ([x_max,  0,  0,  u_max, v_max],), # Top Right
+      ([x_max,  0,  0], [u_max, v_max]), # Top Right
+      ([x_min,  0,  0], [u,     v_max]), # Top Left
+      ([x_min,  1,  0], [u,     v    ]), # Bottom Left
+      ([x_min,  1,  0], [u,     v    ]), # Bottom Left
+      ([x_max,  1,  0], [u_max, v    ]), # Bottom Right
+      ([x_max,  0,  0], [u_max, v_max]), # Top Right
     ]
 
   @property

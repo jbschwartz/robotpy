@@ -105,7 +105,8 @@ class Buffer():
       )
 
   def reload(self, data_list) -> None:
-    self.data = np.array(data_list, dtype=[('', np.float32, 5)])
+    # TODO: This is hardcoded for only one buffer type. This needs to change.
+    self.data = np.array(data_list, dtype=self.data.dtype)
 
     gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vbo)
     gl.glBufferData(gl.GL_ARRAY_BUFFER, self.data.nbytes, self.data, gl.GL_STREAM_DRAW)
