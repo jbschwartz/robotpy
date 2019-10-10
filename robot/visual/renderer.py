@@ -10,6 +10,7 @@ from OpenGL.GL import *
 from robot.common                    import logger, Timer
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
+from robot.visual.gui.widgets.text    import Text
 
 from .opengl.buffer         import Buffer
 from .opengl.shader_program import ShaderProgram
@@ -97,7 +98,9 @@ class Renderer():
           if instance.visible:
             if getattr(instance, 'reload_buffer', False):
               entity.buffer.reload(instance.buffer)
-              instance.reload_buffer = False
+              # TODO: Need to come up with a better way to handle text rendering
+              # and buffer reloading. This is just a quick hack.
+              # instance.reload_buffer = False
 
             instance.prepare(sp)
 

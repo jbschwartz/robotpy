@@ -167,10 +167,15 @@ if __name__ == "__main__":
   for slider in interface.joint_controllers.values():
     renderer.add_many(slider.children.values())
 
-  r = Text("", f, position=Vector3(0.25, 0.25), color=[0]*3)
-  controller.text = r
+  t1 = Text("", f, position=Vector3(0.25, 0.25), color=[0]*3)
+  t2 = Text("", f, position=Vector3(0.25, 0.35), color=[0]*3)
+  t3 = Text("", f, position=Vector3(0.25, 0.45), color=[0]*3)
+  t4 = Text("", f, position=Vector3(0.25, 0.55), color=[0]*3)
+  t5 = Text("", f, position=Vector3(0.25, 0.65), color=[0]*3)
+  t6 = Text("", f, position=Vector3(0.25, 0.75), color=[0]*3)
+  controller.texts = [t1, t2, t3, t4, t5, t6]
 
-  renderer.add(r)
+  renderer.add_many(controller.texts)
   sim.controllers.append(controller)
   sim.controllers.append(controller1)
 
