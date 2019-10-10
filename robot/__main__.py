@@ -1,17 +1,21 @@
-import json, math, sys
+import json, math, sys, glfw
 
 import OpenGL.GL as gl
 
-from robot.common          import Bindings, logger, Timer
-from robot.mech            import Serial, SerialController, Simulation
-from robot.mech            import tool
-from robot.mech.views      import SerialView, FrameView
-from robot.spatial.euler   import Axes, Order
-from robot.spatial         import Matrix4, Mesh, Transform, Quaternion, Vector3
-from robot.traj.linear_os  import LinearOS
-from robot.visual.renderer          import Renderer
+from robot.common                          import Bindings, logger, Timer
+from robot.mech                            import Serial, SerialController, Simulation
+from robot.mech                            import tool
+from robot.mech.views                      import SerialView, FrameView
+from robot.spatial                         import Matrix4, Mesh, Transform, Quaternion, Vector3
+from robot.spatial.euler                   import Axes, Order
+from robot.traj.linear_os                  import LinearOS
+from robot.visual                          import Font
+from robot.visual.renderer                 import Renderer
 from robot.visual.filetypes.stl.stl_parser import STLParser
-from robot.visual.gui.widgets.rectangle import Rectangle
+from robot.visual.messaging.listener       import listen, listener
+from robot.visual.messaging.event          import Event
+from robot.visual.gui.widgets.rectangle    import Rectangle
+from robot.visual.gui.widgets.text         import Text
 from robot.visual.opengl.buffer            import Buffer
 from robot.visual.opengl.shader_program    import ShaderProgram
 from robot.visual.opengl.uniform_buffer    import Mapping, UniformBuffer
@@ -124,6 +128,19 @@ if __name__ == "__main__":
     Vector3( 1,  0)
   ])
 
+  f = Font(32, 16, [])
+  u, v = f.uvs('?')[0]
+  width = 0.0625
+
+  text_buffer = Buffer.from_points_textured([
+    ([1,  0,  0,  u+width,  v+width],), # Top Right
+    ([0,  0,  0,  u,  v+width],), # Top Left
+    ([0,  1,  0,  u,  v],), # Bottom Left
+    ([0,  1,  0,  u,  v],), # Bottom Left
+    ([1,  1,  0,  u+width,  v],), # Bottom Right
+    ([1,  0,  0,  u+width,  v+width],), # Top Right
+  ])
+
   renderer.register_entity_type(
     view_type    = SerialView,
     buffer       = serial_buffer,
@@ -132,6 +149,12 @@ if __name__ == "__main__":
   renderer.register_entity_type(
     view_type    = Rectangle,
     buffer       = rectangle_buffer,
+  )
+
+  renderer.register_entity_type(
+    view_type    = Text,
+    shader_name  = 'character',
+    buffer       = text_buffer,
   )
 
   controller = SerialController(serial)
@@ -143,6 +166,10 @@ if __name__ == "__main__":
   for slider in interface.joint_controllers.values():
     renderer.add_many(slider.children.values())
 
+  r = Text("", f, position=Vector3(0.25, 0.25), color=[0]*3)
+  controller.text = r
+
+  renderer.add(r)
   sim.controllers.append(controller)
   sim.controllers.append(controller1)
 

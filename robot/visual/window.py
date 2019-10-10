@@ -1,4 +1,4 @@
-import math, numpy, glfw, sys
+import math, numpy, glfw, sys, time
 
 from typing import Optional
 
@@ -105,3 +105,5 @@ class Window():
 
           glfw.swap_buffers(self.window)
           glfw.poll_events()
+
+      time.sleep(0.02)
