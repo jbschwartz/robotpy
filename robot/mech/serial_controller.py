@@ -22,6 +22,7 @@ class SerialController():
     self.interface = None
     self.solve()
     self.index = 0
+    self.text = None
 
   def solve(self) -> None:
     target = self.serial.pose()
@@ -36,6 +37,11 @@ class SerialController():
 
   def update_controllers(self, interface):
     self.interface = interface
+
+    if hasattr(self.text, 'load'):
+      self.text.string = "{:.2f}".format(math.degrees(self.serial.angles[0]))
+      self.text.load()
+
     for joint, controller in zip(self.serial.joints, interface.joint_controllers.values()):
       controller.value = joint.normalized_angle
 
@@ -45,6 +51,11 @@ class SerialController():
       for joint_index, controller in controllers.items():
         def callback(name: str, value: float, joint_index: int = joint_index) -> None:
           self.serial.set_joint_angle(joint_index, value, normalized=True)
+
+          if joint_index == 1 and hasattr(self.text, 'load'):
+            self.text.string = "{:.2f}".format(math.degrees(self.serial.angles[0]))
+            self.text.load()
+
           target = self.serial.pose()
           self.solutions = solve_angles(target, self.serial)
           self.index = 0

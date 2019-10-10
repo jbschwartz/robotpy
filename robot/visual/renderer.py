@@ -1,5 +1,7 @@
 import re
 
+import numpy as np
+
 from collections import namedtuple
 from typing      import Callable, Iterable, Type
 
@@ -41,6 +43,18 @@ class Renderer():
     glCullFace(GL_BACK)
     glFrontFace(GL_CCW)
 
+    from robot.visual.filetypes.bmp.bmp_parser import BMPParser
+    b = BMPParser()
+    data_list, width, height = b.parse('./local_dev/ExportedFont.bmp')
+    data = np.array(data_list, dtype=np.uint8)
+
+    self.texture_id = glGenTextures(1)
+    glActiveTexture(GL_TEXTURE0)
+    glBindTexture(GL_TEXTURE_2D, self.texture_id)
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data)
+    glGenerateMipmap(GL_TEXTURE_2D)
+
   def bind_buffer_objects(self) -> None:
     for ubo in self.ubos:
       for shader in self.shaders.values():
@@ -58,6 +72,9 @@ class Renderer():
   @listen(Event.START_FRAME)
   def frame(self):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    glActiveTexture(GL_TEXTURE0)
+    glBindTexture(GL_TEXTURE_2D, self.texture_id)
 
     self.load_buffer_objects()
 

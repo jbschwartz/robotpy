@@ -69,6 +69,16 @@ class Buffer():
     return cls(np.array(data_list, dtype=[('position', '3f4')]))
 
   @classmethod
+  def from_points_textured(cls, points: Iterable[float]) -> 'Buffer':
+    """Create one Buffer for a collection of Vector3 points."""
+    data = np.array(points, dtype=[('', np.float32, 5)])
+
+    return cls(data, {
+      'position': {'type': GL_FLOAT, 'number_of_components': 3},
+      'texCoords': {'type': GL_FLOAT, 'number_of_components': 2},
+    })
+
+  @classmethod
   def Procedural(cls, size) -> 'Buffer':
     """Create an empty buffer for 'procedural' shader programs."""
     return cls(np.empty(size), True)
@@ -96,6 +106,12 @@ class Buffer():
       self.attributes.append(
         Attribute(location, num_components, gl_type, c_void_p(offset))
       )
+
+  def reload(self, data_list) -> None:
+    self.data = np.array(data_list, dtype=[('', np.float32, 5)])
+
+    glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+    glBufferData(GL_ARRAY_BUFFER, self.data.nbytes, self.data, GL_STREAM_DRAW)
 
   def load(self) -> None:
     """Load the OpenGL buffer with the data and enable the attributes."""

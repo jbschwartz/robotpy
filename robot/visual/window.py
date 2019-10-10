@@ -105,3 +105,5 @@ class Window():
 
           glfw.swap_buffers(self.window)
           glfw.poll_events()
+
+      time.sleep(0.02)
