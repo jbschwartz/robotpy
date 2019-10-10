@@ -134,12 +134,12 @@ if __name__ == "__main__":
   width = 0.0625
 
   text_buffer = Buffer.from_points_textured([
-    ([1,  0,  0,  u+width,  v+width],), # Top Right
-    ([0,  0,  0,  u,  v+width],), # Top Left
-    ([0,  1,  0,  u,  v],), # Bottom Left
-    ([0,  1,  0,  u,  v],), # Bottom Left
-    ([1,  1,  0,  u+width,  v],), # Bottom Right
-    ([1,  0,  0,  u+width,  v+width],), # Top Right
+    ([1,  0,  0],  [u+width,  v+width]), # Top Right
+    ([0,  0,  0],  [u,  v+width]), # Top Left
+    ([0,  1,  0],  [u,  v]), # Bottom Left
+    ([0,  1,  0],  [u,  v]), # Bottom Left
+    ([1,  1,  0],  [u+width,  v]), # Bottom Right
+    ([1,  0,  0],  [u+width,  v+width]), # Top Right
   ])
 
   renderer.register_entity_type(
