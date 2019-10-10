@@ -79,6 +79,7 @@ class Joint:
         raise InvalidJointAngleError(f"{value} outside of joint limits [{self.limits.low}, {self.limits.high}]")
 
       self.angle = value
+    return self.angle
 
   @property
   def transform(self) -> Transform:

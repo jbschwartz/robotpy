@@ -89,8 +89,9 @@ class Serial:
     """Set the corresponding joint angle.
 
     Joints are indexed starting with 0 but Joint 0 is the base joint (and it's immovable)."""
-    self.links[joint_index].joint.set_angle(value, normalized)
+    new_angle = self.links[joint_index].joint.set_angle(value, normalized)
     self.update_link_transforms()
+    return new_angle
 
   @property
   def aabb(self) -> AABB:
