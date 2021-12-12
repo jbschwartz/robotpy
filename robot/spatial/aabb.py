@@ -3,7 +3,6 @@ import math
 from typing import Iterable, Union
 
 from .vector3   import Vector3
-from .transform import Transform
 
 class AABB:
   """Axis Aligned Bounding Box."""

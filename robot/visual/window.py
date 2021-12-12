@@ -1,10 +1,10 @@
-import math, numpy, glfw, sys
+import glfw, sys
 
 from typing import Optional
 
 from OpenGL.GL import GL_TRUE
 
-from robot.common       import logger, Timer
+from robot.common       import Timer
 from robot.utils        import sign
 from robot.spatial      import Vector3
 from .messaging.emitter import emitter

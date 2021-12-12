@@ -1,6 +1,6 @@
 import math
 
-from typing import Iterable, Union
+from typing import Iterable
 
 from .aabb         import AABB
 from .exceptions   import DegenerateTriangleError

@@ -1,7 +1,5 @@
 import unittest
 
-from robot import ik
-
 class TestWrist(unittest.TestCase):
   def setUp(self):
     pass

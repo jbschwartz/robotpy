@@ -1,6 +1,5 @@
 import math, unittest
 
-from robot.mech        import Joint, Serial
 from robot.mech.robots import ABB_IRB_120
 from robot.spatial     import Vector3
 

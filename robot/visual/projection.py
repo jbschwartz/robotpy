@@ -1,4 +1,4 @@
-import abc, enum, math
+import abc, math
 
 from robot.spatial import Matrix4, Vector3
 

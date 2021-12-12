@@ -1,7 +1,5 @@
 import glfw, math
 
-from robot.ik.angles                 import solve_angles
-from robot.spatial                   import Dual, Quaternion, Transform, Vector3
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
 

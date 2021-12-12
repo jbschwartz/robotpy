@@ -1,4 +1,4 @@
-import enum, glfw
+import glfw
 
 class Bindings():
   def __init__(self):

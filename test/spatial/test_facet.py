@@ -1,4 +1,4 @@
-import math, unittest
+import unittest
 
 from robot.spatial import Facet, Intersection, Ray, Vector3
 

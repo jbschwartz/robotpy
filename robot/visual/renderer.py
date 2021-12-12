@@ -10,7 +10,6 @@ from robot.visual.messaging.event    import Event
 from .opengl.buffer         import Buffer
 from .opengl.shader_program import ShaderProgram
 from .opengl.shader         import ShaderType
-from .opengl.uniform_buffer import UniformBuffer
 
 Entity = namedtuple('Entity', 'name shader draw_mode buffer instances per_instance add_children')
 

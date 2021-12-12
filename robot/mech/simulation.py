@@ -1,7 +1,6 @@
 import glfw, math, statistics
 
 from collections import deque
-from typing      import Optional
 
 from robot.common                    import logger
 from robot.spatial                   import AABB, Intersection, Ray

@@ -1,7 +1,5 @@
 import json, os
 
-from typing import Optional
-
 from robot.spatial import AABB, Intersection, Mesh, Ray, Transform, Vector3
 from robot.visual.filetypes.stl.stl_parser import STLParser
 

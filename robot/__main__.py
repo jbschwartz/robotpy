@@ -1,8 +1,8 @@
-import json, math, sys
+import json, math
 
 import OpenGL.GL as gl
 
-from robot.common          import Bindings, logger, Timer
+from robot.common          import Bindings, Timer
 from robot.mech            import Serial, Simulation
 from robot.mech            import tool
 from robot.spatial.euler   import Axes, Order
@@ -157,8 +157,6 @@ if __name__ == "__main__":
   renderer.add('grid', None, None, scale=10000)
 
   renderer.add('trajectory', serials[0], None)
-
-  # world_frame = entities.FrameEntity(Transform(), renderer.shaders.get('flat'))
 
   bindings = Bindings()
   settings = vis.CameraSettings()

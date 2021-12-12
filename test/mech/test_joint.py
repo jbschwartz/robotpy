@@ -1,6 +1,5 @@
 import math, unittest
 
-
 from collections import namedtuple
 
 from robot                   import constant
