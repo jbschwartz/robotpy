@@ -227,8 +227,8 @@ class STLParser:
     # TODO: Switch how the ASCII parser constructs facets.
     # Instead of appending vertices into a constructed facet
     # Hold onto vertices and then construct the facet directly here (i.e. Facet(vertices, normal))
-    self.current_facet.compute_aabb()
-    self.current_facet.compute_edges()
+    current_facet.compute_aabb()
+    current_facet.compute_edges()
 
     try:
       if self.compute_normals and self.show_warnings:
