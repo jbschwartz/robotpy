@@ -68,7 +68,7 @@ class AABB:
       t_min = (minimum - origin) * inv_direction
       t_max = (maximum - origin) * inv_direction
 
-      # Swap if reording is necessary
+      # Swap if reordering is necessary
       if t_min > t_max:
         t_min, t_max = t_max, t_min
 

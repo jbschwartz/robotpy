@@ -21,7 +21,7 @@ class Camera():
     self.look_at(position, target, up)
 
   def look_at(self, position: Vector3, target: Vector3, up: Vector3) -> None:
-    """Calcuate look-at transformation.
+    """Calculate look-at transformation.
 
     Uses a geometrically intuitive method with quaternions.
     (instead of a more efficient computation converting from a matrix directly)

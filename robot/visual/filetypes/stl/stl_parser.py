@@ -116,7 +116,7 @@ class STLParser:
         Vector3(*facet_floats[9:12])
       ]
 
-      # We use the attribute value to idenitfy which mesh a facet belongs to
+      # We use the attribute value to identify which mesh a facet belongs to
       # This allows multiple meshes to be saved to one file
 
       # This is non-standard binary STL behavior
