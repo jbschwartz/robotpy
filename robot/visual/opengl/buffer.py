@@ -55,14 +55,14 @@ class Buffer():
   @classmethod
   def from_mesh(cls, mesh: Mesh) -> 'Buffer':
     """Create a Buffer from a Mesh."""
-    data = np.array(mesh.get_buffer_data(), dtype=[('', np.float32, 6),('', np.int32, 1)])
+    data = np.array(mesh.get_buffer_data(), dtype=[('', np.float32, 6),('', np.int32)])
     # TODO: Maybe there is something better than a deepcopy
     return cls(data, deepcopy(MESH_BUFFER_ATTRS))
 
   @classmethod
   def from_meshes(cls, meshes: Iterable[Mesh]) -> 'Buffer':
     """Create one Buffer for a collection of Meshes."""
-    data = np.array([], dtype=[('', np.float32, 6),('', np.int32, 1)])
+    data = np.array([], dtype=[('', np.float32, 6),('', np.int32)])
     for mesh_index, mesh in enumerate(meshes):
       mesh_data = mesh.get_buffer_data(mesh_index)
       data = np.concatenate((data, mesh_data), axis=0)

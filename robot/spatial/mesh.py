@@ -47,7 +47,7 @@ class Mesh:
       for vertex in facet.vertices
     ]
 
-    return np.array(data, dtype=[('', np.float32, 6),('', np.int32, 1)])
+    return np.array(data, dtype=[('', np.float32, 6),('', np.int32)])
 
   def transform(self, transform: 'Transform') -> 'Mesh':
     transformed_facets = [f.transform(transform) for f in self.facets]
