@@ -1,0 +1,11 @@
+name: robotpy
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - ipykernel
+  - pyopengl
+  - numpy
+  - pip
+  - pip:
+    - glfw

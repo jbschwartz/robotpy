@@ -4,10 +4,10 @@
 
 Robot kinematics (and eventually dynamics) written in Python 3.
 
-All development for this project is done live on Twitch. Follow [@jschwartz](https://www.twitch.tv/jschwartz) for notifications.
-
 ## Running
 
+`conda env create -f environment.yml`
+`conda activate robotpy`
 `py -m robot`
 
 ## Testing
