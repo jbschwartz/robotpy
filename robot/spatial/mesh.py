@@ -1,5 +1,7 @@
 import numpy as np
 
+from typing import Iterable
+
 from .aabb         import AABB
 from .intersection import Intersection
 from .kdtree       import KDTree

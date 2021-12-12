@@ -4,11 +4,12 @@ import OpenGL.GL as gl
 
 from robot.common          import Bindings, Timer
 from robot.mech            import Serial, Simulation
-from robot.mech            import tool
+from robot.mech            import tool, SerialController
 from robot.mech.views      import SerialView, FrameView
 from robot.spatial.euler   import Axes, Order
 from robot.spatial         import Matrix4, Mesh, Transform, Quaternion, Vector3
 from robot.traj.linear_os  import LinearOS
+from robot.visual.font     import Font
 from robot.visual.renderer          import Renderer
 from robot.visual.filetypes.stl.stl_parser import STLParser
 from robot.visual.messaging.listener       import listen, listener
@@ -57,8 +58,6 @@ def setup():
   )
 
   # renderer.add('grid', None, None, scale=10000)
-
-  renderer.add('trajectory', serials[0], None)
 
   bindings = Bindings()
   settings = vis.CameraSettings()
