@@ -21,7 +21,6 @@ void main()
 #elif defined(FRAGMENT)
 
 in vec4 vout_world_pos;
-out vec4 gl_FragColor;
 
 uniform float step_size;
 uniform float minor_step_size;
