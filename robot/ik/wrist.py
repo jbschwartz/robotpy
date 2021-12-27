@@ -1,4 +1,4 @@
-from robot.spatial import euler, Transform
+from spatial import euler, Transform
 
 def solve_wrist(target : Transform, arm_angles : list, robot : 'Serial'):
   '''

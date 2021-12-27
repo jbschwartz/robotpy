@@ -5,7 +5,7 @@ from collections import namedtuple
 from robot                   import constant
 from robot.mech.exceptions   import InvalidJointAngleError, InvalidJointDictError
 from robot.mech.joint        import DenavitHartenberg, JointLimits, Joint
-from robot.spatial           import Transform, Vector3
+from spatial                 import Transform, Vector3
 
 def create_dummy_dict(dh: dict = None, limits: dict = None, home: int = None):
   """Create a sample dictionary with all of the DH fields present."""

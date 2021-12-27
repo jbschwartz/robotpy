@@ -5,7 +5,7 @@ from ctypes import c_void_p
 from typing import Iterable
 
 from robot.common    import logger
-from robot.spatial   import Mesh, Vector3
+from spatial         import Mesh, Vector3
 from .shader_program import ShaderProgram
 
 from OpenGL.GL import *
@@ -17,6 +17,20 @@ MESH_BUFFER_ATTRS = {
 }
 
 ATTRIBI_TYPES = (GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT)
+
+def get_buffer_data(mesh: Mesh, index: int = 0) -> np.array:
+    """Return a numpy array of flattened, interleaved vertex position and normal floats.
+    Index is useful for storing multiple meshes in a single OpenGL buffer.
+    This allows the shader program to distinguish between meshes.
+    """
+    data = [
+      ([*vertex, *(facet.normal)], index)
+      for facet in mesh.facets
+      for vertex in facet.vertices
+    ]
+
+    return np.array(data, dtype=[('', np.float32, 6),('', np.int32)])
+
 
 class Buffer():
   """OpenGL Buffer instance."""
@@ -55,7 +69,7 @@ class Buffer():
   @classmethod
   def from_mesh(cls, mesh: Mesh) -> 'Buffer':
     """Create a Buffer from a Mesh."""
-    data = np.array(mesh.get_buffer_data(), dtype=[('', np.float32, 6),('', np.int32)])
+    data = np.array(get_buffer_data(mesh), dtype=[('', np.float32, 6),('', np.int32)])
     # TODO: Maybe there is something better than a deepcopy
     return cls(data, deepcopy(MESH_BUFFER_ATTRS))
 
@@ -64,7 +78,7 @@ class Buffer():
     """Create one Buffer for a collection of Meshes."""
     data = np.array([], dtype=[('', np.float32, 6),('', np.int32)])
     for mesh_index, mesh in enumerate(meshes):
-      mesh_data = mesh.get_buffer_data(mesh_index)
+      mesh_data = get_buffer_data(mesh, mesh_index)
       data = np.concatenate((data, mesh_data), axis=0)
 
     # TODO: Maybe there is something better than a deepcopy

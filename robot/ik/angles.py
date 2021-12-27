@@ -1,6 +1,6 @@
 import math
 
-from robot.spatial import Transform
+from spatial       import Transform
 from .arm          import solve_arm
 from .wrist        import solve_wrist
 

@@ -1,6 +1,6 @@
 import math
 
-from robot.spatial import Vector3
+from spatial       import Vector3
 from .elbow        import solve_elbow
 from .waist        import solve_waist
 from .shoulder     import solve_shoulder

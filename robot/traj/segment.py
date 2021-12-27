@@ -1,6 +1,6 @@
 import abc, math
 
-from robot.spatial import Transform, vector3
+from spatial import Transform, vector3
 
 class Segment(abc.ABC):
   @abc.abstractmethod

@@ -1,7 +1,7 @@
 import math, unittest
 
 import robot.ik    as ik
-from robot.spatial import Vector3
+from spatial       import Vector3
 
 class TestArm(unittest.TestCase):
   def setUp(self):

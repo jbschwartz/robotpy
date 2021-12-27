@@ -3,7 +3,7 @@ import math
 from collections import namedtuple
 
 from robot         import constant
-from robot.spatial import Dual, Quaternion, Transform
+from spatial       import Dual, Quaternion, Transform
 from .exceptions   import InvalidJointAngleError, InvalidJointDictError
 
 # TODO: Generalize this class to potentially handle prismatic case

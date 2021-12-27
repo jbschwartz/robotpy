@@ -3,7 +3,7 @@ import glfw, math, statistics
 from collections import deque
 
 from robot.common                    import logger
-from robot.spatial                   import AABB, Intersection, Ray
+from spatial                         import AABB, Intersection, Ray
 from robot.visual.messaging.listener import listen, listener
 from robot.visual.messaging.event    import Event
 

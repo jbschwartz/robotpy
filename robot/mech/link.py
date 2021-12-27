@@ -3,7 +3,7 @@ import math
 from collections import namedtuple
 from typing      import Iterable, Optional
 
-from robot.spatial import AABB, Intersection, Mesh, Ray, Transform, Vector3
+from spatial       import AABB, Intersection, Mesh, Ray, Transform, Vector3
 from .joint        import Joint
 
 PhysicalProperties = namedtuple('PhysicalProperties', 'com moments volume', defaults=(None, None, None))

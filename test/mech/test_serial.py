@@ -1,7 +1,7 @@
 import math, unittest
 
 from robot.mech.robots import ABB_IRB_120
-from robot.spatial     import Vector3
+from spatial           import Vector3
 
 class TestSerial(unittest.TestCase):
   def setUp(self):

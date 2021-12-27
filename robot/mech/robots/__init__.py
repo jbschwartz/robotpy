@@ -1,7 +1,7 @@
 import json
 
 from robot.mech    import Serial
-from robot.spatial import Mesh
+from spatial       import Mesh
 from robot.visual  import STLParser
 
 with open('./robot/mech/robots/abb_irb_120.json') as json_file:

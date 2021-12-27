@@ -2,7 +2,7 @@ import itertools, math
 
 from typing import Iterable
 
-from robot.spatial     import AABB, Intersection, Mesh, Ray, Transform, Vector3
+from spatial           import AABB, Intersection, Mesh, Ray, Transform, Vector3
 from .exceptions       import InvalidSerialDictError
 from .joint            import Joint
 from .link             import Link

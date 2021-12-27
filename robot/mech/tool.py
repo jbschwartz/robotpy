@@ -1,6 +1,6 @@
 import json, os
 
-from robot.spatial import AABB, Intersection, Mesh, Ray, Transform, Vector3
+from spatial import AABB, Intersection, Mesh, Ray, Transform, Vector3
 from robot.visual.filetypes.stl.stl_parser import STLParser
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

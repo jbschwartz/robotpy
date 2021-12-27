@@ -5,8 +5,8 @@ import OpenGL.GL as gl
 from robot.common          import Bindings, Timer
 from robot.mech            import Serial, Simulation
 from robot.mech            import tool
-from robot.spatial.euler   import Axes, Order
-from robot.spatial         import Mesh, Transform, Quaternion, Vector3
+from spatial.euler         import Axes, Order
+from spatial               import Mesh, Transform, Quaternion, Vector3
 from robot.traj.linear_os  import LinearOS
 from robot.visual.filetypes.stl.stl_parser import STLParser
 from robot.visual.opengl.buffer            import Buffer

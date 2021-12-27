@@ -1,10 +1,17 @@
 import enum, math
 
 from robot         import utils
-from robot.spatial import AABB, vector3, Ray, Transform
+from spatial       import AABB, vector3, Ray, Transform
 from .projection   import OrthoProjection, PerspectiveProjection, Projection
 
 Vector3 = vector3.Vector3
+
+class CoordinateAxes(enum.IntEnum):
+    """The standard cartesian coordinate axes (X, Y, and Z)."""
+
+    X = 0
+    Y = 1
+    Z = 2
 
 class OrbitType(enum.Enum):
   FREE        = enum.auto()
@@ -134,7 +141,7 @@ class Camera():
 
     sorted_points = {}
     sizes = {}
-    for coord in [vector3.VECTOR_X, vector3.VECTOR_Y]:
+    for coord in [CoordinateAxes.X, CoordinateAxes.Y]:
       # Find the points that create the largest width or height in NDC space
       sorted_points[coord] = sorted(camera_box_points, key = lambda point: -ndc_coordinate(point, coord))
       # Calculate the distance between the two extreme points vertically and horizontally
@@ -156,30 +163,30 @@ class Camera():
       '''
       Solve the deltas for all three axis.
 
-      If `major` is vector3.VECTOR_X, the fit occurs on the width of the bounding box.
-      If `major` is vector3.VECTOR_Y, the fit occurs on the height of the bounding box.
+      If `major` is CoordinateAxes.X, the fit occurs on the width of the bounding box.
+      If `major` is CoordinateAxes.Y, the fit occurs on the height of the bounding box.
       `v1` and `v2` are the points along the major axis.
       `v3` and `v4` are the points along hte minor axis.
       '''
       delta_major   = (-projection_factor * v1[major] - v1.z - projection_factor * v2[major] + v2.z) / (2 * projection_factor)
       delta_distance = projection_factor * delta_major + projection_factor * v2[major] - v2.z
 
-      minor = vector3.VECTOR_X if major == vector3.VECTOR_Y else vector3.VECTOR_Y
+      minor = CoordinateAxes.X if major == CoordinateAxes.Y else CoordinateAxes.Y
 
       delta_minor = (-v4.z * v3[minor] - v3.z * v4[minor]) / (v3.z + v4.z)
 
       return (delta_major, delta_minor, delta_distance)
 
-    x_min = sorted_points[vector3.VECTOR_X][-1]
-    x_max = sorted_points[vector3.VECTOR_X][0]
-    y_min = sorted_points[vector3.VECTOR_Y][-1]
-    y_max = sorted_points[vector3.VECTOR_Y][0]
+    x_min = sorted_points[CoordinateAxes.X][-1]
+    x_max = sorted_points[CoordinateAxes.X][0]
+    y_min = sorted_points[CoordinateAxes.Y][-1]
+    y_max = sorted_points[CoordinateAxes.Y][0]
 
-    if sizes[vector3.VECTOR_Y] > sizes[vector3.VECTOR_X]:
+    if sizes[CoordinateAxes.Y] > sizes[CoordinateAxes.X]:
       # Height is the constraint: Y is the major axis
       if isinstance(self.projection, PerspectiveProjection):
         projection_factor = self.projection.matrix.elements[5] / scale
-        delta_y, delta_x, delta_z = solve_deltas(vector3.VECTOR_Y, y_max, y_min, x_max, x_min, projection_factor)
+        delta_y, delta_x, delta_z = solve_deltas(CoordinateAxes.Y, y_max, y_min, x_max, x_min, projection_factor)
       elif isinstance(self.projection, OrthoProjection):
         delta_x = -(x_max.x + x_min.x) / 2
         delta_y = -(y_max.y + y_min.y) / 2
@@ -190,7 +197,7 @@ class Camera():
       # Width is the constraint: X is the major axis
       if isinstance(self.projection, PerspectiveProjection):
         projection_factor = self.projection.matrix.elements[0] / scale
-        delta_x, delta_y, delta_z = solve_deltas(vector3.VECTOR_X, x_max, x_min, y_max, y_min, projection_factor)
+        delta_x, delta_y, delta_z = solve_deltas(CoordinateAxes.X, x_max, x_min, y_max, y_min, projection_factor)
       elif isinstance(self.projection, OrthoProjection):
         delta_x = -(x_max.x + x_min.x) / 2
         delta_y = -(y_max.y + y_min.y) / 2

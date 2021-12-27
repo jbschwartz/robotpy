@@ -1,7 +1,7 @@
 from typing import Union
 
 from robot.mech                         import Link, Serial, Tool
-from robot.spatial                      import Matrix4, Transform
+from spatial                            import Matrix4, Transform
 from robot.visual                       import Camera, Renderer
 from robot.visual.opengl.shader_program import ShaderProgram
 

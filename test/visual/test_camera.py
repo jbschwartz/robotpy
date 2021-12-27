@@ -1,6 +1,6 @@
 import math, unittest
 
-from robot.spatial import Vector3
+from spatial       import Vector3
 from robot.visual  import Camera
 
 class TestCamera(unittest.TestCase):

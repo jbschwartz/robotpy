@@ -2,7 +2,7 @@ from numbers import Number
 from typing  import Callable, Iterable, Union
 
 from robot.utils import raise_if
-from robot.spatial import Matrix4, Transform, Vector3
+from spatial     import Matrix4, Transform, Vector3
 
 from .exceptions import UniformArraySizeError, UniformSizeError, UniformTypeError
 
