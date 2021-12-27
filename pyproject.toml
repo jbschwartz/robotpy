@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "robotpy"
+version = "0.1.0"
+description = "Robot Kinematics in Python."
+authors = ["James Schwartz"]
+
+[tool.poetry.dependencies]
+python = "~3.9"
+spatial = { git = "https://github.com/jbschwartz/spatial.git" }
+PyOpenGL = "3.1.0"
+glfw = "^2.5.0"
+numpy = "^1.21.5"
+
+[tool.poetry.dev-dependencies]
+black = "^21.12b0"
+mypy = "^0.930"
+pydocstyle = "^6.1.1"
+pylint = "^2.12.2"
+coverage = "^6.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+
+[tool.pydocstyle]
+match='(?!test_).*\.py'
+ignore = "D100, D203"
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = "C0114"
+good-names = "x,y,z"
