@@ -14,7 +14,7 @@ class LinearOS():
     # TODO: Don't forget to handle the blending case when there is only one segment.
     self.path.blend(30)
 
-    self.target_orientation = robot.pose().rotation()
+    self.target_orientation = robot.pose().rotation
 
     self.segment_duration = [segment.length / self.path.length * duration for segment in self.path.segments]
 

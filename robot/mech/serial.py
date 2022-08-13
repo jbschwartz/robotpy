@@ -90,7 +90,7 @@ class Serial:
 
   @property
   def aabb(self) -> AABB:
-    aabb = AABB.from_points([link.aabb for link in self.links])
+    aabb = AABB([link.aabb for link in self.links])
 
     if self.tool:
       aabb.expand(self.tool.aabb)
@@ -191,4 +191,4 @@ class Serial:
 
     total = pose * tip_transform * Transform.from_axis_angle_translation(translation=Vector3(0, 0, -wrist_length))
 
-    return total.translation()
+    return total.translation

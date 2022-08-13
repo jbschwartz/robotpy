@@ -63,7 +63,8 @@ class STLParser:
 
     self.current = {
       'state': ParserState.PARSE_SOLID,
-      'facet': Facet(),
+      # TODO: The ASCII parser is completely broken by changes to spatial >=0.2.0.
+      'facet': None, # Facet(),
       'line': 1
     }
 

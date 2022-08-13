@@ -26,7 +26,7 @@ def solve_wrist(target : Transform, arm_angles : list, robot : 'Serial'):
     # Must be intrinsic ZYZ based on mechanical configuration of spherical wrist
     #   Axis 4 rotates about Z, Axis 5 rotates about Y, Axis 6 rotates about Z
     # There are at least two solutions
-    wrist_sets = euler.angles(delta.rotation(), axes=euler.Axes.ZYZ, order=euler.Order.INTRINSIC)
+    wrist_sets = euler.angles(delta.rotation, axes=euler.Axes.ZYZ, order=euler.Order.INTRINSIC)
 
     solutions.extend([angle_set + wrist_set for wrist_set in wrist_sets])
 

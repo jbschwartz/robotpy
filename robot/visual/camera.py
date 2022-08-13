@@ -73,7 +73,7 @@ class Camera():
 
   @property
   def position(self) -> Vector3:
-    return self.camera_to_world.translation()
+    return self.camera_to_world.translation
 
   def orbit(self, target: Vector3, pitch: float = 0, yaw: float = 0, orbit_type: OrbitType = OrbitType.FREE) -> None:
     """Orbit the camera around target point (with pitch and yaw)."""

@@ -40,7 +40,7 @@ class Link:
   @property
   def aabb(self) -> AABB:
     """Return the Link Mesh's AABB in world space."""
-    return AABB.from_points([self.to_world(corner) for corner in self.mesh.aabb.corners])
+    return AABB([self.to_world(corner) for corner in self.mesh.aabb.corners])
 
   @property
   def properties(self) -> PhysicalProperties:
