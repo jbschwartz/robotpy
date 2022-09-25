@@ -6,13 +6,16 @@ Robot kinematics (and eventually dynamics) written in Python 3.
 
 ## Running
 
-`conda env create -f environment.yml`
-`conda activate robotpy`
-`py -m robot`
+Install dependencies through `poetry`.
+
+```
+poetry install
+python -m robot
+```
 
 ## Testing
 
-`py -m unittest`
+`python -m unittest`
 
 ### Running a Single Test File
 
