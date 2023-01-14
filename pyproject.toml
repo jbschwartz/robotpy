@@ -5,7 +5,7 @@ description = "Robot Kinematics in Python."
 authors = ["James Schwartz"]
 
 [tool.poetry.dependencies]
-python = "~3.9"
+python = "^3.9"
 spatial = { git = "https://github.com/jbschwartz/spatial.git", tag = "v0.3.0" }
 PyOpenGL = {version = "3.1.1a1", allow-prereleases = true}
 glfw = "^2.5.0"
