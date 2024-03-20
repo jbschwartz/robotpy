@@ -12,7 +12,7 @@ glfw = "^2.5.0"
 numpy = "^1.22.0"
 
 [tool.poetry.dev-dependencies]
-black = "^21.12b0"
+black = "^24.3"
 mypy = "^0.930"
 pydocstyle = "^6.1.1"
 pylint = "^2.12.2"
